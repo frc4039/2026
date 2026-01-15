@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -52,7 +53,8 @@ public class RobotContainer {
     // cancelling on release.
     m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
 
-    m_driverController.leftTrigger().whileTrue(new IntakeCommand(new IntakeSubsystem()));
+    m_driverController.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+    m_driverController.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
   }
 
   /**

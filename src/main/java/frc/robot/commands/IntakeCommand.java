@@ -11,9 +11,11 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class IntakeCommand extends Command {
   /** Creates a new IntakeCommand. */
   IntakeSubsystem intakeSubsystem;
-  public IntakeCommand(IntakeSubsystem intakeSubsystem) {
+  private boolean intake;
+  public IntakeCommand(IntakeSubsystem intakeSubsystem, Boolean intake) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.intakeSubsystem = intakeSubsystem;
+    this.intake = intake;
   }
 
   // Called when the command is initially scheduled.
@@ -23,7 +25,11 @@ public class IntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intakeSubsystem.intake();
+    if(intake) {
+      intakeSubsystem.intake();
+    } else {
+      intakeSubsystem.outtake();
+    }  
   }
 
   // Called once the command ends or is interrupted.

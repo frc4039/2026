@@ -18,8 +18,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new Intake. */
   public static final class IntakeContants {
-    static int kIntakeMotorCanID = 13;
-    static double kIntakeSpeed = 200;
+    static int kIntakeMotorCanID = 21;
+    static double kIntakeSpeed = 0.5;
   }
 
   private final SparkFlex intakeMotor;
@@ -37,6 +37,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void intake(){
     intakeMotor.getClosedLoopController().setSetpoint(IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
+  }
+
+   public void outtake(){
+    intakeMotor.getClosedLoopController().setSetpoint(-1 * IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
   }
 
   public void stopMotor() {

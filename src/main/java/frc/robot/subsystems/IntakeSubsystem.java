@@ -19,7 +19,7 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new Intake. */
   public static final class IntakeContants {
     static int kIntakeMotorCanID = 21;
-    static double kIntakeSpeed = 0.5;
+    static double kIntakeSpeed = -1;
   }
 
   private final SparkFlex intakeMotor;
@@ -29,18 +29,20 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeMotor = new SparkFlex(IntakeSubsystem.IntakeContants.kIntakeMotorCanID, MotorType.kBrushless);
 
     intakeMotorConfig.idleMode(IdleMode.kBrake);
-    intakeMotorConfig.smartCurrentLimit(40);
+    //intakeMotorConfig.smartCurrentLimit(80);
 
     intakeMotor.configure(intakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
   }
 
   public void intake(){
-    intakeMotor.getClosedLoopController().setSetpoint(IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
+    //intakeMotor.getClosedLoopController().setSetpoint(IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
+    intakeMotor.set(IntakeSubsystem.IntakeContants.kIntakeSpeed);
   }
 
    public void outtake(){
-    intakeMotor.getClosedLoopController().setSetpoint(-1 * IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
+    //intakeMotor.getClosedLoopController().setSetpoint(-1 * IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
+    intakeMotor.set(-1 * IntakeSubsystem.IntakeContants.kIntakeSpeed);
   }
 
   public void stopMotor() {

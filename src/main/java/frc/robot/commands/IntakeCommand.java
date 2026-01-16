@@ -14,6 +14,7 @@ public class IntakeCommand extends Command {
   private boolean intake;
   public IntakeCommand(IntakeSubsystem intakeSubsystem, Boolean intake) {
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(intakeSubsystem);
     this.intakeSubsystem = intakeSubsystem;
     this.intake = intake;
   }
@@ -27,7 +28,7 @@ public class IntakeCommand extends Command {
   public void execute() {
     if(intake) {
       intakeSubsystem.intake();
-    } else {
+    } else if(!intake){
       intakeSubsystem.outtake();
     }  
   }

@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -84,7 +86,7 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	public void moveToPosition(double position) {
-				System.out.println(position);
+		System.out.println(position);
 		final MotionMagicVoltage request = new MotionMagicVoltage(position);
 
 		final double newPosition = position / TurretConstants.kDegreesPerRotation;
@@ -100,6 +102,11 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public double getTurretPosition() {
 		return turretMotor.getPosition().getValueAsDouble() * TurretConstants.kDegreesPerRotation;
+	}
+
+	public void moveToOwlHeadPosition(DoubleSupplier robotHeading, double desiredDirection) {
+		double owlHeadPosition = robotHeading.getAsDouble() + desiredDirection;
+		this.moveToPosition((owlHeadPosition % 360 + 360) % 360);
 	}
 
 	@Override

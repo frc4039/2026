@@ -6,36 +6,31 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.TurretSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TurretWithJoystickCommand extends Command {
-  /** Creates a new TurretWithJoystickCommand. */
+public class OwlHeadTurretCommand extends Command {
+  /** Creates a new OwlHeadTurretCommand. */
+  private DoubleSupplier robotHeading;
   private final TurretSubsystem turretSubsystem;
-  private final DoubleSupplier x;
-  private final DoubleSupplier y;
-	private DoubleSupplier robotHeading;
-
-  public TurretWithJoystickCommand(TurretSubsystem turretSubsystem, DoubleSupplier x, DoubleSupplier y, DoubleSupplier robotHeading) {
+  public OwlHeadTurretCommand(DoubleSupplier robotHeading, TurretSubsystem turretSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(turretSubsystem);
-    this.turretSubsystem = turretSubsystem;
-    this.x = x;
-    this.y = y;
     this.robotHeading = robotHeading;
+    this.turretSubsystem = turretSubsystem;
+    addRequirements(turretSubsystem);
+
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double angle = Units.radiansToDegrees(Math.atan2(this.y.getAsDouble(), this.x.getAsDouble()));
-    turretSubsystem.moveToOwlHeadPosition(this.robotHeading, angle);
+    turretSubsystem.moveToPosition(this.robotHeading.getAsDouble());
   }
 
   // Called once the command ends or is interrupted.
@@ -48,3 +43,5 @@ public class TurretWithJoystickCommand extends Command {
     return false;
   }
 }
+
+//deprecated

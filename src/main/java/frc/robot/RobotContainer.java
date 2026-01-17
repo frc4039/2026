@@ -8,8 +8,10 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.TurretMoveCommand;
+import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -30,6 +32,9 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
+
+  private final CommandXboxController m_operatorController = 
+    new CommandXboxController(OperatorConstants.kOperatorPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -65,6 +70,7 @@ public class RobotContainer {
 
 		m_driverController.a().whileTrue(new TurretMoveCommand(turretSubsystem, TurretSubsystem.TurretConstants.kTurretForwardPosition));
 		m_driverController.y().whileTrue(new TurretMoveCommand(turretSubsystem, TurretSubsystem.TurretConstants.kTurretBackwardPosition));
+    m_operatorController.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25).or(m_operatorController.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)).whileTrue(new TurretWithJoystickCommand(turretSubsystem, () -> m_operatorController.getRightX(), () -> m_operatorController.getRightY())); //moves turrettttttttttttttttttttt
   }
 
   /**

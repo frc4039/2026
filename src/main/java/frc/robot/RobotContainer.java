@@ -6,7 +6,12 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.commands.Autos;
+import frc.robot.commands.TurretMoveCommand;
+import frc.robot.commands.TurretWithJoystickCommand;
+import frc.robot.subsystems.TurretSubsystem;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.TeleopDriveCommand;
@@ -23,6 +28,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -38,35 +44,33 @@ public class RobotContainer {
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 	private HardwareMonitor hardwareMonitor = new HardwareMonitor();
 
-	// The robot's subsystems and commands are defined here...
-	private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
+	private final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
-	// Replace with CommandPS4Controller or CommandJoystick if needed
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
 
-	/**
-	 * The container for the robot. Contains subsystems, OI devices, and commands.
-	 */
-	public RobotContainer() {
-		driveSubsystem.setDefaultCommand(
-				new TeleopDriveCommand(driveSubsystem, driver::getLeftY, driver::getLeftX,
-						driver::getRightX, -1.0));
+  private final CommandXboxController operator = 
+    new CommandXboxController(OperatorConstants.kOperatorPort);
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    
-  
-		// Configure the trigger bindings
-		configureBindings();
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    // Configure the trigger bindings
+    configureBindings();
 
-		hardwareMonitor.registerDevice(null, driver);
+    SmartDashboard.putData(turretSubsystem);
+    SmartDashboard.putData(
+      new InstantCommand(() -> turretSubsystem.resetTurret())
+        .withName("ResetTurret")
+        .ignoringDisable(true)
+    );
+
+	hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
 		SmartDashboard.putData(CommandScheduler.getInstance());
 
 		SmartDashboard.putData(driveSubsystem);
-	}
+  }
 
 	/**
 	 * Use this method to define your trigger->command mappings. Triggers can be
@@ -88,9 +92,10 @@ public class RobotContainer {
 			Translation2d currentPosition = driveSubsystem.getPose().getTranslation();
 			driveSubsystem.resetGyroAngle(new Pose2d(currentPosition, resetAngle));
 		}));
-		// Schedule `exampleMethodCommand` when the Xbox controller's B button is
-		// pressed, cancelling on release.
-		driver.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+
+		driveSubsystem.setDefaultCommand(
+				new TeleopDriveCommand(driveSubsystem, driver::getLeftY, driver::getLeftX,
+						driver::getRightX, -1.0));
 
 		// Robot centric driving
 		driver.povUp().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0.035, 0));
@@ -99,18 +104,10 @@ public class RobotContainer {
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
 
 
-    driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-    driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
+    	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+    	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
+	    operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25).or(operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)).whileTrue(new TurretWithJoystickCommand(turretSubsystem, () -> operator.getRightX(), () -> operator.getRightY())); //moves turrettttttttttttttttttttt
 	}
 
-	/**
-	 * Use this to pass the autonomous command to the main {@link Robot} class.
-	 *
-	 * @return the command to run in autonomous
-	 */
-	// public Command getAutonomousCommand() {
-	// // An example command will be run in autonomous
-	// return Autos.exampleAuto(m_exampleSubsystem);
-	// }
 }

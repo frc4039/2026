@@ -10,7 +10,9 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -33,6 +35,13 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+
+    SmartDashboard.putData(turretSubsystem);
+    SmartDashboard.putData(
+      new InstantCommand(() -> turretSubsystem.resetTurret())
+        .withName("ResetTurret")
+        .ignoringDisable(true)
+    );
   }
 
   /**
@@ -45,6 +54,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     new Trigger(m_exampleSubsystem::exampleCondition)
         .onTrue(new ExampleCommand(m_exampleSubsystem));

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class TurretSubsystem extends SubsystemBase {
 	public final class TurretConstants {
 		// How fast the turret rotates from one point to another.
-		public static final double kRotationSpeed = 0.1;
+		public static final double kRotationSpeed = 1.0;
 
 		// Device id
 		public static final int kMotorID = 31;
@@ -33,14 +33,14 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kSTurret = 0.0;
 		public static final double kVTurret = 0.0;
 		public static final double kATurret = 0.0;
-		public static final double kPTurret = 0.0;
-		public static final double kITurret = 0.0;
+		public static final double kPTurret = 50.0;
+		public static final double kITurret = 1.0;
 		public static final double kDTurret = 0.0;
 
 		// Motion magic
-		public static final double kCruiseVelocity = 0.0;
-		public static final double kAcceleration = 0.0;
-		public static final double kJerk = 0.0;
+		public static final double kCruiseVelocity = 720.0 / kDegreesPerRotation;
+		public static final double kAcceleration = 1440.0 / kDegreesPerRotation;
+		public static final double kJerk = 10000.0 / kDegreesPerRotation;
 
 		// The accuracy (in degrees) that the turret has to be from it's target position
 		// for the command to be considered done.
@@ -63,9 +63,9 @@ public class TurretSubsystem extends SubsystemBase {
 		mcfg.withInverted(InvertedValue.Clockwise_Positive);
 		mcfg.withNeutralMode(NeutralModeValue.Brake);
 
-		TalonFXConfiguration talongFXConfigs = new TalonFXConfiguration().withMotorOutput(mcfg);
+		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration().withMotorOutput(mcfg);
 
-		Slot0Configs slotConfigs = talongFXConfigs.Slot0;
+		Slot0Configs slotConfigs = talonFXConfigs.Slot0;
 
 		slotConfigs.kS = TurretConstants.kSTurret;
 		slotConfigs.kV = TurretConstants.kVTurret;
@@ -74,14 +74,17 @@ public class TurretSubsystem extends SubsystemBase {
 		slotConfigs.kI = TurretConstants.kITurret;
 		slotConfigs.kD = TurretConstants.kDTurret;
 
-		MotionMagicConfigs motionMagicConfigs = talongFXConfigs.MotionMagic;
+		MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
 
 		motionMagicConfigs.MotionMagicCruiseVelocity = TurretConstants.kCruiseVelocity;
 		motionMagicConfigs.MotionMagicAcceleration = TurretConstants.kAcceleration;
 		motionMagicConfigs.MotionMagicJerk = TurretConstants.kJerk;
+
+		turretMotor.getConfigurator().apply(talonFXConfigs);
 	}
 
 	public void moveToPosition(double position) {
+				System.out.println(position);
 		final MotionMagicVoltage request = new MotionMagicVoltage(position);
 
 		final double newPosition = position / TurretConstants.kDegreesPerRotation;
@@ -89,6 +92,10 @@ public class TurretSubsystem extends SubsystemBase {
 		turretMotor.setControl(request.withPosition(newPosition)
 				.withSlot(0)
 				.withOverrideBrakeDurNeutral(true));
+	}
+
+	public void resetTurret() {
+		turretMotor.setPosition(180.0 / TurretConstants.kDegreesPerRotation);
 	}
 
 	public double getTurretPosition() {
@@ -102,9 +109,8 @@ public class TurretSubsystem extends SubsystemBase {
 
 	@Override
 	public void initSendable(SendableBuilder builder) {
-		builder.addDoubleProperty("Turret speed", () -> turretMotor.getPosition().getValueAsDouble(), null);
-		builder.addDoubleProperty("Turret encoder raw", () -> turretMotor.getVelocity().getValueAsDouble(), null);
 		builder.addDoubleProperty("Turret encoder degrees", () -> getTurretPosition(), null);
+		builder.addDoubleProperty("Turret speed", () -> turretMotor.getVelocity().getValueAsDouble(), null);
 		builder.addDoubleProperty("Turret acceleration", () -> turretMotor.getAcceleration().getValueAsDouble(), null);
 	}
 }

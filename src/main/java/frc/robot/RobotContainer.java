@@ -108,9 +108,23 @@ public class RobotContainer {
     	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
-	    operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25).or(operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)).whileTrue(new TurretWithJoystickCommand(turretSubsystem, () -> operator.getRightX(), () -> operator.getRightY())); //moves turrettttttttttttttttttttt
 
-      driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
+      	driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
+	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
+	    
+
+		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
+			.or(
+				operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
+			)
+			.whileTrue(
+				new TurretWithJoystickCommand(
+					turretSubsystem,
+					() -> operator.getRightX(),
+					() -> operator.getRightY(),
+					() -> driveSubsystem.getHeading()
+				)
+			); //moves turrettttttttttttttttttttt
 	}
 
 }

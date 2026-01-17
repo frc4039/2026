@@ -16,12 +16,15 @@ public class TurretWithJoystickCommand extends Command {
   private final TurretSubsystem turretSubsystem;
   private final DoubleSupplier x;
   private final DoubleSupplier y;
-  public TurretWithJoystickCommand(TurretSubsystem turretSubsystem, DoubleSupplier x, DoubleSupplier y) {
+	private DoubleSupplier robotHeading;
+
+  public TurretWithJoystickCommand(TurretSubsystem turretSubsystem, DoubleSupplier x, DoubleSupplier y, DoubleSupplier robotHeading) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(turretSubsystem);
     this.turretSubsystem = turretSubsystem;
     this.x = x;
     this.y = y;
+    this.robotHeading = robotHeading;
   }
 
   // Called when the command is initially scheduled.
@@ -32,7 +35,7 @@ public class TurretWithJoystickCommand extends Command {
   @Override
   public void execute() {
     double angle = Units.radiansToDegrees(Math.atan2(this.y.getAsDouble(), this.x.getAsDouble()));
-    turretSubsystem.moveToPosition(angle);
+    turretSubsystem.moveToOwlHeadPosition(this.robotHeading, angle);
   }
 
   // Called once the command ends or is interrupted.

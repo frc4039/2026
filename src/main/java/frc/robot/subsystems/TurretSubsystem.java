@@ -102,6 +102,10 @@ public class TurretSubsystem extends SubsystemBase {
 		return turretMotor.getPosition().getValueAsDouble() * TurretConstants.kDegreesPerRotation;
 	}
 
+	public void moveToOwlHeadPosition(DoubleSupplier robotHeading, double desiredDirection) {
+		this.moveToPosition(robotHeading.getAsDouble() + desiredDirection)
+	}
+
 	@Override
 	public void periodic() {
 		// For safety, stop the turret whenever the robot is disabled.

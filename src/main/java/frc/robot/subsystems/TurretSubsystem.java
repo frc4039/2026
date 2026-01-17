@@ -105,7 +105,8 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	public void moveToOwlHeadPosition(DoubleSupplier robotHeading, double desiredDirection) {
-		this.moveToPosition(robotHeading.getAsDouble() + desiredDirection);
+		double owlHeadPosition = robotHeading.getAsDouble() + desiredDirection;
+		this.moveToPosition((owlHeadPosition % 360 + 360) % 360);
 	}
 
 	@Override

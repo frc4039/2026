@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -16,5 +20,13 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorPort = 1;
+  }
+
+  public static class FieldConstants {
+    public static final double kFieldLength = 651.22;
+    public static final double kDistanceFromHubToWall = 182.11;
+    public static final Pose2d kBlueHub = new Pose2d(Units.inchesToMeters(182.11), Units.inchesToMeters(159), new Rotation2d(0));
+    public static final Pose2d kRedHub = new Pose2d(Units.inchesToMeters(469.11), Units.inchesToMeters(159), new Rotation2d(0));
+
   }
 }

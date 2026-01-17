@@ -11,11 +11,13 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.TeleopDriveCommand;
+import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.HardwareMonitor;
 
@@ -47,6 +49,8 @@ public class RobotContainer {
 
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem();
+
+	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
@@ -109,7 +113,7 @@ public class RobotContainer {
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
 
-      	driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
+      	driver.rightTrigger().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
 

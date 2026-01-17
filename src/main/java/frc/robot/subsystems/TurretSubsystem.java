@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -11,8 +12,15 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.FieldConstants;
 
 public class TurretSubsystem extends SubsystemBase {
 	public final class TurretConstants {
@@ -51,6 +59,9 @@ public class TurretSubsystem extends SubsystemBase {
 		// Positions
 		public static final double kTurretForwardPosition = 180.0;
 		public static final double kTurretBackwardPosition = 360.0;
+
+		//Turret Offset
+		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(7), Units.inchesToMeters(2), new Rotation2d(0));
 	}
 
 	private TalonFX turretMotor;
@@ -97,7 +108,7 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	public void resetTurret() {
-		turretMotor.setPosition(180.0 / TurretConstants.kDegreesPerRotation);
+		turretMotor.setPosition(0.0 / TurretConstants.kDegreesPerRotation);
 	}
 
 	public double getTurretPosition() {
@@ -107,6 +118,19 @@ public class TurretSubsystem extends SubsystemBase {
 	public void moveToOwlHeadPosition(DoubleSupplier robotHeading, double desiredDirection) {
 		double owlHeadPosition = robotHeading.getAsDouble() + desiredDirection;
 		this.moveToPosition((owlHeadPosition % 360 + 360) % 360);
+	}
+
+	public static Pose2d getHub() {
+		Optional<Alliance> alliance = DriverStation.getAlliance();
+		if (alliance.isPresent()) {
+			if (alliance.get() == Alliance.Red) {
+				return FieldConstants.kRedHub;
+			}
+			else {
+				return FieldConstants.kBlueHub;
+			}
+		}
+		return FieldConstants.kRedHub;
 	}
 
 	@Override

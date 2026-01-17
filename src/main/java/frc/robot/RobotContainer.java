@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.Autos;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
@@ -108,6 +109,8 @@ public class RobotContainer {
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
 	    operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25).or(operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)).whileTrue(new TurretWithJoystickCommand(turretSubsystem, () -> operator.getRightX(), () -> operator.getRightY())); //moves turrettttttttttttttttttttt
+
+      driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	}
 
 }

@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.Autos;
+import frc.robot.commands.ClimbCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.subsystems.TurretSubsystem;
@@ -19,6 +20,7 @@ import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.EndgameSubsystem;
 import frc.robot.utils.HardwareMonitor;
 
 import java.util.Optional;
@@ -51,6 +53,7 @@ public class RobotContainer {
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
+	private final EndgameSubsystem endgameSubsystem = new EndgameSubsystem();
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
@@ -129,6 +132,10 @@ public class RobotContainer {
 					() -> driveSubsystem.getHeading()
 				)
 			); //moves turrettttttttttttttttttttt
+
+
+		operator.rightTrigger().whileTrue(new ClimbCommand(endgameSubsystem, true));
+		operator.rightBumper().whileTrue(new ClimbCommand(endgameSubsystem, false));
 	}
 
 }

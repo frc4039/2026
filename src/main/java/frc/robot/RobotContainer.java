@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.Autos;
+import frc.robot.commands.FeederCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.subsystems.TurretSubsystem;
@@ -19,6 +20,7 @@ import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.utils.HardwareMonitor;
 
 import java.util.Optional;
@@ -28,9 +30,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -51,6 +51,7 @@ public class RobotContainer {
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
+	private final FeederSubsystem feederSubsystem = new FeederSubsystem();
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
@@ -129,6 +130,9 @@ public class RobotContainer {
 					() -> driveSubsystem.getHeading()
 				)
 			); //moves turrettttttttttttttttttttt
+
+		operator.leftTrigger().whileTrue(new FeederCommand(feederSubsystem, false));
+		operator.leftBumper().whileTrue(new FeederCommand(feederSubsystem, true));
 	}
 
 }

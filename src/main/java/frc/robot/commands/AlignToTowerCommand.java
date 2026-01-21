@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.VisionSubsystem.VisionConstants;
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -32,21 +33,21 @@ public class AlignToTowerCommand extends DeferredCommand {
 
   // Called when the command is initially scheduled.
   public static Command getPathCommand(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
-  Pose2d Target;
+  Pose2d Target = VisionConstants.redTower;
   double endX;
   double endY;
   
   var alliance = DriverStation.getAlliance();
-  if (alliance.isPresent()) {
-      if (alliance.get() == DriverStation.Alliance.Red){
-        Target = visionSubsystem.getRedTowerPose();
-      }
-      else{
-        Target = visionSubsystem.getBlueTowerPose();
-      }
-  }else{
-    return null;
-  }
+  // if (alliance.isPresent()) {
+  //     if (alliance.get() == DriverStation.Alliance.Red){
+  //       Target = visionSubsystem.getRedTowerPose();
+  //     }
+  //     else{
+  //       Target = visionSubsystem.getBlueTowerPose();
+  //     }
+  // }else{
+  //   return null;
+  // }
 
     endX = Target.getX();// + finalXOffset * Math.cos(Target.getRotation().getRadians()) - finalYOffset * Math.sin(Target.getRotation().getRadians());
     endY = Target.getY();// + finalXOffset * Math.sin(Target.getRotation().getRadians()) + finalYOffset * Math.cos(Target.getRotation().getRadians());

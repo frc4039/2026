@@ -50,7 +50,7 @@ public class VisionSubsystem extends SubsystemBase {
     public static final double rightAngleOffset = -22.17;
     public static final double leftAngleOffset = 22.17;
     
-    public static final Pose2d redTower = new Pose2d(15.44, 5.4991, new Rotation2d(Units.degreesToRadians(-180)));
+    public static final Pose2d redTower = new Pose2d(15.44, 5.4991, new Rotation2d(Units.degreesToRadians(0)));
     public static final Pose2d blueTower = new Pose2d(1, 1, new Rotation2d(1));
 
 

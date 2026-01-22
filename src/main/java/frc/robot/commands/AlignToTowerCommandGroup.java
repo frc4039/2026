@@ -18,6 +18,6 @@ public class AlignToTowerCommandGroup extends SequentialCommandGroup {
   public AlignToTowerCommandGroup(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new AlignToTowerCommand(driveSubsystem, visionSubsystem), new RobotCentricDriveCommand(driveSubsystem, 1, 0));
+    addCommands(new AlignToTowerCommand(driveSubsystem, visionSubsystem), new RobotCentricDriveCommand(driveSubsystem, 0, -0.10));
   }
 }

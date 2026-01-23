@@ -13,27 +13,26 @@ public class FeederSubsystem extends SubsystemBase {
 	// Constants of the feeder subsystem
 	public static final class FeederConstants {
 		static int kFeederMotorId = 41;
-		static double kFeederSpeed = 0.5;
+		static double kFeederSpeed = 0.40;
 	}
 
 	private final SparkFlex feederMotor;
 	private final SparkFlexConfig feederMotorConfig = new SparkFlexConfig();
 
 	public FeederSubsystem() {
-		feederMotor = new SparkFlex(IntakeSubsystem.IntakeContants.kIntakeMotorCanID, MotorType.kBrushless);
+		feederMotor = new SparkFlex(FeederConstants.kFeederMotorId, MotorType.kBrushless);
 
-		feederMotorConfig.idleMode(IdleMode.kBrake);
+		feederMotorConfig.idleMode(IdleMode.kCoast);
 		// intakeMotorConfig.smartCurrentLimit(80);
 
 		feederMotor.configure(feederMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
 	}
 
 	public void spin(Boolean reverseMotor) {
 		if (reverseMotor) {
-			feederMotor.set(-1 * IntakeSubsystem.IntakeContants.kIntakeSpeed);
+			feederMotor.set(-1 * FeederConstants.kFeederSpeed);
 		} else {
-			feederMotor.set(IntakeSubsystem.IntakeContants.kIntakeSpeed);
+			feederMotor.set(FeederConstants.kFeederSpeed);
 		}
 	}
 

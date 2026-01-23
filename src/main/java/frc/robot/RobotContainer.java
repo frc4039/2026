@@ -16,9 +16,11 @@ import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.TurretFeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
+import frc.robot.commands.TurretFeederCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.utils.HardwareMonitor;
@@ -52,6 +54,7 @@ public class RobotContainer {
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
 	private final FeederSubsystem feederSubsystem = new FeederSubsystem();
+	private final TurretFeederSubsystem turretFeederSubsystem = new TurretFeederSubsystem();
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
@@ -131,8 +134,11 @@ public class RobotContainer {
 				)
 			); //moves turrettttttttttttttttttttt
 
-		operator.leftTrigger().whileTrue(new FeederCommand(feederSubsystem, false));
-		operator.leftBumper().whileTrue(new FeederCommand(feederSubsystem, true));
+		operator.leftTrigger().whileTrue(new FeederCommand(feederSubsystem, true));
+		operator.leftBumper().whileTrue(new FeederCommand(feederSubsystem, false));
+
+		operator.rightTrigger().whileTrue(new TurretFeederCommand(turretFeederSubsystem, true));
+		operator.rightBumper().whileTrue(new TurretFeederCommand(turretFeederSubsystem, false));
 	}
 
 }

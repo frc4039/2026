@@ -68,7 +68,7 @@ public class AlignToTowerCommand extends DeferredCommand {
     Pose2d end = new Pose2d(endX, endY, Rotation2d.fromRadians(endAngle));
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses( start, end);
 
-    PathConstraints constraints = new PathConstraints(0.5, 1.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+    PathConstraints constraints = new PathConstraints(1, 1.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
       PathPlannerPath path = new PathPlannerPath(
           waypoints,
           constraints,

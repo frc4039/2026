@@ -65,10 +65,10 @@ public class TurretFeederSubsystem extends SubsystemBase {
 		turretFeederMotor.configure(turretFeederMotorConfig, ResetMode.kResetSafeParameters,
 				PersistMode.kPersistParameters);
 
-		SmartDashboard.putData("TurretFeederSubsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
-		SmartDashboard.putData("TurretFeederSubsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
-		SmartDashboard.putData("TurretFeederSubsystem/Dynamic Forward", sysid.dynamic(Direction.kForward));
-		SmartDashboard.putData("TurretFeederSubsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
+		// SmartDashboard.putData("TurretFeederSubsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
+		// SmartDashboard.putData("TurretFeederSubsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
+		// SmartDashboard.putData("TurretFeederSubsystem/Dynamic Forward", sysid.dynamic(Direction.kForward));
+		// SmartDashboard.putData("TurretFeederSubsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
 
 	}
 

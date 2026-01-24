@@ -18,13 +18,13 @@ import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.TurretFeederSubsystem;
+import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.commands.TurretFeederCommand;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.FeederSubsystem;
+import frc.robot.subsystems.SpindexerSubsystem;
 import frc.robot.utils.HardwareMonitor;
 
 import java.util.Optional;
@@ -55,8 +55,8 @@ public class RobotContainer {
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
-	private final FeederSubsystem feederSubsystem = new FeederSubsystem();
-	private final TurretFeederSubsystem turretFeederSubsystem = new TurretFeederSubsystem();
+	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem();
+	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem();
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);

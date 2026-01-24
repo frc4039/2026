@@ -1,13 +1,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.TurretFeederSubsystem;
+import frc.robot.subsystems.FeederSubsystem;
 
 public class TurretFeederCommand extends Command {
-	TurretFeederSubsystem turretFeederSubsystem;
+	FeederSubsystem turretFeederSubsystem;
 	private boolean reverseMotor;
 
-	public TurretFeederCommand(TurretFeederSubsystem turretFeederSubsystem, Boolean reverseMotor) {
+	public TurretFeederCommand(FeederSubsystem turretFeederSubsystem, Boolean reverseMotor) {
 		addRequirements(turretFeederSubsystem);
 		this.turretFeederSubsystem = turretFeederSubsystem;
 		this.reverseMotor = reverseMotor;

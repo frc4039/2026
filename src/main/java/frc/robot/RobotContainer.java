@@ -10,6 +10,7 @@ import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.AlignToTowerCommand;
 import frc.robot.commands.AlignToTowerCommandGroup;
 import frc.robot.commands.Autos;
+import frc.robot.commands.FeederCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.subsystems.TurretSubsystem;
@@ -17,10 +18,13 @@ import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.TurretFeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
+import frc.robot.commands.TurretFeederCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.utils.HardwareMonitor;
 
 import java.util.Optional;
@@ -30,9 +34,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -53,6 +55,8 @@ public class RobotContainer {
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
+	private final FeederSubsystem feederSubsystem = new FeederSubsystem();
+	private final TurretFeederSubsystem turretFeederSubsystem = new TurretFeederSubsystem();
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
@@ -71,6 +75,8 @@ public class RobotContainer {
         .withName("ResetTurret")
         .ignoringDisable(true)
     );
+	SmartDashboard.putData(feederSubsystem);
+
 
 	hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
@@ -119,19 +125,27 @@ public class RobotContainer {
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
 		driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
+    
+		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
+			.or(
+				operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
+			)
+			.whileTrue(
+				new TurretWithJoystickCommand(
+					turretSubsystem,
+					() -> operator.getRightX(),
+					() -> operator.getRightY(),
+					() -> driveSubsystem.getHeading()
+				)
+			); //moves turrettttttttttttttttttttt
 
-		// operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
-		// 	.or(
-		// 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
-		// 	)
-		// 	.whileTrue(
-		// 		new TurretWithJoystickCommand(
-		// 			turretSubsystem,
-		// 			() -> operator.getRightX(),
-		// 			() -> operator.getRightY(),
-		// 			() -> driveSubsystem.getHeading()
-		// 		)
-		// 	); //moves turrettttttttttttttttttttt
+		operator.leftTrigger().whileTrue(new FeederCommand(feederSubsystem, true));
+		operator.leftBumper().whileTrue(new FeederCommand(feederSubsystem, false));
+
+		operator.rightTrigger().whileTrue(new TurretFeederCommand(turretFeederSubsystem, true));
+		operator.rightBumper().whileTrue(new TurretFeederCommand(turretFeederSubsystem, false));
+
+		operator.a().whileTrue(new TurretFeederCommand(turretFeederSubsystem, true).alongWith(new FeederCommand(feederSubsystem, true)));
 	}
 
 }

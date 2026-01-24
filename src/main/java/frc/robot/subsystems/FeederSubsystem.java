@@ -67,10 +67,10 @@ public class FeederSubsystem extends SubsystemBase {
 
 		feederMotor.configure(feederMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 	
-		SmartDashboard.putData("FeederSubsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
-		SmartDashboard.putData("FeederSubsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
-		SmartDashboard.putData("FeederSubsystem/Dynamic Forward", sysid.dynamic(Direction.kForward));
-		SmartDashboard.putData("FeederSubsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
+		// SmartDashboard.putData("FeederSubsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
+		// SmartDashboard.putData("FeederSubsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
+		// SmartDashboard.putData("FeederSubsystem/Dynamic Forward", sysid.dynamic(Direction.kForward));
+		// SmartDashboard.putData("FeederSubsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
 
 
 	}

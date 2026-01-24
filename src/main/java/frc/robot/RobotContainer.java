@@ -26,12 +26,15 @@ import frc.robot.commands.FeederCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SpindexerSubsystem;
 import frc.robot.utils.HardwareMonitor;
+import frc.robot.utils.Helpers;
 
 import java.util.Optional;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -48,15 +51,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+ 
 	private HardwareMonitor hardwareMonitor = new HardwareMonitor();
-
+ 	private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(hardwareMonitor);
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
-	private final TurretSubsystem turretSubsystem = new TurretSubsystem();
+	private final TurretSubsystem turretSubsystem = new TurretSubsystem(hardwareMonitor);
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
-	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem();
-	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem();
+	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
+	private final FeederSubsystem feederSubsystem = new FeederSubsystem(hardwareMonitor);
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
@@ -69,20 +72,33 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
 
-    SmartDashboard.putData(turretSubsystem);
+    
     SmartDashboard.putData(
       new InstantCommand(() -> turretSubsystem.resetTurret())
         .withName("ResetTurret")
         .ignoringDisable(true)
     );
+	SmartDashboard.putData(spindexerSubsystem);
 	SmartDashboard.putData(feederSubsystem);
-
+	SmartDashboard.putData(intakeSubsystem);
+	SmartDashboard.putData(turretSubsystem);
 
 	hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
 		SmartDashboard.putData(CommandScheduler.getInstance());
 
 		SmartDashboard.putData(driveSubsystem);
+
+		 // Put the BuildInfo so we can see what version of the code is running.
+    SmartDashboard.putData("BuildInfo", new Sendable() {
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.publishConstString("Robot Name", Helpers.getRobotName());
+        builder.publishConstString("Git Branch", Helpers.getGitBranch());
+        builder.publishConstString("Git SHA", Helpers.getGitSHA());
+        builder.publishConstString("Build Date", Helpers.getBuildDate());
+      }
+    });
   }
 
 	/**
@@ -139,13 +155,13 @@ public class RobotContainer {
 				)
 			); //moves turrettttttttttttttttttttt
 
-		operator.leftTrigger().whileTrue(new SpindexerCommand(feederSubsystem, true));
-		operator.leftBumper().whileTrue(new SpindexerCommand(feederSubsystem, false));
+		operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, true));
+		operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
 
-		operator.rightTrigger().whileTrue(new FeederCommand(turretFeederSubsystem, true));
-		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
+		operator.rightTrigger().whileTrue(new FeederCommand(feederSubsystem, true));
+		operator.rightBumper().whileTrue(new FeederCommand(feederSubsystem, false));
 
-		operator.a().whileTrue(new FeederCommand(turretFeederSubsystem, true).alongWith(new SpindexerCommand(feederSubsystem, true)));
+		driver.rightTrigger().whileTrue(new FeederCommand(feederSubsystem, true).alongWith(new SpindexerCommand(spindexerSubsystem, true)));
 	}
 
 }

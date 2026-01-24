@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.HardwareMonitor;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -25,7 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final SparkFlex intakeMotor;
   private final SparkFlexConfig intakeMotorConfig = new SparkFlexConfig();
 
-  public IntakeSubsystem() {
+  public IntakeSubsystem(HardwareMonitor hardwareMonitor) {
     intakeMotor = new SparkFlex(IntakeSubsystem.IntakeContants.kIntakeMotorCanID, MotorType.kBrushless);
 
     intakeMotorConfig.idleMode(IdleMode.kBrake);
@@ -33,6 +35,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     intakeMotor.configure(intakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    hardwareMonitor.registerDevice(this, intakeMotor);
   }
 
   public void intake(){
@@ -49,6 +52,13 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeMotor.stopMotor();
   }
   @Override
+
+  public void initSendable(SendableBuilder builder) {
+		builder.addDoubleProperty("Spindexer Wheel Speed", () -> intakeMotor.getEncoder().getVelocity(), null);
+		builder.addDoubleProperty("Current", () -> intakeMotor.getOutputCurrent(), null);
+
+	}
+
   public void periodic() {
     // This method will be called once per scheduler run
   }

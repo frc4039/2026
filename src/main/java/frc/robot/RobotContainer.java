@@ -73,6 +73,8 @@ public class RobotContainer {
         .withName("ResetTurret")
         .ignoringDisable(true)
     );
+	SmartDashboard.putData(feederSubsystem);
+
 
 	hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
@@ -139,6 +141,8 @@ public class RobotContainer {
 
 		operator.rightTrigger().whileTrue(new TurretFeederCommand(turretFeederSubsystem, true));
 		operator.rightBumper().whileTrue(new TurretFeederCommand(turretFeederSubsystem, false));
+
+		operator.a().whileTrue(new TurretFeederCommand(turretFeederSubsystem, true).alongWith(new FeederCommand(feederSubsystem, true)));
 	}
 
 }

@@ -10,7 +10,7 @@ import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.AlignToTowerCommand;
 import frc.robot.commands.AlignToTowerCommandGroup;
 import frc.robot.commands.Autos;
-import frc.robot.commands.FeederCommand;
+import frc.robot.commands.SpindexerCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.subsystems.TurretSubsystem;
@@ -22,7 +22,7 @@ import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
-import frc.robot.commands.TurretFeederCommand;
+import frc.robot.commands.FeederCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SpindexerSubsystem;
 import frc.robot.utils.HardwareMonitor;
@@ -139,13 +139,13 @@ public class RobotContainer {
 				)
 			); //moves turrettttttttttttttttttttt
 
-		operator.leftTrigger().whileTrue(new FeederCommand(feederSubsystem, true));
-		operator.leftBumper().whileTrue(new FeederCommand(feederSubsystem, false));
+		operator.leftTrigger().whileTrue(new SpindexerCommand(feederSubsystem, true));
+		operator.leftBumper().whileTrue(new SpindexerCommand(feederSubsystem, false));
 
-		operator.rightTrigger().whileTrue(new TurretFeederCommand(turretFeederSubsystem, true));
-		operator.rightBumper().whileTrue(new TurretFeederCommand(turretFeederSubsystem, false));
+		operator.rightTrigger().whileTrue(new FeederCommand(turretFeederSubsystem, true));
+		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
 
-		operator.a().whileTrue(new TurretFeederCommand(turretFeederSubsystem, true).alongWith(new FeederCommand(feederSubsystem, true)));
+		operator.a().whileTrue(new FeederCommand(turretFeederSubsystem, true).alongWith(new SpindexerCommand(feederSubsystem, true)));
 	}
 
 }

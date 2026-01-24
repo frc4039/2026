@@ -1,34 +1,35 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.SpindexerSubsystem;
+import frc.robot.subsystems.FeederSubsystem;
 
 public class FeederCommand extends Command {
-	SpindexerSubsystem feederSubsystem;
+	FeederSubsystem turretFeederSubsystem;
 	private boolean reverseMotor;
 
-	public FeederCommand(SpindexerSubsystem feederSubsystem, Boolean reverseMotor) {
-		addRequirements(feederSubsystem);
-		this.feederSubsystem = feederSubsystem;
+	public FeederCommand(FeederSubsystem turretFeederSubsystem, Boolean reverseMotor) {
+		addRequirements(turretFeederSubsystem);
+		this.turretFeederSubsystem = turretFeederSubsystem;
 		this.reverseMotor = reverseMotor;
 	}
 
 	@Override
 	public void initialize() {
+
 	}
 
 	@Override
 	public void execute() {
 		if (reverseMotor) {
-			feederSubsystem.spin(true);
+			turretFeederSubsystem.feed(true);
 		} else {
-			feederSubsystem.spin(false);
+			turretFeederSubsystem.feed(false);
 		}
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		feederSubsystem.stopMotor();
+		turretFeederSubsystem.stopMotor();
 	}
 
 	@Override

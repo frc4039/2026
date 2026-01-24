@@ -10,7 +10,7 @@ import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.AlignToTowerCommand;
 import frc.robot.commands.AlignToTowerCommandGroup;
 import frc.robot.commands.Autos;
-import frc.robot.commands.FeederCommand;
+import frc.robot.commands.SpindexerCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.subsystems.TurretSubsystem;
@@ -18,13 +18,13 @@ import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.TurretFeederSubsystem;
+import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
-import frc.robot.commands.TurretFeederCommand;
+import frc.robot.commands.FeederCommand;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.FeederSubsystem;
+import frc.robot.subsystems.SpindexerSubsystem;
 import frc.robot.utils.HardwareMonitor;
 
 import java.util.Optional;
@@ -55,8 +55,8 @@ public class RobotContainer {
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
-	private final FeederSubsystem feederSubsystem = new FeederSubsystem();
-	private final TurretFeederSubsystem turretFeederSubsystem = new TurretFeederSubsystem();
+	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem();
+	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem();
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
@@ -139,13 +139,13 @@ public class RobotContainer {
 				)
 			); //moves turrettttttttttttttttttttt
 
-		operator.leftTrigger().whileTrue(new FeederCommand(feederSubsystem, true));
-		operator.leftBumper().whileTrue(new FeederCommand(feederSubsystem, false));
+		operator.leftTrigger().whileTrue(new SpindexerCommand(feederSubsystem, true));
+		operator.leftBumper().whileTrue(new SpindexerCommand(feederSubsystem, false));
 
-		operator.rightTrigger().whileTrue(new TurretFeederCommand(turretFeederSubsystem, true));
-		operator.rightBumper().whileTrue(new TurretFeederCommand(turretFeederSubsystem, false));
+		operator.rightTrigger().whileTrue(new FeederCommand(turretFeederSubsystem, true));
+		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
 
-		operator.a().whileTrue(new TurretFeederCommand(turretFeederSubsystem, true).alongWith(new FeederCommand(feederSubsystem, true)));
+		operator.a().whileTrue(new FeederCommand(turretFeederSubsystem, true).alongWith(new SpindexerCommand(feederSubsystem, true)));
 	}
 
 }

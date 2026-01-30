@@ -18,8 +18,10 @@ import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
+import frc.robot.commands.ShootCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.commands.FeederCommand;
@@ -58,6 +60,8 @@ public class RobotContainer {
 	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem();
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem();
 
+	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
 
@@ -76,6 +80,7 @@ public class RobotContainer {
         .ignoringDisable(true)
     );
 	SmartDashboard.putData(feederSubsystem);
+	SmartDashboard.putData(shooterSubsystem);
 
 
 	hardwareMonitor.registerDevice(null, driver);
@@ -120,11 +125,12 @@ public class RobotContainer {
     	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
-
+		driver.rightBumper().whileTrue(new SpindexerCommand(feederSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
+		driver.rightTrigger().whileTrue(new ShootCommand(shooterSubsystem));
       	//driver.rightTrigger().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
-		driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
+		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
     
 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
 			.or(
@@ -142,8 +148,8 @@ public class RobotContainer {
 		operator.leftTrigger().whileTrue(new SpindexerCommand(feederSubsystem, true));
 		operator.leftBumper().whileTrue(new SpindexerCommand(feederSubsystem, false));
 
-		operator.rightTrigger().whileTrue(new FeederCommand(turretFeederSubsystem, true));
-		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
+		operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, true));
 
 		operator.a().whileTrue(new FeederCommand(turretFeederSubsystem, true).alongWith(new SpindexerCommand(feederSubsystem, true)));
 	}

@@ -22,6 +22,7 @@ import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.ShooterHoodCommand;
+import frc.robot.commands.ShootCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.commands.FeederCommand;
@@ -61,6 +62,8 @@ public class RobotContainer {
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem();
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 
+	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
 
@@ -79,6 +82,7 @@ public class RobotContainer {
         .ignoringDisable(true)
     );
 	SmartDashboard.putData(feederSubsystem);
+	SmartDashboard.putData(shooterSubsystem);
 
 
 	hardwareMonitor.registerDevice(null, driver);
@@ -123,7 +127,8 @@ public class RobotContainer {
     	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
-
+		driver.rightBumper().whileTrue(new SpindexerCommand(feederSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
+		driver.rightTrigger().whileTrue(new ShootCommand(shooterSubsystem));
       	//driver.rightTrigger().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
@@ -145,8 +150,8 @@ public class RobotContainer {
 		operator.leftTrigger().whileTrue(new SpindexerCommand(feederSubsystem, true));
 		operator.leftBumper().whileTrue(new SpindexerCommand(feederSubsystem, false));
 
-		operator.rightTrigger().whileTrue(new FeederCommand(turretFeederSubsystem, true));
-		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
+		operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, true));
 
 		operator.a().whileTrue(new FeederCommand(turretFeederSubsystem, true).alongWith(new SpindexerCommand(feederSubsystem, true)));
 	}

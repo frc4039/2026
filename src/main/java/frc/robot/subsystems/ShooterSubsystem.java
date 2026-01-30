@@ -1,0 +1,115 @@
+package frc.robot.subsystems;
+
+import java.util.Optional;
+import java.util.function.DoubleSupplier;
+
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.controls.Follower;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.FieldConstants;
+
+public class ShooterSubsystem extends SubsystemBase {
+	public final class ShooterConstants {
+		// How fast the turret rotates from one point to another.
+		public static final double KMotorVelocity = 20;
+
+		// Device ids
+		public static final int kLeaderMotorID = 32;
+    public static final int kFollowerMotorID = 33;
+
+
+		// Pid values
+		public static final double kVShooter = 0.0;
+		public static final double kSShooter = 0.0;
+		public static final double kAShooter = 50;
+		public static final double kPShooter = 0.3;
+		public static final double kIShooter = 0.0;
+		public static final double kDShooter = 0.0;
+
+		
+
+
+	}
+
+	private TalonFX shooterLeaderMotor, shooterFollowerMotor;
+
+  Follower follower;
+
+	public ShooterSubsystem() {
+		shooterLeaderMotor = new TalonFX(ShooterConstants.kLeaderMotorID);
+    shooterFollowerMotor = new TalonFX(ShooterConstants.kFollowerMotorID);
+
+
+		shooterLeaderMotor.setNeutralMode(NeutralModeValue.Coast);
+    shooterFollowerMotor.setNeutralMode(NeutralModeValue.Coast);
+
+    follower = new Follower(ShooterConstants.kLeaderMotorID, MotorAlignmentValue.Opposed);
+
+    shooterFollowerMotor.setControl(follower);
+		MotorOutputConfigs mcfg = new MotorOutputConfigs();
+
+		mcfg.withInverted(InvertedValue.CounterClockwise_Positive);
+		mcfg.withNeutralMode(NeutralModeValue.Coast);
+
+		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration().withMotorOutput(mcfg);
+
+		Slot0Configs slotConfigs = talonFXConfigs.Slot0;
+
+		slotConfigs.kS = ShooterConstants.kSShooter;
+		slotConfigs.kV = ShooterConstants.kVShooter;
+		slotConfigs.kA = ShooterConstants.kAShooter;
+		slotConfigs.kP = ShooterConstants.kPShooter;
+		slotConfigs.kI = ShooterConstants.kIShooter;
+		slotConfigs.kD = ShooterConstants.kDShooter;
+
+		shooterLeaderMotor.getConfigurator().apply(talonFXConfigs);
+	}
+
+	
+
+	public void shoot(Boolean forward) {
+    final VelocityVoltage request = new VelocityVoltage(ShooterConstants.KMotorVelocity).withSlot(0);
+
+    if(forward) {
+      shooterLeaderMotor.setControl(request.withVelocity(ShooterConstants.KMotorVelocity));
+    } else {
+       shooterLeaderMotor.setControl(request.withVelocity(-1 * ShooterConstants.KMotorVelocity));
+    }
+  } 
+
+  public void stop() {
+    shooterLeaderMotor.stopMotor();
+  } 
+
+	
+
+	@Override
+	public void periodic() {
+		// For safety, stop the turret whenever the robot is disabled.
+	}
+
+	@Override
+	public void initSendable(SendableBuilder builder) {
+		builder.addDoubleProperty("Shooter speed", () -> shooterLeaderMotor.getVelocity().getValueAsDouble(), null);
+		builder.addDoubleProperty("Shooter acceleration", () -> shooterLeaderMotor.getAcceleration().getValueAsDouble(), null);
+	}
+	
+}

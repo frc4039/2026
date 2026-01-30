@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.ShooterHoodCommand;

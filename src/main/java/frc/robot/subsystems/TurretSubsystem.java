@@ -62,6 +62,11 @@ public class TurretSubsystem extends SubsystemBase {
 
 		//Turret Offset
 		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(7), Units.inchesToMeters(2), new Rotation2d(0));
+
+		//Min/Max
+		public static final double kMin = 50;
+		public static final double kMax = 220;
+
 	}
 
 	private TalonFX turretMotor;
@@ -108,7 +113,7 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	public void resetTurret() {
-		turretMotor.setPosition(0.0 / TurretConstants.kDegreesPerRotation);
+		turretMotor.setPosition(180.0 / TurretConstants.kDegreesPerRotation);
 	}
 
 	public double getTurretPosition() {

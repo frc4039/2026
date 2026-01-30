@@ -61,18 +61,26 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kTurretBackwardPosition = 360.0;
 
 		//Turret Offset
-		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(7), Units.inchesToMeters(2), new Rotation2d(0));
+		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(7), Units.inchesToMeters(2), new Rotation2d(180));
 
 		//Min/Max
-		public static final double kMin = 50;
-		public static final double kMax = 220;
+		public static final double kMin = -135;
+		public static final double kMax = 50;
 
+		public static final double kHubTargetHeight = 1.4351;
+		public static final double kTurretHeight = 0.5;
+		public static final double kDeltaZ = kHubTargetHeight - kTurretHeight;
+		public static final double kVelocityZ = 7.3;
+		public static final double kTimeOfFlight = (kVelocityZ + Math.sqrt(Math.pow(kVelocityZ, 2) - (2 * 9.81 * kDeltaZ))) / 9.81;
+		public static final double kShooterWheelCircumference = Units.inchesToMeters(4 * Math.PI);
 	}
 
 	private TalonFX turretMotor;
+	private DriveSubsystem driveSubsystem;
 
 	public TurretSubsystem() {
 		turretMotor = new TalonFX(TurretConstants.kMotorID);
+		driveSubsystem = new DriveSubsystem(null);
 
 		turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -113,7 +121,7 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	public void resetTurret() {
-		turretMotor.setPosition(180.0 / TurretConstants.kDegreesPerRotation);
+		turretMotor.setPosition(0.0 / TurretConstants.kDegreesPerRotation);
 	}
 
 	public double getTurretPosition() {
@@ -122,7 +130,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public void moveToOwlHeadPosition(DoubleSupplier robotHeading, double desiredDirection) {
 		double owlHeadPosition = robotHeading.getAsDouble() + desiredDirection;
-		this.moveToPosition((owlHeadPosition % 360 + 360) % 360);
+		this.moveToPosition((owlHeadPosition % 360 + 360) % 360); 
 	}
 
 	public static Pose2d getHub() {
@@ -136,6 +144,24 @@ public class TurretSubsystem extends SubsystemBase {
 			}
 		}
 		return FieldConstants.kRedHub;
+	}
+
+	public void stopMotor() {
+		turretMotor.stopMotor();
+	}
+
+	
+
+	public double getXVelocity() {
+		return driveSubsystem.getDistanceFromHub() / TurretConstants.kTimeOfFlight;
+	}
+
+	public double getOutputVelocity() {
+		return Math.sqrt(Math.pow(this.getXVelocity(), 2) + Math.pow(TurretConstants.kVelocityZ, 2));
+	}
+
+	public double getAngle() {
+		return Math.atan2(TurretConstants.kVelocityZ, getXVelocity());
 	}
 
 	@Override

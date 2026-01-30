@@ -95,6 +95,11 @@ public class ShooterSubsystem extends SubsystemBase {
     }
   } 
 
+  public void shootInput(double velocity) {
+    final VelocityVoltage request = new VelocityVoltage(velocity).withSlot(0);
+    shooterLeaderMotor.setControl(request.withVelocity(velocity));
+  } 
+
   public void stop() {
     shooterLeaderMotor.stopMotor();
   } 

@@ -26,6 +26,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.ShooterHoodCommand;
+import frc.robot.commands.SpinUpCommand;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
@@ -133,10 +134,10 @@ public class RobotContainer {
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
 		driver.rightBumper().whileTrue(new SpindexerCommand(feederSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
-		driver.rightTrigger().whileTrue(new AimCommand(turretSubsystem, shooterSubsystem, driveSubsystem, shooterHoodSubsystem));
+		driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
       	driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
-		driver.a().whileTrue(new ManualVelocityCommand(shooterSubsystem));
+		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
 		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));

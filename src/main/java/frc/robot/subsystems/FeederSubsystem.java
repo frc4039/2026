@@ -19,12 +19,14 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.SpindexerSubsystem.SpindexerConstants;;
+import frc.robot.subsystems.SpindexerSubsystem.SpindexerConstants;
+import frc.robot.utils.HardwareMonitor;;
 
 public class FeederSubsystem extends SubsystemBase {
 	public static final class FeederConstants {
@@ -50,7 +52,7 @@ public class FeederSubsystem extends SubsystemBase {
 		new SysIdRoutine.Mechanism(this::voltageDrive, this::logMotors, this)
 	);
 
-	public FeederSubsystem() {
+	public FeederSubsystem(HardwareMonitor hardwareMonitor) {
 		feederMotor = new SparkFlex(FeederConstants.kTurretFeederMotorId, MotorType.kBrushless);
 
 		feederMotorConfig.idleMode(IdleMode.kCoast);
@@ -64,6 +66,8 @@ public class FeederSubsystem extends SubsystemBase {
 
 		feederMotor.configure(feederMotorConfig, ResetMode.kResetSafeParameters,
 				PersistMode.kPersistParameters);
+
+		hardwareMonitor.registerDevice(this, feederMotor);
 
 		// SmartDashboard.putData("TurretFeederSubsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
 		// SmartDashboard.putData("TurretFeederSubsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
@@ -100,7 +104,10 @@ public class FeederSubsystem extends SubsystemBase {
 	}
 
 	@Override
-	public void periodic() {
-		SmartDashboard.putNumber("Turret Feeder Wheel Speed:", feederMotor.getEncoder().getVelocity());
+	public void initSendable(SendableBuilder builder) {
+		builder.addDoubleProperty("Feeder Wheel Speed", () -> feederMotor.getEncoder().getVelocity(), null);
+		builder.addDoubleProperty("Current", () -> feederMotor.getOutputCurrent(), null);
 	}
+
+	public void periodic() {}
 }

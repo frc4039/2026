@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.utils.HardwareMonitor;
 
 public class TurretSubsystem extends SubsystemBase {
 	public final class TurretConstants {
@@ -66,7 +67,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 	private TalonFX turretMotor;
 
-	public TurretSubsystem() {
+	public TurretSubsystem(HardwareMonitor hardwareMonitor) {
 		turretMotor = new TalonFX(TurretConstants.kMotorID);
 
 		turretMotor.setNeutralMode(NeutralModeValue.Brake);
@@ -94,6 +95,8 @@ public class TurretSubsystem extends SubsystemBase {
 		motionMagicConfigs.MotionMagicJerk = TurretConstants.kJerk;
 
 		turretMotor.getConfigurator().apply(talonFXConfigs);
+
+		hardwareMonitor.registerDevice(this, turretMotor);
 	}
 
 	public void moveToPosition(double position) {

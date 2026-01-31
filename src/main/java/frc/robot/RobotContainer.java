@@ -62,9 +62,10 @@ public class RobotContainer {
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem(hardwareMonitor);
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
-	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem();
-	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem();
+	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem(hardwareMonitor);
+	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
+	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
 
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
@@ -150,8 +151,8 @@ public class RobotContainer {
       	//driver.rightTrigger().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
-		driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
-		driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
+		// driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
+		// driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
 			.or(
 				operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
@@ -168,10 +169,11 @@ public class RobotContainer {
 		operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, true));
 		operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
 
-		operator.rightTrigger().whileTrue(new FeederCommand(feederSubsystem, true));
-		operator.rightBumper().whileTrue(new FeederCommand(feederSubsystem, false));
+		operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
 
-		driver.rightTrigger().whileTrue(new FeederCommand(feederSubsystem, true).alongWith(new SpindexerCommand(spindexerSubsystem, true)));
+		operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
+		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 	}
 
 }

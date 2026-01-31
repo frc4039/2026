@@ -19,12 +19,14 @@ public class ResetTurretGyro extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+
+    turretSubsystem.resetTurret();
+	}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    turretSubsystem.resetTurret();
   }
 
   // Called once the command ends or is interrupted.
@@ -34,6 +36,6 @@ public class ResetTurretGyro extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

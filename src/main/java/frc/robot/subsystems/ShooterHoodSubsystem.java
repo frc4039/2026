@@ -79,8 +79,6 @@ public class ShooterHoodSubsystem extends SubsystemBase{
     }
 
     public void moveToPosition(double position) {
-		System.out.println(position);
-		
 		final double newPosition = position / ShooterAngleConstants.kDegreesPerRotation;
 		final MotionMagicVoltage request = new MotionMagicVoltage(newPosition);
 

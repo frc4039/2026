@@ -135,7 +135,7 @@ public class RobotContainer {
 		driver.rightBumper().whileTrue(new SpindexerCommand(feederSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
 		driver.rightTrigger().whileTrue(new AimCommand(turretSubsystem, shooterSubsystem, driveSubsystem, shooterHoodSubsystem));
       	driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
-		driver.b().onTrue(new ResetTurretGyro(turretSubsystem));
+		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
 		driver.a().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    

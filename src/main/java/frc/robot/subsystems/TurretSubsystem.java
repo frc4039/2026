@@ -62,18 +62,20 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kTurretForwardPosition = 180.0;
 		public static final double kTurretBackwardPosition = 360.0;
 
-		//Turret Offset
-		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(7), Units.inchesToMeters(2), Rotation2d.fromDegrees(180));
+		// Turret Offset
+		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(5.75),
+				Units.inchesToMeters(5.25), Rotation2d.fromDegrees(180));
 
-		//Min/Max
-		public static final double kMin = -135;
+		// Min/Max
+		public static final double kMin = -180;
 		public static final double kMax = 50;
 
 		public static final double kHubTargetHeight = 1.4351;
 		public static final double kTurretHeight = 0.5;
 		public static final double kDeltaZ = kHubTargetHeight - kTurretHeight;
 		public static final double kVelocityZ = 7.3;
-		public static final double kTimeOfFlight = (kVelocityZ + Math.sqrt(Math.pow(kVelocityZ, 2) - (2 * 9.81 * kDeltaZ))) / 9.81;
+		public static final double kTimeOfFlight = (kVelocityZ
+				+ Math.sqrt(Math.pow(kVelocityZ, 2) - (2 * 9.81 * kDeltaZ))) / 9.81;
 		public static final double kShooterWheelCircumference = Units.inchesToMeters(4 * Math.PI);
 	}
 
@@ -131,7 +133,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public void moveToOwlHeadPosition(DoubleSupplier robotHeading, double desiredDirection) {
 		double owlHeadPosition = robotHeading.getAsDouble() + desiredDirection;
-		this.moveToPosition((owlHeadPosition % 360 + 360) % 360); 
+		this.moveToPosition((owlHeadPosition % 360 + 360) % 360);
 	}
 
 	public static Pose2d getHub() {
@@ -139,8 +141,7 @@ public class TurretSubsystem extends SubsystemBase {
 		if (alliance.isPresent()) {
 			if (alliance.get() == Alliance.Red) {
 				return FieldConstants.kRedHub;
-			}
-			else {
+			} else {
 				return FieldConstants.kBlueHub;
 			}
 		}
@@ -149,9 +150,8 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public void stopMotor() {
 		turretMotor.stopMotor();
+		System.out.println("Trying to disable turret motor");
 	}
-
-	
 
 	public double getXVelocity() {
 		return driveSubsystem.getDistanceFromHub() / TurretConstants.kTimeOfFlight;
@@ -167,11 +167,10 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public Pose2d getTurretPose() {
 		return driveSubsystem.getPose()
-			.plus(TurretConstants.kTurretOffset)
-			.plus(new Transform2d(
-				new Translation2d(),
-				Rotation2d.fromDegrees(-1 * this.getTurretPosition())
-			));
+				.plus(TurretConstants.kTurretOffset)
+				.plus(new Transform2d(
+						new Translation2d(),
+						Rotation2d.fromDegrees(-1 * this.getTurretPosition())));
 	}
 
 	@Override
@@ -184,6 +183,20 @@ public class TurretSubsystem extends SubsystemBase {
 		builder.addDoubleProperty("Turret encoder degrees", () -> getTurretPosition(), null);
 		builder.addDoubleProperty("Turret speed", () -> turretMotor.getVelocity().getValueAsDouble(), null);
 		builder.addDoubleProperty("Turret acceleration", () -> turretMotor.getAcceleration().getValueAsDouble(), null);
-		builder.addDoubleProperty("Shooter Target", () -> this.getOutputVelocity() / TurretConstants.kShooterWheelCircumference, null);
+		builder.addDoubleProperty("Turret Target", () -> {
+			var controlInfo = turretMotor.getAppliedControl();
+			if(controlInfo instanceof MotionMagicVoltage){
+				return ((MotionMagicVoltage) controlInfo).Position * TurretConstants.kDegreesPerRotation;
+			}
+			return 0;
+		}, null);
+		builder.addDoubleProperty("Shooter Target", () -> this.getOutputVelocity(), null);
+		builder.addDoubleProperty("Target", () -> driveSubsystem.getDistanceFromHub(), null);
+		// builder.addDoubleProperty("Turret Target",() -> {
+		// moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
+		// Pose2d currentRobotPose2d = driveSubsystem.getPose().plus(TurretConstants.kTurretOffset);
+		// Pose2d hubPose2d = TurretSubsystem.getHub();
+		// 		-1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees())))
+		// }, null);
 	}
 }

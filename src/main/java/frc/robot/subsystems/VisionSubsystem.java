@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
 
@@ -126,6 +127,7 @@ public class VisionSubsystem extends SubsystemBase {
     private final PhotonCamera frontLeftCam;
 //    private final PhotonCamera backCam;
     private final DriveSubsystem m_driveSubsystem;
+    private final TurretSubsystem turretSubsystem;
     private Field2d fieldDisplay = new Field2d();
     private List<Pose2d> blueTargets = new ArrayList<>();
     private List<Pose2d> redTargets = new ArrayList<>();
@@ -146,8 +148,9 @@ public class VisionSubsystem extends SubsystemBase {
     public final PhotonPoseEstimator frontLeftPhotonPoseEstimator;
 //    public final PhotonPoseEstimator backPhotonPoseEstimator;
 
-    public VisionSubsystem(DriveSubsystem driveSubsystem) {
+    public VisionSubsystem(DriveSubsystem driveSubsystem, TurretSubsystem turretSubsystem) {
         m_driveSubsystem = driveSubsystem;
+        this.turretSubsystem = turretSubsystem;
         aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
     frontRightCam = new PhotonCamera(VisionConstants.kFrontRightCameraName);
@@ -295,6 +298,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         fieldDisplay.setRobotPose(m_driveSubsystem.getPose());
         fieldDisplay.getObject("blueHub").setPose(TurretSubsystem.getHub());
+        fieldDisplay.getObject("Turret").setPose(turretSubsystem.getTurretPose());
 
     }
 }

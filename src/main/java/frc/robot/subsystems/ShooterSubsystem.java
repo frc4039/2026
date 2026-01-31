@@ -57,6 +57,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
 	private TalonFX shooterLeaderMotor, shooterFollowerMotor;
 
+	private double manualVelocity;
+
 	private VoltageOut voltRequest = new VoltageOut(0.0);
 	private SysIdRoutine sysid = new SysIdRoutine(
 			new SysIdRoutine.Config(
@@ -122,6 +124,11 @@ public class ShooterSubsystem extends SubsystemBase {
 		shooterLeaderMotor.setControl(request.withVelocity(velocity));
 	}
 
+	public void manualVelocity() {
+		final VelocityVoltage request = new VelocityVoltage(manualVelocity).withSlot(0);
+		shooterLeaderMotor.setControl(request.withVelocity(manualVelocity));
+	}
+
 	public void stop() {
 		shooterLeaderMotor.stopMotor();
 	}
@@ -136,6 +143,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		builder.addDoubleProperty("Shooter speed", () -> shooterLeaderMotor.getVelocity().getValueAsDouble(), null);
 		builder.addDoubleProperty("Shooter acceleration", () -> shooterLeaderMotor.getAcceleration().getValueAsDouble(),
 				null);
+		builder.addDoubleProperty("Set Velocity", () -> manualVelocity, (manualVelocity) -> this.manualVelocity = manualVelocity);
 	}
 
 }

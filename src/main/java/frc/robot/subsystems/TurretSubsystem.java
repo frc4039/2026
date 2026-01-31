@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -162,6 +163,15 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public double getHoodAngle() {
 		return Units.radiansToDegrees(Math.atan2(TurretConstants.kVelocityZ, getXVelocity()));
+	}
+
+	public Pose2d getTurretPose() {
+		return driveSubsystem.getPose()
+			.plus(TurretConstants.kTurretOffset)
+			.plus(new Transform2d(
+				new Translation2d(),
+				Rotation2d.fromDegrees(-1 * this.getTurretPosition())
+			));
 	}
 
 	@Override

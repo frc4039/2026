@@ -46,6 +46,7 @@ public class ShooterHoodSubsystem extends SubsystemBase{
     public ShooterHoodSubsystem(){
         hoodMotor = new TalonFX(ShooterAngleConstants.motorId);
         hoodMotor.setNeutralMode(NeutralModeValue.Coast);
+		
 
         MotorOutputConfigs mcfg = new MotorOutputConfigs();
 
@@ -53,7 +54,8 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 		mcfg.withNeutralMode(NeutralModeValue.Coast);
 
 		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration().withMotorOutput(mcfg);
-
+		talonFXConfigs.CurrentLimits.StatorCurrentLimit = 15;
+		talonFXConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 		Slot0Configs slotConfigs = talonFXConfigs.Slot0;
 
 		slotConfigs.kS = ShooterAngleConstants.kSAngle;
@@ -85,7 +87,7 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 
 		hoodMotor.setControl(request.withPosition(newPosition)
 				.withSlot(0)
-				.withOverrideBrakeDurNeutral(true));
+				.withOverrideBrakeDurNeutral(false));
                 
 	}
 
@@ -93,8 +95,13 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 		return hoodMotor.getPosition().getValueAsDouble() * ShooterAngleConstants.kDegreesPerRotation;
 	}
 
+	public void stopMotor() {
+		hoodMotor.stopMotor();
+	}
+
 	@Override
 	public void initSendable(SendableBuilder builder) {
 		builder.addDoubleProperty("Hood Angle", () -> this.getHoodPosition(), null);
+		builder.addDoubleProperty("Current", () -> hoodMotor.getStatorCurrent().getValueAsDouble(), null);
 	}
 }

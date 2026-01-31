@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.ManualVelocityCommand;
 import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.ResetTurretGyro;
 import frc.robot.commands.AimCommand;
@@ -60,7 +61,7 @@ public class RobotContainer {
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem);
 
-	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
+	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem);
 	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem();
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem();
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
@@ -135,6 +136,7 @@ public class RobotContainer {
 		driver.rightTrigger().whileTrue(new AimCommand(turretSubsystem, shooterSubsystem, driveSubsystem, shooterHoodSubsystem));
       	driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem));
+		driver.a().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
 		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
@@ -158,7 +160,7 @@ public class RobotContainer {
 		operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
 		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, true));
 
-		operator.a().whileTrue(new FeederCommand(turretFeederSubsystem, true).alongWith(new SpindexerCommand(feederSubsystem, true)));
+		operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
 
 		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 	}

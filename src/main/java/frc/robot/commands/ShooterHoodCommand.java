@@ -27,6 +27,7 @@ public class ShooterHoodCommand extends Command {
 	@Override
 	public void end(boolean interrupted) {
         System.out.println("Is ending");
+		shooterHoodSubsystem.stopMotor();
 	}
 
 	@Override

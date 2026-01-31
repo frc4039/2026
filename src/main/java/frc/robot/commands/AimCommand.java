@@ -48,6 +48,7 @@ public class AimCommand extends Command {
   public void end(boolean interrupted) {
     turretSubsystem.stopMotor();
     shooterSubsystem.stop();
+    shooterHoodSubsystem.stopMotor();
   }
 
   // Returns true when the command should end.

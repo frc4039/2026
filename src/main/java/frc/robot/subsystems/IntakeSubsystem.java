@@ -20,6 +20,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public static final class IntakeContants {
     static int kIntakeMotorCanID = 21;
     static double kIntakeSpeed = -0.6;
+    static double kOutakeSpeed = 1;
   }
 
   private final SparkFlex intakeMotor;
@@ -42,7 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
    public void outtake(){
     //intakeMotor.getClosedLoopController().setSetpoint(-1 * IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
-    intakeMotor.set(-1 * IntakeSubsystem.IntakeContants.kIntakeSpeed);
+    intakeMotor.set(IntakeSubsystem.IntakeContants.kOutakeSpeed);
   }
 
   public void stopMotor() {

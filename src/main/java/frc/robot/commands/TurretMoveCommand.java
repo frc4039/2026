@@ -30,7 +30,6 @@ public class TurretMoveCommand extends Command {
 
 	@Override
 	public boolean isFinished() {
-		System.out.println(turretSubsystem.getTurretPosition() + " " + position);
 		if (Math.abs(turretSubsystem.getTurretPosition()
 				- position) < TurretSubsystem.TurretConstants.kTurretAccuracyThreshold) {
 			return true;

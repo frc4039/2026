@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.subsystems.ShooterSubsystem.ShooterConstants;
 
 public class TurretSubsystem extends SubsystemBase {
 	public final class TurretConstants {
@@ -42,14 +43,14 @@ public class TurretSubsystem extends SubsystemBase {
 		// Pid values
 		public static final double kSTurret = 0.0;
 		public static final double kVTurret = 0.0;
-		public static final double kATurret = 0.0;
-		public static final double kPTurret = 50.0;
+		public static final double kATurret = 0.1;
+		public static final double kPTurret = 60.0;
 		public static final double kITurret = 1.0;
 		public static final double kDTurret = 0.0;
 
 		// Motion magic
-		public static final double kCruiseVelocity = 720.0 / kDegreesPerRotation;
-		public static final double kAcceleration = 1440.0 / kDegreesPerRotation;
+		public static final double kCruiseVelocity = 1500.0 / kDegreesPerRotation;
+		public static final double kAcceleration = 2000.0 / kDegreesPerRotation;
 		public static final double kJerk = 10000.0 / kDegreesPerRotation;
 
 		// The accuracy (in degrees) that the turret has to be from it's target position
@@ -61,7 +62,7 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kTurretBackwardPosition = 360.0;
 
 		//Turret Offset
-		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(7), Units.inchesToMeters(2), new Rotation2d(180));
+		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(7), Units.inchesToMeters(2), Rotation2d.fromDegrees(180));
 
 		//Min/Max
 		public static final double kMin = -135;
@@ -78,9 +79,9 @@ public class TurretSubsystem extends SubsystemBase {
 	private TalonFX turretMotor;
 	private DriveSubsystem driveSubsystem;
 
-	public TurretSubsystem() {
+	public TurretSubsystem(DriveSubsystem driveSubsystem) {
 		turretMotor = new TalonFX(TurretConstants.kMotorID);
-		driveSubsystem = new DriveSubsystem(null);
+		this.driveSubsystem = driveSubsystem;
 
 		turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -110,7 +111,6 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	public void moveToPosition(double position) {
-		System.out.println(position);
 		final MotionMagicVoltage request = new MotionMagicVoltage(position);
 
 		final double newPosition = position / TurretConstants.kDegreesPerRotation;
@@ -160,8 +160,8 @@ public class TurretSubsystem extends SubsystemBase {
 		return Math.sqrt(Math.pow(this.getXVelocity(), 2) + Math.pow(TurretConstants.kVelocityZ, 2));
 	}
 
-	public double getAngle() {
-		return Math.atan2(TurretConstants.kVelocityZ, getXVelocity());
+	public double getHoodAngle() {
+		return Units.radiansToDegrees(Math.atan2(TurretConstants.kVelocityZ, getXVelocity()));
 	}
 
 	@Override
@@ -174,5 +174,6 @@ public class TurretSubsystem extends SubsystemBase {
 		builder.addDoubleProperty("Turret encoder degrees", () -> getTurretPosition(), null);
 		builder.addDoubleProperty("Turret speed", () -> turretMotor.getVelocity().getValueAsDouble(), null);
 		builder.addDoubleProperty("Turret acceleration", () -> turretMotor.getAcceleration().getValueAsDouble(), null);
+		builder.addDoubleProperty("Shooter Target", () -> this.getOutputVelocity() / TurretConstants.kShooterWheelCircumference, null);
 	}
 }

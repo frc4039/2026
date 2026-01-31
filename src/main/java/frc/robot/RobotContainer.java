@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.ResetTurretGyro;
+import frc.robot.commands.AimCommand;
 import frc.robot.commands.AlignToTowerCommand;
 import frc.robot.commands.AlignToTowerCommandGroup;
 import frc.robot.commands.Autos;
@@ -57,7 +58,7 @@ public class RobotContainer {
 	private HardwareMonitor hardwareMonitor = new HardwareMonitor();
 
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
-	private final TurretSubsystem turretSubsystem = new TurretSubsystem();
+	private final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem);
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
 	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem();
@@ -85,6 +86,7 @@ public class RobotContainer {
     );
 	SmartDashboard.putData(feederSubsystem);
 	SmartDashboard.putData(shooterSubsystem);
+	SmartDashboard.putData(shooterHoodSubsystem);
 
 
 	hardwareMonitor.registerDevice(null, driver);
@@ -130,13 +132,13 @@ public class RobotContainer {
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
 		driver.rightBumper().whileTrue(new SpindexerCommand(feederSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
-		driver.rightTrigger().whileTrue(new ShootCommand(shooterSubsystem));
+		driver.rightTrigger().whileTrue(new AimCommand(turretSubsystem, shooterSubsystem, driveSubsystem, shooterHoodSubsystem));
       	driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
-		driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
-		driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
+		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
+		//driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
 			.or(
 				operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
@@ -157,6 +159,8 @@ public class RobotContainer {
 		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, true));
 
 		operator.a().whileTrue(new FeederCommand(turretFeederSubsystem, true).alongWith(new SpindexerCommand(feederSubsystem, true)));
+
+		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 	}
 
 }

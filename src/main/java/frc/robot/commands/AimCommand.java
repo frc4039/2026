@@ -7,6 +7,8 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ShooterHoodSubsystem;
+import frc.robot.subsystems.ShooterHoodSubsystem.ShooterAngleConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
@@ -17,11 +19,13 @@ public class AimCommand extends Command {
   private TurretSubsystem turretSubsystem;
   private ShooterSubsystem shooterSubsystem;
   private DriveSubsystem driveSubsystem;
-  public AimCommand(TurretSubsystem turretSubsystem, ShooterSubsystem shooterSubsystem, DriveSubsystem driveSubsystem) {
+  private ShooterHoodSubsystem shooterHoodSubsystem;
+  public AimCommand(TurretSubsystem turretSubsystem, ShooterSubsystem shooterSubsystem, DriveSubsystem driveSubsystem, ShooterHoodSubsystem shooterHoodSubsystem) {
     this.shooterSubsystem = shooterSubsystem;
     this.turretSubsystem = turretSubsystem;
     this.driveSubsystem = driveSubsystem;
-    addRequirements(turretSubsystem, shooterSubsystem);
+    this.shooterHoodSubsystem = shooterHoodSubsystem;
+    addRequirements(turretSubsystem, shooterSubsystem, shooterHoodSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -36,11 +40,15 @@ public class AimCommand extends Command {
     Pose2d hubPose2d = TurretSubsystem.getHub();
     turretSubsystem.moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin, -1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees())));
     shooterSubsystem.shootInput(turretSubsystem.getOutputVelocity() / TurretConstants.kShooterWheelCircumference);
+    shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax, Math.max(ShooterAngleConstants.kMin, turretSubsystem.getHoodAngle()))));
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    turretSubsystem.stopMotor();
+    shooterSubsystem.stop();
+  }
 
   // Returns true when the command should end.
   @Override

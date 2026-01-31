@@ -97,8 +97,8 @@ public class VisionSubsystem extends SubsystemBase {
 
     public static final Transform3d kRobotToCamFrontLeft =
         new Transform3d(
-          new Translation3d(Units.inchesToMeters(13), Units.inchesToMeters(10), Units.inchesToMeters(11.5)),
-          new Rotation3d(0, Units.degreesToRadians(-24.5), Units.degreesToRadians(10)));
+          new Translation3d(Units.inchesToMeters(11 + (1/16)), Units.inchesToMeters(13), Units.inchesToMeters(16 + (5/6))),
+          new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(90)));
         
   
 /*     public static final Transform3d kRobotToCamBack = 

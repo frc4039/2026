@@ -21,7 +21,7 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new Intake. */
   public static final class IntakeContants {
     static int kIntakeMotorCanID = 21;
-    static double kIntakeSpeed = -1;
+    static double kIntakeSpeed = -0.6;
   }
 
   private final SparkFlex intakeMotor;

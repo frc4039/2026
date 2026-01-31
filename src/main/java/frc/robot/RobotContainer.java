@@ -18,8 +18,12 @@ import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterHoodSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
+import frc.robot.commands.ShooterHoodCommand;
+import frc.robot.commands.ShootCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.commands.FeederCommand;
@@ -58,8 +62,11 @@ public class RobotContainer {
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem(hardwareMonitor);
 
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem);
-	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
-	private final FeederSubsystem feederSubsystem = new FeederSubsystem(hardwareMonitor);
+	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem();
+	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem();
+	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
+
+	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
@@ -82,6 +89,8 @@ public class RobotContainer {
 	SmartDashboard.putData(feederSubsystem);
 	SmartDashboard.putData(intakeSubsystem);
 	SmartDashboard.putData(turretSubsystem);
+	SmartDashboard.putData(shooterSubsystem);
+
 
 	hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
@@ -136,12 +145,13 @@ public class RobotContainer {
     	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
-
+		driver.rightBumper().whileTrue(new SpindexerCommand(feederSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
+		driver.rightTrigger().whileTrue(new ShootCommand(shooterSubsystem));
       	//driver.rightTrigger().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
 		driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
-    
+		driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
 			.or(
 				operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)

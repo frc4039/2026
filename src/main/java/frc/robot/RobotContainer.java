@@ -65,7 +65,6 @@ public class RobotContainer {
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem, hardwareMonitor);
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem);
-	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem(hardwareMonitor);
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
@@ -90,7 +89,6 @@ public class RobotContainer {
         .ignoringDisable(true)
     );
 	SmartDashboard.putData(spindexerSubsystem);
-	SmartDashboard.putData(feederSubsystem);
 	SmartDashboard.putData(intakeSubsystem);
 	SmartDashboard.putData(turretSubsystem);
 	SmartDashboard.putData(shooterSubsystem);
@@ -150,7 +148,7 @@ public class RobotContainer {
     	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
-		driver.rightBumper().whileTrue(new SpindexerCommand(feederSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
+		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
 		driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
       	driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));

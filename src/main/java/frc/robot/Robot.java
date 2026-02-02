@@ -31,7 +31,9 @@ public class Robot extends TimedRobot {
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
     m_robotContainer = new RobotContainer();
-    //turretSubsystem = new TurretSubsystem(driv);
+    DataLogManager.start();// Starts recording to data log
+    DriverStation.startDataLog(DataLogManager.getLog()); // Record both DS control and joystick data
+
   }
 
   /**

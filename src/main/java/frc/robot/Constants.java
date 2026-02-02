@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -27,6 +28,15 @@ public final class Constants {
     public static final double kDistanceFromHubToWall = 182.11;
     public static final Pose2d kBlueHub = new Pose2d(Units.inchesToMeters(182.11), Units.inchesToMeters(159), new Rotation2d(0));
     public static final Pose2d kRedHub = new Pose2d(Units.inchesToMeters(469.11), Units.inchesToMeters(159), new Rotation2d(0));
-
+    public static final Pose2d kRedAllianceLine = new Pose2d(Units.inchesToMeters(469.11), 0, new Rotation2d(0));
+    public static final Pose2d kRedPassTargetRight = new Pose2d(Units.inchesToMeters(560), Units.inchesToMeters(75), new Rotation2d(0));
+    public static final Pose2d kLeftPassTarget = new Pose2d(Units.inchesToMeters(560), Units.inchesToMeters(240), new Rotation2d(0));
+    public static final double kCenterLine = Units.inchesToMeters(158.32);
+    public static Pose2d flipPoseY(Pose2d yPose2d) {
+      return new Pose2d(yPose2d.getX(), Units.inchesToMeters(316.64) - yPose2d.getY(), yPose2d.getRotation());
+    }
+    public static Pose2d flipPoseX(Pose2d xPose2d) {
+      return new Pose2d(Units.inchesToMeters(650.12) - xPose2d.getX(), xPose2d.getY(), xPose2d.getRotation());
+    }
   }
 }

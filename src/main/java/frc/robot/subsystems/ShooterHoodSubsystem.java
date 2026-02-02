@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 
@@ -24,29 +25,37 @@ public class ShooterHoodSubsystem extends SubsystemBase{
         public static final double kIAngle = 0;
         public static final double kDAngle = 0; 
 
-		public static final double gearRatio = 257.142857142857142;
-        public static final double kDegreesPerRotation = 360 / gearRatio;
+		public static final double gearRatio = (4.0 * 4.0) * (15.0/14.0) * (180.0/15.0);
+        public static final double kDegreesPerRotation = 360.0 / gearRatio;
 
         public static final double kCruiseVelocity = 720.0 / kDegreesPerRotation;
 		public static final double kAcceleration = 1440.0 / kDegreesPerRotation;
 		public static final double kJerk = 10000.0 / kDegreesPerRotation;
 
 		public static final double angleThreshold = 0.5;
+
+		public static final double kHoodOffset = 80;
+
+		//Hard limits for hood angle
+		public static final double kMin = 50;
+		public static final double kMax = 80;
     }
 
     private TalonFX hoodMotor;
 
     public ShooterHoodSubsystem(){
         hoodMotor = new TalonFX(ShooterAngleConstants.motorId);
-        hoodMotor.setNeutralMode(NeutralModeValue.Brake);
+        hoodMotor.setNeutralMode(NeutralModeValue.Coast);
+		
 
         MotorOutputConfigs mcfg = new MotorOutputConfigs();
 
-		mcfg.withInverted(InvertedValue.Clockwise_Positive);
-		mcfg.withNeutralMode(NeutralModeValue.Brake);
+		mcfg.withInverted(InvertedValue.CounterClockwise_Positive);
+		mcfg.withNeutralMode(NeutralModeValue.Coast);
 
 		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration().withMotorOutput(mcfg);
-
+		talonFXConfigs.CurrentLimits.StatorCurrentLimit = 15;
+		talonFXConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 		Slot0Configs slotConfigs = talonFXConfigs.Slot0;
 
 		slotConfigs.kS = ShooterAngleConstants.kSAngle;
@@ -66,18 +75,17 @@ public class ShooterHoodSubsystem extends SubsystemBase{
     }
 
     public void resetTurret(){
-        hoodMotor.setPosition(0);
+        hoodMotor.setPosition(ShooterAngleConstants.kHoodOffset / ShooterAngleConstants.kDegreesPerRotation);
     }
 
     public void moveToPosition(double position) {
-		System.out.println(position);
-		final MotionMagicVoltage request = new MotionMagicVoltage(position);
-
 		final double newPosition = position / ShooterAngleConstants.kDegreesPerRotation;
+		final MotionMagicVoltage request = new MotionMagicVoltage(newPosition);
+
 
 		hoodMotor.setControl(request.withPosition(newPosition)
 				.withSlot(0)
-				.withOverrideBrakeDurNeutral(true));
+				.withOverrideBrakeDurNeutral(false));
                 
 	}
 
@@ -85,4 +93,13 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 		return hoodMotor.getPosition().getValueAsDouble() * ShooterAngleConstants.kDegreesPerRotation;
 	}
 
+	public void stopMotor() {
+		hoodMotor.stopMotor();
+	}
+
+	@Override
+	public void initSendable(SendableBuilder builder) {
+		builder.addDoubleProperty("Hood Angle", () -> this.getHoodPosition(), null);
+		builder.addDoubleProperty("Current", () -> hoodMotor.getStatorCurrent().getValueAsDouble(), null);
+	}
 }

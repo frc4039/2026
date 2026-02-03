@@ -17,6 +17,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -488,6 +489,11 @@ public class DriveSubsystem extends SubsystemBase {
 		Pose2d hubPose = TurretSubsystem.getHub();
 		Pose2d currentRobotPose2d = this.getPose().plus(TurretConstants.kTurretOffset);
 		return Math.sqrt(Math.pow(hubPose.relativeTo(currentRobotPose2d).getX(), 2) + Math.pow(hubPose.relativeTo(currentRobotPose2d).getY(), 2));
+	}
+
+	public Pose2d getShootOnTheFlyPose2d() {
+		Pose2d currentPose2d = this.getPose();
+		return currentPose2d.plus(new Transform2d(this.getRobotFieldSpeedX() * TurretConstants.kTimeOfFlight, this.getRobotFieldSpeedY() * TurretConstants.kTimeOfFlight, new Rotation2d(0)));
 	}
 	
 }

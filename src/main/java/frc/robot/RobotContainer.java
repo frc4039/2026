@@ -75,7 +75,6 @@ public class RobotContainer {
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem, hardwareMonitor);
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem);
-	private final SpindexerSubsystem feederSubsystem = new SpindexerSubsystem(hardwareMonitor);
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
@@ -110,7 +109,6 @@ public class RobotContainer {
         .ignoringDisable(true)
     );
 	SmartDashboard.putData(spindexerSubsystem);
-	SmartDashboard.putData(feederSubsystem);
 	SmartDashboard.putData(intakeSubsystem);
 	SmartDashboard.putData(turretSubsystem);
 	SmartDashboard.putData(shooterSubsystem);
@@ -163,9 +161,9 @@ public class RobotContainer {
 
 		driver.x().onTrue(new AutoAimCommand(turretSubsystem,driveSubsystem,shooterHoodSubsystem));
 		driver.leftTrigger().onTrue(new AutoIntakeCommand(intakeSubsystem, true));
-		driver.leftBumper().onTrue(new AutoStopIntakeCommand(intakeSubsystem));
+		//driver.leftBumper().onTrue(new AutoStopIntakeCommand(intakeSubsystem));
 		driver.rightTrigger().onTrue(new AutoSpinUpCommand(shooterSubsystem,turretSubsystem));
-		driver.rightBumper().onTrue(new AutoSpinUpStopCommand(shooterSubsystem));
+		//driver.rightBumper().onTrue(new AutoSpinUpStopCommand(shooterSubsystem));
 		driver.a().onTrue(new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
 		driver.b().onTrue(new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, false, false));
 

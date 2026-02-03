@@ -79,6 +79,9 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kTimeOfFlight = (kVelocityZ
 				+ Math.sqrt(Math.pow(kVelocityZ, 2) - (2 * 9.81 * kDeltaZ))) / 9.81;
 		public static final double kShooterWheelCircumference = Units.inchesToMeters(4 * Math.PI);
+
+		public static final double kManualChangeLimit = Units.inchesToMeters(18);
+		public static final double kManualChangeAmount = Units.inchesToMeters(3);
 	}
 
 	private TalonFX turretMotor;
@@ -148,24 +151,23 @@ public class TurretSubsystem extends SubsystemBase {
 	public static Transform2d changeTargetLocation(String direction) {
 		Optional<Alliance> alliance = DriverStation.getAlliance();
 		if(direction == "up") {
-			xTransform += Units.inchesToMeters(-3);
+			xTransform += -1 * TurretConstants.kManualChangeAmount;
 		} else if (direction == "down") {
-			xTransform += Units.inchesToMeters(3);
+			xTransform += TurretConstants.kManualChangeAmount;
 		} else if(direction == "left") {
-			yTransform += Units.inchesToMeters(-3);
+			yTransform += -1 * TurretConstants.kManualChangeAmount;
 		} else if(direction == "right") {
-			yTransform += Units.inchesToMeters(3);
+			yTransform += TurretConstants.kManualChangeAmount;
 		}
 
-		if(xTransform >= Units.inchesToMeters(8)) {
-			xTransform = Units.inchesToMeters(8);
-		} 
-		if(xTransform <= Units.inchesToMeters(-8)) {
-			xTransform = Units.inchesToMeters(-8);
-		} if(yTransform >= Units.inchesToMeters(8)) {
-			yTransform = Units.inchesToMeters(8);
-		} if(yTransform <= Units.inchesToMeters(-8)) {
-			yTransform = Units.inchesToMeters(-8);
+		if(xTransform >= TurretConstants.kManualChangeLimit) {
+			xTransform = TurretConstants.kManualChangeLimit;
+		} if(xTransform <= -1 * TurretConstants.kManualChangeLimit) {
+			xTransform = -1 * TurretConstants.kManualChangeLimit;
+		} if(yTransform >= TurretConstants.kManualChangeLimit) {
+			yTransform = TurretConstants.kManualChangeLimit;
+		} if(yTransform <= -1 * TurretConstants.kManualChangeLimit) {
+			yTransform = -1 * TurretConstants.kManualChangeLimit;
 		} 
 		if(alliance.get() == Alliance.Red) {
 			return new Transform2d(xTransform, yTransform, new Rotation2d(0));

@@ -12,6 +12,9 @@ import frc.robot.commands.ResetTurretGyro;
 import frc.robot.commands.AimCommand;
 import frc.robot.commands.AlignToTowerCommand;
 import frc.robot.commands.AlignToTowerCommandGroup;
+import frc.robot.commands.AutoAimCommand;
+import frc.robot.commands.AutoIntakeCommand;
+import frc.robot.commands.AutoSpinUpCommand;
 import frc.robot.commands.Autos;
 import frc.robot.commands.SpindexerCommand;
 import frc.robot.commands.TurretMoveCommand;
@@ -36,7 +39,10 @@ import frc.robot.subsystems.SpindexerSubsystem;
 import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
 
+import java.security.spec.NamedParameterSpec;
 import java.util.Optional;
+
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -49,6 +55,10 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.AutoStopIntakeCommand;
+import frc.robot.commands.AutoSpinUpStopCommand;
+import frc.robot.commands.AutoSpindexerFeedCommand;
+import frc.robot.commands.AutoSpindexerFeedStopCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -81,6 +91,16 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
+
+	NamedCommands.registerCommand("StartIntake", new AutoIntakeCommand(intakeSubsystem,true));
+	NamedCommands.registerCommand("StopIntake", new AutoStopIntakeCommand(intakeSubsystem));
+	NamedCommands.registerCommand("SpindexerFeed", new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, false, false));
+	NamedCommands.registerCommand("StopSpindexerFeed", new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
+	NamedCommands.registerCommand("ShooterSpinUp", new AutoSpinUpCommand(shooterSubsystem, turretSubsystem));
+	NamedCommands.registerCommand("ShooterStopSpinUp", new AutoSpinUpStopCommand(shooterSubsystem));
+	NamedCommands.registerCommand("Aim", new AutoAimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
+
+
     configureBindings();
 
     
@@ -140,7 +160,18 @@ public class RobotContainer {
 				new TeleopDriveCommand(driveSubsystem, driver::getLeftY, driver::getLeftX,
 						driver::getRightX, -1.0));
 
+
+		driver.x().onTrue(new AutoAimCommand(turretSubsystem,driveSubsystem,shooterHoodSubsystem));
+		driver.leftTrigger().onTrue(new AutoIntakeCommand(intakeSubsystem, true));
+		driver.leftBumper().onTrue(new AutoStopIntakeCommand(intakeSubsystem));
+		driver.rightTrigger().onTrue(new AutoSpinUpCommand(shooterSubsystem,turretSubsystem));
+		driver.rightBumper().onTrue(new AutoSpinUpStopCommand(shooterSubsystem));
+		driver.a().onTrue(new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
+		driver.b().onTrue(new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, false, false));
+
+
 		// Robot centric driving
+		/* 
 		driver.povUp().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0.035, 0));
 		driver.povDown().whileTrue(new RobotCentricDriveCommand(driveSubsystem, -0.035, 0));
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
@@ -182,6 +213,7 @@ public class RobotContainer {
 
 		operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
 		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		*/
 	}
 
 }

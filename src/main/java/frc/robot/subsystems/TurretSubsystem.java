@@ -12,6 +12,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -82,6 +83,9 @@ public class TurretSubsystem extends SubsystemBase {
 
 	private TalonFX turretMotor;
 	private DriveSubsystem driveSubsystem;
+	public static double xTransform = 0;
+	public static double yTransform = 0;
+	
 
 	public TurretSubsystem(DriveSubsystem driveSubsystem, HardwareMonitor hardwareMonitor) {
 		turretMotor = new TalonFX(TurretConstants.kMotorID);
@@ -114,6 +118,8 @@ public class TurretSubsystem extends SubsystemBase {
 		turretMotor.getConfigurator().apply(talonFXConfigs);
 
 		hardwareMonitor.registerDevice(this, turretMotor);
+
+		
 	}
 
 	public void moveToPosition(double position) {
@@ -139,16 +145,47 @@ public class TurretSubsystem extends SubsystemBase {
 		this.moveToPosition((owlHeadPosition % 360 + 360) % 360);
 	}
 
+	public static Transform2d changeTargetLocation(String direction) {
+		Optional<Alliance> alliance = DriverStation.getAlliance();
+		if(direction == "up") {
+			xTransform += Units.inchesToMeters(-3);
+		} else if (direction == "down") {
+			xTransform += Units.inchesToMeters(3);
+		} else if(direction == "left") {
+			yTransform += Units.inchesToMeters(-3);
+		} else if(direction == "right") {
+			yTransform += Units.inchesToMeters(3);
+		}
+
+		if(xTransform >= Units.inchesToMeters(8)) {
+			xTransform = Units.inchesToMeters(8);
+		} 
+		if(xTransform <= Units.inchesToMeters(-8)) {
+			xTransform = Units.inchesToMeters(-8);
+		} if(yTransform >= Units.inchesToMeters(8)) {
+			yTransform = Units.inchesToMeters(8);
+		} if(yTransform <= Units.inchesToMeters(-8)) {
+			yTransform = Units.inchesToMeters(-8);
+		} 
+		if(alliance.get() == Alliance.Red) {
+			return new Transform2d(xTransform, yTransform, new Rotation2d(0));
+		} else {
+			return new Transform2d(-1 * xTransform, -1 * yTransform, new Rotation2d(0));
+		}
+	}
+
+	
+
 	public static Pose2d getHub() {
 		Optional<Alliance> alliance = DriverStation.getAlliance();
 		if (alliance.isPresent()) {
 			if (alliance.get() == Alliance.Red) {
-				return FieldConstants.kRedHub;
+				return FieldConstants.kRedHub.plus(changeTargetLocation("67"));
 			} else {
-				return FieldConstants.kBlueHub;
+				return FieldConstants.kBlueHub.plus(changeTargetLocation("67"));
 			}
 		}
-		return FieldConstants.kRedHub;
+		return FieldConstants.kRedHub.plus(changeTargetLocation("67"));
 	}
 
 	public void stopMotor() {

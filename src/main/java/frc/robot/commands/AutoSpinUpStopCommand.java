@@ -8,6 +8,7 @@ public class AutoSpinUpStopCommand extends InstantCommand{
     ShooterSubsystem shooterSubsystem;
 
     public AutoSpinUpStopCommand(ShooterSubsystem shooterSubsystem){
+        addRequirements(shooterSubsystem);
         this.shooterSubsystem = shooterSubsystem;
     }
 

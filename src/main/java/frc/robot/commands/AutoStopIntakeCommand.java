@@ -8,6 +8,7 @@ public class AutoStopIntakeCommand extends InstantCommand{
     IntakeSubsystem intakeSubsystem;
 
     public AutoStopIntakeCommand(IntakeSubsystem intakeSubsystem){
+        addRequirements(intakeSubsystem);
         this.intakeSubsystem = intakeSubsystem;
     }
 

@@ -161,9 +161,9 @@ public class RobotContainer {
 
 		driver.x().onTrue(new AutoAimCommand(turretSubsystem,driveSubsystem,shooterHoodSubsystem));
 		driver.leftTrigger().onTrue(new AutoIntakeCommand(intakeSubsystem, true));
-		//driver.leftBumper().onTrue(new AutoStopIntakeCommand(intakeSubsystem));
+		driver.leftBumper().onTrue(new AutoStopIntakeCommand(intakeSubsystem));
 		driver.rightTrigger().onTrue(new AutoSpinUpCommand(shooterSubsystem,turretSubsystem));
-		//driver.rightBumper().onTrue(new AutoSpinUpStopCommand(shooterSubsystem));
+		driver.rightBumper().onTrue(new AutoSpinUpStopCommand(shooterSubsystem));
 		driver.a().onTrue(new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
 		driver.b().onTrue(new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, false, false));
 

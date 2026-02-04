@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ManualVelocityCommand;
+import frc.robot.commands.ObjectTrackingCommand;
 import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.ResetTurretGyro;
 import frc.robot.commands.AimCommand;
@@ -147,6 +148,7 @@ public class RobotContainer {
 
     	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
     	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
+		driver.y().whileTrue(new ObjectTrackingCommand(visionSubsystem, driveSubsystem));
 
 		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
 		driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));

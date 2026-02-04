@@ -26,6 +26,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -41,6 +42,7 @@ public class VisionSubsystem extends SubsystemBase {
     //public static final String kFrontRightCameraName = "LimelightFrontRight";
     public static final String kFrontLeftCameraName = "FrontLeft-Camera";
     public static final String kFrontRightCameraName = "FrontRight-Camera";
+    public static final String kExternalCamera = "ExternalCamera";
    // public static final String kBackCameraName = "LimelightBack";
     public static final double xOffset = Helpers.isBabycakes() ?0.42 + .105: 0.42 + .11; // 0.42m is the offest from the center of the robot to the edge of the bumper.  
     public static final double yOffsetRight = 0.164;  //  Distance from the center of the tag to the center of the branch right.
@@ -102,7 +104,7 @@ public class VisionSubsystem extends SubsystemBase {
           new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(90)));
         
   
-/*     public static final Transform3d kRobotToCamBack = 
+    public static final Transform3d kRobotToCamBack = 
       Helpers.isBabycakes()?
         new Transform3d(
           new Translation3d(-0.013, 0.26, 0.856),
@@ -112,7 +114,7 @@ public class VisionSubsystem extends SubsystemBase {
           new Translation3d(-0.013, 0.26,0.856),
           new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-20),
           Units.degreesToRadians(180)));
-*/    
+   
     public static final double kMaxGyroCameraAngleDelta = 89.0;
 
     }
@@ -125,7 +127,7 @@ public class VisionSubsystem extends SubsystemBase {
     private final AprilTagFieldLayout aprilTagFieldLayout;
     private final PhotonCamera frontRightCam;
     private final PhotonCamera frontLeftCam;
-//    private final PhotonCamera backCam;
+    private final PhotonCamera frontCam;
     private final DriveSubsystem m_driveSubsystem;
     private final TurretSubsystem turretSubsystem;
     private Field2d fieldDisplay = new Field2d();
@@ -155,7 +157,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     frontRightCam = new PhotonCamera(VisionConstants.kFrontRightCameraName);
     frontLeftCam = new PhotonCamera(VisionConstants.kFrontLeftCameraName);
-//    backCam = new PhotonCamera(VisionConstants.kBackCameraName);
+    frontCam = new PhotonCamera(VisionConstants.kExternalCamera);
     // hw.registerDevice(this, frontRightCam);
     // hw.registerDevice(this, frontLeftCam);
 //    hw.registerDevice(this, backCam);
@@ -283,6 +285,16 @@ public class VisionSubsystem extends SubsystemBase {
   public Pose3d getTagPose(int tagID) {
     return aprilTagFieldLayout.getTagPose(tagID).get();
     }
+
+  public double getTargetYaw() {
+    PhotonPipelineResult target = frontCam.getLatestResult();
+    if(target.getBestTarget() != null) {
+      return target.getBestTarget().getYaw();
+    }  else {
+      return 0;
+    }
+  }
+  
 
     @Override
     public void periodic() {

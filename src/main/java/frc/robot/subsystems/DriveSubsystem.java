@@ -493,7 +493,7 @@ public class DriveSubsystem extends SubsystemBase {
 
 	public Pose2d getShootOnTheFlyPose2d() {
 		Pose2d currentPose2d = this.getPose();
-		return currentPose2d.plus(new Transform2d(this.getRobotFieldSpeedX() * TurretConstants.kTimeOfFlight, this.getRobotFieldSpeedY() * TurretConstants.kTimeOfFlight, new Rotation2d(0)));
+		return currentPose2d.plus(new Transform2d(-1 * (this.getRobotFieldSpeedX() * TurretConstants.kTimeOfFlight), -1 * (this.getRobotFieldSpeedY() * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
 	}
 	
 }

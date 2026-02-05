@@ -46,7 +46,7 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kSTurret = 0.0;
 		public static final double kVTurret = 0.0;
 		public static final double kATurret = 0.1;
-		public static final double kPTurret = 60.0;
+		public static final double kPTurret = 100.0;
 		public static final double kITurret = 1.0;
 		public static final double kDTurret = 0.0;
 

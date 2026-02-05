@@ -42,10 +42,10 @@ public class DriveSubsystem extends SubsystemBase {
 		public static final double kMaxSpeedMetersPerSecond = 2.0; // was 5.0 //Keep Lower Than Real Max
 		public static final double kMaxAngularSpeed = Helpers.isBabycakes() ? (1.35 * Math.PI) : (1.8 * Math.PI); // radians per second for turning
 
-		public static final double kAimP = 1.8;
+		public static final double kAimP = 1.0;
 		public static final double kAimI = 0;
 		public static final double kAimD = 0;
-		public static final Constraints kAimProfile = new Constraints(6 * Math.PI, 4 * Math.PI);
+		public static final Constraints kAimProfile = new Constraints(1 * Math.PI, 0.5 * Math.PI);//Acceleration was 4 speed was 6
 
 		public static final double KTransP = 1.0;
 		public static final double KTransI = 0.0;

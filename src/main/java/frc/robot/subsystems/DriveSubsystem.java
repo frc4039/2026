@@ -244,6 +244,8 @@ public class DriveSubsystem extends SubsystemBase {
 		builder.addDoubleProperty("Speed (mps)", () -> getSpeed(), null);
 		builder.addDoubleProperty("Speed (fps)", () -> Units.metersToFeet(getSpeed()), null);
 		builder.addDoubleProperty("Acceleration", () -> getAcceleration(), null);
+		builder.addDoubleProperty("Robot Velocity X", () -> this.getRobotFieldSpeedX(), null);
+		builder.addDoubleProperty("Robot Velocity Y", () -> this.getRobotFieldSpeedY(), null);
 	}
 
 	/**
@@ -493,7 +495,7 @@ public class DriveSubsystem extends SubsystemBase {
 
 	public Pose2d getShootOnTheFlyPose2d() {
 		Pose2d currentPose2d = this.getPose();
-		return currentPose2d.plus(new Transform2d(-1 * (this.getRobotFieldSpeedX() * TurretConstants.kTimeOfFlight), -1 * (this.getRobotFieldSpeedY() * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
+		return currentPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * TurretConstants.kTimeOfFlight), (this.getRobotRelativeSpeeds().vyMetersPerSecond * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
 	}
 	
 }

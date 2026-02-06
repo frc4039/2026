@@ -118,6 +118,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
 	public void stop() {
+		System.out.println("Stopping Motor");
 		shooterLeaderMotor.stopMotor();
 	}
 

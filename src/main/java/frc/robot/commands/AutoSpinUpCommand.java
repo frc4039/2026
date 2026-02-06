@@ -11,6 +11,7 @@ public class AutoSpinUpCommand extends Command {
   private final TurretSubsystem turretSubsystem;
   public AutoSpinUpCommand(ShooterSubsystem shooterSubsystem, TurretSubsystem turretSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(shooterSubsystem);
     this.shooterSubsystem = shooterSubsystem; 
     this.turretSubsystem = turretSubsystem;
     shootingEstimator.put(7.517, 27.0);

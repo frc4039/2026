@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import au.grapplerobotics.CanBridge;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -33,7 +34,7 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     DataLogManager.start();// Starts recording to data log
     DriverStation.startDataLog(DataLogManager.getLog()); // Record both DS control and joystick data
-
+    CanBridge.runTCP();
   }
 
   /**

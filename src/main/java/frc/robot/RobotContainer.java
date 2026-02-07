@@ -30,6 +30,7 @@ import frc.robot.commands.ShooterHoodCommand;
 import frc.robot.commands.SpinUpCommand;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.TeleopDriveCommand;
+import frc.robot.commands.TimeOfFlightSensorCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.commands.FeederCommand;
 import frc.robot.subsystems.DriveSubsystem;
@@ -182,6 +183,7 @@ public class RobotContainer {
 
 		operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
 		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		operator.y().onTrue(new TimeOfFlightSensorCommand().ignoringDisable(true));
 
 		operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
 		operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));

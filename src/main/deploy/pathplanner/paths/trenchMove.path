@@ -42,13 +42,23 @@
       "name": "",
       "waypointRelativePos": 0,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Retract Hood"
+        }
+      }
     },
     {
       "name": "StartIntake",
       "waypointRelativePos": 0.5892687559354056,
       "endWaypointRelativePos": null,
-      "command": null
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "StartIntake"
+        }
+      }
     }
   ],
   "globalConstraints": {
@@ -60,7 +70,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 1.0,
+    "velocity": 3.0,
     "rotation": -4.224403217083857
   },
   "reversed": false,

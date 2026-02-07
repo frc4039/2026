@@ -34,6 +34,7 @@ import frc.robot.commands.ShootCommand;
 import frc.robot.commands.TeleopDriveCommand;
 import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.commands.FeederCommand;
+import frc.robot.commands.HoodGoToZeroPositionComand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SpindexerSubsystem;
 import frc.robot.utils.HardwareMonitor;
@@ -53,6 +54,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.AutoStopIntakeCommand;
@@ -94,11 +96,13 @@ public class RobotContainer {
 	NamedCommands.registerCommand("Shoot", new ShootCommand(shooterSubsystem));
 	NamedCommands.registerCommand("StartIntake", new AutoIntakeCommand(intakeSubsystem,true));
 	NamedCommands.registerCommand("StopIntake", new AutoStopIntakeCommand(intakeSubsystem));
-	NamedCommands.registerCommand("SpindexerFeed", new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, shooterSubsystem,false, false));
+	NamedCommands.registerCommand("SpindexerFeed", new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, shooterSubsystem,false, false, turretSubsystem));
 	NamedCommands.registerCommand("StopSpindexerFeed", new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
 	NamedCommands.registerCommand("ShooterSpinUp", new AutoSpinUpCommand(shooterSubsystem, turretSubsystem));
 	NamedCommands.registerCommand("ShooterStopSpinUp", new AutoSpinUpStopCommand(shooterSubsystem));
 	NamedCommands.registerCommand("Aim", new AutoAimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
+	NamedCommands.registerCommand("Retract Hood", new HoodGoToZeroPositionComand(shooterHoodSubsystem));
+	NamedCommands.registerCommand("Wait", new WaitCommand(5));
 
 
     configureBindings();
@@ -166,7 +170,7 @@ public class RobotContainer {
 		driver.rightTrigger().onTrue(new AutoSpinUpCommand(shooterSubsystem,turretSubsystem));
 		driver.rightBumper().onTrue(new AutoSpinUpStopCommand(shooterSubsystem));
 		driver.a().onTrue(new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
-		driver.b().onTrue(new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, shooterSubsystem, false, false));
+		driver.b().onTrue(new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, shooterSubsystem, false, false, turretSubsystem));
 
 
 		// Robot centric driving

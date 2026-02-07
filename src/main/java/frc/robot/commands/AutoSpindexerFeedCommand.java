@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SpindexerSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class AutoSpindexerFeedCommand extends Command{
     SpindexerSubsystem spindexerSubsystem;
@@ -11,14 +12,15 @@ public class AutoSpindexerFeedCommand extends Command{
 	ShooterSubsystem shooterSubsystem;
 	private boolean spindexerReverseMotor;
 	private boolean feederReverseMotor;
-
-	public AutoSpindexerFeedCommand(SpindexerSubsystem spindexerSubsystem, FeederSubsystem feederSubsystem, ShooterSubsystem shooterSubsystem, Boolean spindexerReverseMotor, Boolean feederReverseMotor) {
+	private TurretSubsystem turretSubsystem;
+	public AutoSpindexerFeedCommand(SpindexerSubsystem spindexerSubsystem, FeederSubsystem feederSubsystem, ShooterSubsystem shooterSubsystem, Boolean spindexerReverseMotor, Boolean feederReverseMotor, TurretSubsystem turretSubsystem) {
 		addRequirements(feederSubsystem);
 		this.spindexerSubsystem = spindexerSubsystem;
 		this.feederSubsystem = feederSubsystem;
 		this.spindexerReverseMotor = spindexerReverseMotor;
 		this.feederReverseMotor = feederReverseMotor;
 		this.shooterSubsystem = shooterSubsystem;
+		this.turretSubsystem = turretSubsystem;
 	}
 
 	@Override
@@ -28,6 +30,11 @@ public class AutoSpindexerFeedCommand extends Command{
 	@Override
 	public void execute() {
 		if (shooterSubsystem.atTargetSpeed() == false) {
+			spindexerSubsystem.stopMotor();
+			return;
+		}
+		if(!turretSubsystem.isAtPosition()) {
+			spindexerSubsystem.stopMotor();
 			return;
 		}
 		if (spindexerReverseMotor) {

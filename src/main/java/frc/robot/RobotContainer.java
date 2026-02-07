@@ -154,6 +154,7 @@ public class RobotContainer {
       	driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
 		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
+		driver.y().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
 		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));

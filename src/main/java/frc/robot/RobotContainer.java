@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ManualVelocityCommand;
+import frc.robot.commands.MoveIntakeSlideCommand;
 import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.ResetTurretGyro;
 import frc.robot.commands.AimCommand;
@@ -24,6 +25,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
+import frc.robot.subsystems.IntakeSlideSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.ShooterHoodCommand;
 import frc.robot.commands.SpinUpCommand;
@@ -68,6 +70,7 @@ public class RobotContainer {
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
+	private final IntakeSlideSubsystem intakeSlideSubsystem = new IntakeSlideSubsystem();
 
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
@@ -93,6 +96,7 @@ public class RobotContainer {
 	SmartDashboard.putData(turretSubsystem);
 	SmartDashboard.putData(shooterSubsystem);
 	SmartDashboard.putData(shooterHoodSubsystem);
+	SmartDashboard.putData(intakeSlideSubsystem);
 
 
 	hardwareMonitor.registerDevice(null, driver);
@@ -150,9 +154,10 @@ public class RobotContainer {
 
 		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
 		driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
-      	driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
+      	driver.x().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, true));
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
 		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
+		driver.y().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, false));
 	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
 		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));

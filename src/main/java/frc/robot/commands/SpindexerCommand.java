@@ -28,7 +28,7 @@ public class SpindexerCommand extends Command {
 
 	@Override
 	public void end(boolean interrupted) {
-		feederSubsystem.stopMotor();
+		feederSubsystem.stop();
 	}
 
 	@Override

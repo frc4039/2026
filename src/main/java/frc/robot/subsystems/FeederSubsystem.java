@@ -7,6 +7,13 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -45,69 +52,64 @@ public class FeederSubsystem extends SubsystemBase {
 
 	}
 
-	private final SparkFlex feederMotor;
-	private final SparkFlexConfig feederMotorConfig = new SparkFlexConfig();
-	private SysIdRoutine sysid = new SysIdRoutine(
-		new SysIdRoutine.Config(Volts.per(Second).of(0.5), Volts.of(2), Seconds.of(5)),
-		new SysIdRoutine.Mechanism(this::voltageDrive, this::logMotors, this)
-	);
+	private final TalonFX feederMotor;
+	
 
 	public FeederSubsystem(HardwareMonitor hardwareMonitor) {
-		feederMotor = new SparkFlex(FeederConstants.kTurretFeederMotorId, MotorType.kBrushless);
+		feederMotor = new TalonFX(SpindexerConstants.kSpindexerMotorId);
 
-		feederMotorConfig.idleMode(IdleMode.kCoast);
-		feederMotorConfig.closedLoop
-			.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-			.pid(FeederConstants.kTurretFeederWheelP, 
-				FeederConstants.kTurretFeederWheelI, 
-				FeederConstants.kTurretFeederWheelD, 
-				ClosedLoopSlot.kSlot0)
-			.outputRange(-1, 1,ClosedLoopSlot.kSlot0);
+		feederMotor.setNeutralMode(NeutralModeValue.Coast);
 
-		feederMotor.configure(feederMotorConfig, ResetMode.kResetSafeParameters,
-				PersistMode.kPersistParameters);
+		MotorOutputConfigs mcfg = new MotorOutputConfigs();
+
+		mcfg.withInverted(InvertedValue.CounterClockwise_Positive);
+		mcfg.withNeutralMode(NeutralModeValue.Coast);
+
+		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration().withMotorOutput(mcfg);
+
+		Slot0Configs slotConfigs = talonFXConfigs.Slot0;
+
+		slotConfigs.kS = FeederConstants.kS;
+		slotConfigs.kV = SpindexerConstants.kV;
+		// slotConfigs.kA = SpindexerConstants.kAShooter;
+		slotConfigs.kP = FeederConstants.kTurretFeederWheelP;
+		slotConfigs.kI = FeederConstants.kTurretFeederWheelI;
+		slotConfigs.kD = FeederConstants.kTurretFeederWheelD;
+
+		feederMotor.getConfigurator().apply(talonFXConfigs);
 
 		hardwareMonitor.registerDevice(this, feederMotor);
 
-		// SmartDashboard.putData("TurretFeederSubsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
-		// SmartDashboard.putData("TurretFeederSubsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
-		// SmartDashboard.putData("TurretFeederSubsystem/Dynamic Forward", sysid.dynamic(Direction.kForward));
-		// SmartDashboard.putData("TurretFeederSubsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
-
 	}
 
-	public void feed(Boolean reverseMotor) {
-		if (reverseMotor) {
-			feederMotor.getClosedLoopController().setSetpoint(FeederConstants.kTurretFeederSpeed, ControlType.kVelocity,
-					ClosedLoopSlot.kSlot0, FeederConstants.kFeedForward.calculate(FeederConstants.kTurretFeederSpeed));
+	public void feed(Boolean forward) {
+		final VelocityVoltage request = new VelocityVoltage(FeederConstants.kTurretFeederSpeed).withSlot(0);
+
+		if (forward) {
+			feederMotor.setControl(request.withVelocity(FeederConstants.kTurretFeederSpeed));
 		} else {
-			feederMotor.getClosedLoopController().setSetpoint(-1 * FeederConstants.kTurretFeederSpeed, ControlType.kVelocity,
-					ClosedLoopSlot.kSlot0, FeederConstants.kFeedForward.calculate(-1 * FeederConstants.kTurretFeederSpeed));
+			feederMotor.setControl(request.withVelocity(-1 * FeederConstants.kTurretFeederSpeed));
 		}
 	}
 
-	public void stopMotor() {
+	public void feedInput(double velocity) {
+		final VelocityVoltage request = new VelocityVoltage(velocity).withSlot(0);
+		feederMotor.setControl(request.withVelocity(velocity));
+	}
+
+
+	public void stop() {
 		feederMotor.stopMotor();
 	}
 
-	private void voltageDrive(Voltage volts) {
-		feederMotor.setVoltage(volts);
-	}
-
-	private void logMotors(SysIdRoutineLog log) {
-		var encoder = feederMotor.getEncoder();
-		log.motor("turret feeder motor")
-			.angularPosition(Rotations.of(encoder.getPosition()))
-			.angularVelocity(Rotations.per(Minute).of(encoder.getVelocity()))
-			.current(Amps.of(feederMotor.getOutputCurrent()))
-			.voltage(Volts.of(feederMotor.getBusVoltage() * feederMotor.getAppliedOutput()));
+	@Override
+	public void periodic() {
+		// For safety, stop the turret whenever the robot is disabled.
 	}
 
 	@Override
 	public void initSendable(SendableBuilder builder) {
-		builder.addDoubleProperty("Feeder Wheel Speed", () -> feederMotor.getEncoder().getVelocity(), null);
-		builder.addDoubleProperty("Current", () -> feederMotor.getOutputCurrent(), null);
+		builder.addDoubleProperty("Feeder speed", () -> feederMotor.getVelocity().getValueAsDouble(), null);
 	}
 
-	public void periodic() {}
 }

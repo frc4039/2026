@@ -18,6 +18,13 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -44,78 +51,64 @@ public class SpindexerSubsystem extends SubsystemBase {
 		public static final SimpleMotorFeedforward kFeedForward = new SimpleMotorFeedforward(kS, kV);
 	}
 
-	private final SparkFlex spindexerMotor;
-	private final SparkFlexConfig feederMotorConfig = new SparkFlexConfig();
-	private SysIdRoutine sysid = new SysIdRoutine(
-		new SysIdRoutine.Config(Volts.per(Second).of(0.5), Volts.of(2), Seconds.of(5)),
-		new SysIdRoutine.Mechanism(this::voltageDrive, this::logMotors, this)
-	);
+	private final TalonFX spindexerMotor;
+	
 
 	public SpindexerSubsystem(HardwareMonitor hardwareMonitor) {
-		spindexerMotor = new SparkFlex(SpindexerConstants.kSpindexerMotorId, MotorType.kBrushless);
+		spindexerMotor = new TalonFX(SpindexerConstants.kSpindexerMotorId);
 
-		feederMotorConfig.idleMode(IdleMode.kCoast);
-		// intakeMotorConfig.smartCurrentLimit(80);
-		feederMotorConfig.closedLoop
-				.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-				.pid(SpindexerConstants.kSpindexerWheelP,
-						SpindexerConstants.kSpindexerWheelI,
-						SpindexerConstants.kSpindexerWheelD,
-						ClosedLoopSlot.kSlot0)
-				.outputRange(-0.75, 0.75, ClosedLoopSlot.kSlot0);
+		spindexerMotor.setNeutralMode(NeutralModeValue.Coast);
 
-		
+		MotorOutputConfigs mcfg = new MotorOutputConfigs();
 
-		spindexerMotor.configure(feederMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-	
+		mcfg.withInverted(InvertedValue.CounterClockwise_Positive);
+		mcfg.withNeutralMode(NeutralModeValue.Coast);
+
+		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration().withMotorOutput(mcfg);
+
+		Slot0Configs slotConfigs = talonFXConfigs.Slot0;
+
+		// slotConfigs.kS = SpindexerConstants.kSp;
+		// slotConfigs.kV = SpindexerConstants.kVShooter;
+		// slotConfigs.kA = SpindexerConstants.kAShooter;
+		slotConfigs.kP = SpindexerConstants.kSpindexerWheelP;
+		slotConfigs.kI = SpindexerConstants.kSpindexerWheelI;
+		slotConfigs.kD = SpindexerConstants.kSpindexerWheelD;
+
+		spindexerMotor.getConfigurator().apply(talonFXConfigs);
+
 		hardwareMonitor.registerDevice(this, spindexerMotor);
-		// SmartDashboard.putData("FeederSubsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
-		// SmartDashboard.putData("FeederSubsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
-		// SmartDashboard.putData("FeederSubsystem/Dynamic Forward", sysid.dynamic(Direction.kForward));
-		// SmartDashboard.putData("FeederSubsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
-
 
 	}
 
-	public void spin(Boolean reverseMotor) {
-		if (reverseMotor) {
-			spindexerMotor.getClosedLoopController().setSetpoint(SpindexerConstants.kSpindexerSpeed, ControlType.kVelocity,
-					ClosedLoopSlot.kSlot0, SpindexerConstants.kFeedForward.calculate(SpindexerConstants.kSpindexerSpeed));
+	public void spin(Boolean forward) {
+		final VelocityVoltage request = new VelocityVoltage(SpindexerConstants.kSpindexerSpeed).withSlot(0);
+
+		if (forward) {
+			spindexerMotor.setControl(request.withVelocity(SpindexerConstants.kSpindexerSpeed));
 		} else {
-			spindexerMotor.getClosedLoopController().setSetpoint(-1 * SpindexerConstants.kSpindexerSpeed, ControlType.kVelocity,
-					ClosedLoopSlot.kSlot0, SpindexerConstants.kFeedForward.calculate(-1 * SpindexerConstants.kSpindexerSpeed));
+			spindexerMotor.setControl(request.withVelocity(-1 * SpindexerConstants.kSpindexerSpeed));
 		}
-
 	}
 
-	public void stopMotor() {
+	public void spinInput(double velocity) {
+		final VelocityVoltage request = new VelocityVoltage(velocity).withSlot(0);
+		spindexerMotor.setControl(request.withVelocity(velocity));
+	}
+
+
+	public void stop() {
 		spindexerMotor.stopMotor();
-	}
-
-	/** Set motor voltage output. Used for sysid. */
-	private void voltageDrive(Voltage volts) {
-		spindexerMotor.setVoltage(volts);
-	}
-
-	/** Log motor encoder . */
-	private void logMotors(SysIdRoutineLog log) {
-		var encoder = spindexerMotor.getEncoder();
-		log.motor("spindexer")
-			.angularPosition(Rotations.of(encoder.getPosition()))
-			.angularVelocity(Rotations.per(Minute).of(encoder.getVelocity()))
-			.current(Amps.of(spindexerMotor.getOutputCurrent()))
-			.voltage(Volts.of(spindexerMotor.getBusVoltage() * spindexerMotor.getAppliedOutput()));
-	}
-
-	/** Send dashboard data. */
-	@Override
-	public void initSendable(SendableBuilder builder) {
-		builder.addDoubleProperty("Spindexer Wheel Speed", () -> spindexerMotor.getEncoder().getVelocity(), null);
-		builder.addDoubleProperty("Current", () -> spindexerMotor.getOutputCurrent(), null);
-
 	}
 
 	@Override
 	public void periodic() {
+		// For safety, stop the turret whenever the robot is disabled.
 	}
+
+	@Override
+	public void initSendable(SendableBuilder builder) {
+		builder.addDoubleProperty("Spindexer speed", () -> spindexerMotor.getVelocity().getValueAsDouble(), null);
+	}
+
 }

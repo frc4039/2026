@@ -91,9 +91,10 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
 
+	NamedCommands.registerCommand("Shoot", new ShootCommand(shooterSubsystem));
 	NamedCommands.registerCommand("StartIntake", new AutoIntakeCommand(intakeSubsystem,true));
 	NamedCommands.registerCommand("StopIntake", new AutoStopIntakeCommand(intakeSubsystem));
-	NamedCommands.registerCommand("SpindexerFeed", new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, false, false));
+	NamedCommands.registerCommand("SpindexerFeed", new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, shooterSubsystem,false, false));
 	NamedCommands.registerCommand("StopSpindexerFeed", new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
 	NamedCommands.registerCommand("ShooterSpinUp", new AutoSpinUpCommand(shooterSubsystem, turretSubsystem));
 	NamedCommands.registerCommand("ShooterStopSpinUp", new AutoSpinUpStopCommand(shooterSubsystem));
@@ -165,7 +166,7 @@ public class RobotContainer {
 		driver.rightTrigger().onTrue(new AutoSpinUpCommand(shooterSubsystem,turretSubsystem));
 		driver.rightBumper().onTrue(new AutoSpinUpStopCommand(shooterSubsystem));
 		driver.a().onTrue(new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
-		driver.b().onTrue(new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, false, false));
+		driver.b().onTrue(new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, shooterSubsystem, false, false));
 
 
 		// Robot centric driving

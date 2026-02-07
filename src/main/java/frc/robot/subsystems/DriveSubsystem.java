@@ -504,5 +504,13 @@ public class DriveSubsystem extends SubsystemBase {
 		Pose2d currentPose2d = this.getPose();
 		return currentPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * TurretConstants.kTimeOfFlight), (this.getRobotRelativeSpeeds().vyMetersPerSecond * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
 	}
+	
+	
+	public void moveSimulation(double x, double y, double rotation) {
+		Pose2d currentPose = getPose();
+		
+		Pose2d simPose = new Pose2d(currentPose.getX() + x * 0.2, currentPose.getY() + y * -0.2, currentPose.getRotation().plus(Rotation2d.fromDegrees(rotation * 2)));
+		m_poseEstimator.resetPose(simPose);
+	}
 
 }

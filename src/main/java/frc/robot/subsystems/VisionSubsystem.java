@@ -23,7 +23,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -301,7 +303,10 @@ public class VisionSubsystem extends SubsystemBase {
 
         fieldDisplay.setRobotPose(m_driveSubsystem.getPose());
         fieldDisplay.getObject("target").setPose(shotCalculator.getTargetPose());
-        fieldDisplay.getObject("turret").setPose(turretSubsystem.getTurretPose(m_driveSubsystem.getPose()));
+        //fieldDisplay.getObject("turret").setPose(turretSubsystem.getTurretPose(m_driveSubsystem.getPose()));
+
+        var turretPose = new Pose3d(m_driveSubsystem.getPose()).plus(TurretConstants.kTurretOffset).toPose2d().plus(new Transform2d( new Translation2d(), Rotation2d.fromDegrees(-1 * shotCalculator.turretYaw)));
+        fieldDisplay.getObject("Turret").setPose(turretPose);
 
     }
 }

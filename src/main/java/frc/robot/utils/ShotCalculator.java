@@ -92,24 +92,6 @@ public class ShotCalculator {
 
         Pose3d ballReleasePosition = robotPosition.plus(TurretConstants.kTurretOffset);
 
-        // TODO: Calculate the correct shot.
-        Translation3d ballReleaseVelocity = null;
-
-        if (ballReleaseVelocity != null) {
-            // Convert the theoretical shot into the real values.
-            this.shooterMps = ballReleaseVelocity.getNorm();
-
-            double ballDirX = ballReleaseVelocity.getX();
-            double ballDirY = ballReleaseVelocity.getY();
-            this.turretYaw = new Rotation2d(ballReleaseVelocity.getX(), ballReleaseVelocity.getY())
-                    .minus(ballReleasePosition.getRotation().toRotation2d())
-                    .getDegrees();
-
-            double ballDirXY = Math.sqrt(ballDirX * ballDirX + ballDirY * ballDirY);
-            double ballDirZ = ballReleaseVelocity.getZ();
-            this.hoodPitch = new Rotation2d(ballDirXY, ballDirZ).getDegrees();
-        } else {
-            // If we couldn't calculate a valid shot angle, fallback to old logic.
             Pose2d currentRobotPose2d = robotPosition.plus(TurretConstants.kTurretOffset).toPose2d();
             Pose2d hubPose2d = new Pose2d(this.target.toTranslation2d(), new Rotation2d());
             double distanceToHub = currentRobotPose2d.getTranslation().getDistance(hubPose2d.getTranslation());
@@ -123,6 +105,33 @@ public class ShotCalculator {
             
             // From TurretSubsystem.getHoodAngle()
             this.hoodPitch = Units.radiansToDegrees(Math.atan2(TurretConstants.kVelocityZ, xVelocity));
+    
+
+        // TODO: Calculate the correct shot.
+        Translation3d vecT = new Translation3d(
+            (Math.cos(Units.degreesToRadians(this.turretYaw))) * (Math.cos(Units.degreesToRadians(this.hoodPitch))) * (this.shooterMps), 
+            (Math.sin(Units.degreesToRadians(this.turretYaw))) * (Math.cos(Units.degreesToRadians(this.hoodPitch))) * (this.shooterMps), 
+            (Math.sin(this.hoodPitch)) * this.shooterMps);
+        
+        Translation3d ballReleaseVelocity = new Translation3d(
+            (vecT.getX()) - (robotVelocity.getX()), 
+            (vecT.getY()) - (robotVelocity.getY()), 
+            vecT.getZ());
+
+            ballReleaseVelocity = null;
+        if (ballReleaseVelocity != null) {
+            // Convert the theoretical shot into the real values.
+            this.shooterMps = ballReleaseVelocity.getNorm();
+
+            double ballDirX = ballReleaseVelocity.getX();
+            double ballDirY = ballReleaseVelocity.getY();
+            this.turretYaw = new Rotation2d(ballReleaseVelocity.getX(), ballReleaseVelocity.getY())
+                    .minus(ballReleasePosition.getRotation().toRotation2d().plus(new Rotation2d(Units.degreesToRadians(180))))
+                    .getDegrees();
+
+            double ballDirXY = Math.sqrt(ballDirX * ballDirX + ballDirY * ballDirY);
+            double ballDirZ = ballReleaseVelocity.getZ();
+            this.hoodPitch = new Rotation2d(ballDirXY, ballDirZ).getDegrees();
         }
 
         // Convert ball m/s to rotations/s.

@@ -38,9 +38,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -71,6 +73,8 @@ public class RobotContainer {
 
   private final CommandXboxController operator = 
     new CommandXboxController(OperatorConstants.kOperatorPort);
+	
+	private final CommandXboxController keyboard = new CommandXboxController(3);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -128,11 +132,15 @@ public class RobotContainer {
 			Translation2d currentPosition = driveSubsystem.getPose().getTranslation();
 			driveSubsystem.resetGyroAngle(new Pose2d(currentPosition, resetAngle));
 		}));
-
-		driveSubsystem.setDefaultCommand(
+		if(Robot.isReal()){
+			driveSubsystem.setDefaultCommand(
 				new TeleopDriveCommand(driveSubsystem, driver::getLeftY, driver::getLeftX,
 						driver::getRightX, -1.0));
-
+		} else {
+			driveSubsystem.setDefaultCommand(
+				new TeleopDriveCommand(driveSubsystem, keyboard::getLeftX, keyboard::getLeftY,
+						keyboard::getRightX, -1.0));
+		}
 		// Robot centric driving
 		driver.povUp().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0.035, 0));
 		driver.povDown().whileTrue(new RobotCentricDriveCommand(driveSubsystem, -0.035, 0));
@@ -175,6 +183,9 @@ public class RobotContainer {
 
 		operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
 		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+
+		keyboard.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, shotCalculator));
+
 	}
 
 }

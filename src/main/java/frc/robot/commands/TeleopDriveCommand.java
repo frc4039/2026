@@ -11,7 +11,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-
+import frc.robot.Robot;
 import frc.robot.subsystems.DriveSubsystem;
 
 /**
@@ -100,7 +100,9 @@ public class TeleopDriveCommand extends Command {
 	@Override
 	public void execute() {
 		double rotationGoal = rotationAngle.getAsDouble();
-		if (rotationGoal != -1.0) {
+		if(Robot.isSimulation()) {
+				driveSubsystem.moveSimulation(xSpeedSupplier.getAsDouble(), ySpeedSupplier.getAsDouble(), -3 * this.rotSpeedSupplier.getAsDouble());
+		}if (rotationGoal != -1.0) {
 			rotationController.setGoal(rotationGoal);
 			driveSubsystem.drive(-xSpeedSupplier.getAsDouble(), -ySpeedSupplier.getAsDouble(),
 					rotationController.calculate(Math.toRadians(driveSubsystem.getHeading())),

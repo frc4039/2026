@@ -33,6 +33,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
+import frc.robot.utils.ShotCalculator;
 
 public class VisionSubsystem extends SubsystemBase {
     /** Creates a new VisionSubsystem. */
@@ -147,10 +148,12 @@ public class VisionSubsystem extends SubsystemBase {
    public final PhotonPoseEstimator frontRightPhotonPoseEstimator;
     public final PhotonPoseEstimator frontLeftPhotonPoseEstimator;
 //    public final PhotonPoseEstimator backPhotonPoseEstimator;
+    private final ShotCalculator shotCalculator;
 
-    public VisionSubsystem(DriveSubsystem driveSubsystem, TurretSubsystem turretSubsystem) {
+    public VisionSubsystem(DriveSubsystem driveSubsystem, TurretSubsystem turretSubsystem, ShotCalculator shotCalculator) {
         m_driveSubsystem = driveSubsystem;
         this.turretSubsystem = turretSubsystem;
+        this.shotCalculator = shotCalculator;
         aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
     frontRightCam = new PhotonCamera(VisionConstants.kFrontRightCameraName);
@@ -297,10 +300,8 @@ public class VisionSubsystem extends SubsystemBase {
 //        updateCamera(backCam, backPhotonPoseEstimator, "BackPose");
 
         fieldDisplay.setRobotPose(m_driveSubsystem.getPose());
-        fieldDisplay.getObject("blueHub").setPose(TurretSubsystem.getHub().plus(TurretSubsystem.changeTargetLocation("67")));
-        fieldDisplay.getObject("Turret").setPose(turretSubsystem.getTurretPose());
-        fieldDisplay.getObject("Shoot On The Fly Pose").setPose(m_driveSubsystem.getShootOnTheFlyPose2d());
-
+        fieldDisplay.getObject("target").setPose(shotCalculator.getTargetPose());
+        fieldDisplay.getObject("turret").setPose(turretSubsystem.getTurretPose(m_driveSubsystem.getPose()));
 
     }
 }

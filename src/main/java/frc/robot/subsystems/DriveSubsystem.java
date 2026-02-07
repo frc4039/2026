@@ -16,6 +16,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -35,6 +36,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
+import frc.robot.utils.ShotCalculator;
 
 public class DriveSubsystem extends SubsystemBase {
 	public static final class DriveConstants {
@@ -120,14 +122,16 @@ public class DriveSubsystem extends SubsystemBase {
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double m_currentRotation = 0.0;
-	private double m_currentTranslationDir = 0.0;
-	private double m_currentTranslationMag = 0.0;
+	
+	private final ShotCalculator shotCalculator;
 
 	// Odometry class for tracking robot pose
-	public static SwerveDrivePoseEstimator m_poseEstimator;
+	public SwerveDrivePoseEstimator m_poseEstimator;
 
 	/** Creates a new DriveSubsystem. */
-	public DriveSubsystem(HardwareMonitor hw) {
+	public DriveSubsystem(HardwareMonitor hw, ShotCalculator shotCalculator) {
+		this.shotCalculator = shotCalculator;
+
 		m_poseEstimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics,
 				Rotation2d.fromDegrees(0.0),
 				new SwerveModulePosition[] {
@@ -234,6 +238,8 @@ public class DriveSubsystem extends SubsystemBase {
 						m_rearLeft.getPosition(),
 						m_rearRight.getPosition()
 				});
+
+		shotCalculator.update(new Pose3d(getPose()), getVelocity());
 	}
 
 	@Override
@@ -474,6 +480,13 @@ public class DriveSubsystem extends SubsystemBase {
 		return robotSpeed;
 	}
 
+	public ChassisSpeeds getVelocity() {
+		Pose2d currentPose = getPose();
+		ChassisSpeeds robotRelativeSpeeds = getRobotRelativeSpeeds();
+		ChassisSpeeds fieldRelativeSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeeds, currentPose.getRotation());
+		return fieldRelativeSpeeds;
+	}
+
 	/** Return x Pose Value */
 	public double getPoseXValue() {
 		return this.getPose().getX();
@@ -487,15 +500,9 @@ public class DriveSubsystem extends SubsystemBase {
 		m_poseEstimator.addVisionMeasurement(estVisionPose, estVisionTimeStamp);
 	}
 
-	public double getDistanceFromHub() {
-		Pose2d hubPose = TurretSubsystem.getHub();
-		Pose2d currentRobotPose2d = this.getPose().plus(TurretConstants.kTurretOffset);
-		return Math.sqrt(Math.pow(hubPose.relativeTo(currentRobotPose2d).getX(), 2) + Math.pow(hubPose.relativeTo(currentRobotPose2d).getY(), 2));
-	}
-
 	public Pose2d getShootOnTheFlyPose2d() {
 		Pose2d currentPose2d = this.getPose();
 		return currentPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * TurretConstants.kTimeOfFlight), (this.getRobotRelativeSpeeds().vyMetersPerSecond * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
 	}
-	
+
 }

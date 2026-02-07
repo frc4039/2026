@@ -6,6 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Unit;
 
@@ -26,17 +28,18 @@ public final class Constants {
   public static class FieldConstants {
     public static final double kFieldLength = 651.22;
     public static final double kDistanceFromHubToWall = 182.11;
-    public static final Pose2d kBlueHub = new Pose2d(Units.inchesToMeters(182.11), Units.inchesToMeters(159), new Rotation2d(0));
-    public static final Pose2d kRedHub = new Pose2d(Units.inchesToMeters(469.11), Units.inchesToMeters(159), new Rotation2d(0));
-    public static final Pose2d kRedAllianceLine = new Pose2d(Units.inchesToMeters(469.11), 0, new Rotation2d(0));
-    public static final Pose2d kRedPassTargetRight = new Pose2d(Units.inchesToMeters(560), Units.inchesToMeters(75), new Rotation2d(0));
-    public static final Pose2d kLeftPassTarget = new Pose2d(Units.inchesToMeters(560), Units.inchesToMeters(240), new Rotation2d(0));
+		public static final double kHubHeight = 1.4351;
+    public static final Translation3d kBlueHub = new Translation3d(Units.inchesToMeters(182.11), Units.inchesToMeters(159), kHubHeight);
+    public static final Translation3d kRedHub = new Translation3d(Units.inchesToMeters(469.11), Units.inchesToMeters(159), kHubHeight);
+    public static final Translation3d kRedPassTargetRight = new Translation3d(Units.inchesToMeters(560), Units.inchesToMeters(75), 0);
+    public static final Translation3d kLeftPassTarget = new Translation3d(Units.inchesToMeters(560), Units.inchesToMeters(240), 0);
+    public static final double kRedAllianceLine = Units.inchesToMeters(469.11);
     public static final double kCenterLine = Units.inchesToMeters(158.32);
-    public static Pose2d flipPoseY(Pose2d yPose2d) {
-      return new Pose2d(yPose2d.getX(), Units.inchesToMeters(316.64) - yPose2d.getY(), yPose2d.getRotation());
+    public static Translation3d flipPoseY(Translation3d yPose2d) {
+      return new Translation3d(yPose2d.getX(), Units.inchesToMeters(316.64) - yPose2d.getY(), yPose2d.getZ());
     }
-    public static Pose2d flipPoseX(Pose2d xPose2d) {
-      return new Pose2d(Units.inchesToMeters(650.12) - xPose2d.getX(), xPose2d.getY(), xPose2d.getRotation());
+    public static Translation3d flipPoseX(Translation3d xPose2d) {
+      return new Translation3d(Units.inchesToMeters(650.12) - xPose2d.getX(), xPose2d.getY(), xPose2d.getZ());
     }
   }
 }

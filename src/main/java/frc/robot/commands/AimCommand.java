@@ -4,16 +4,16 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem.ShooterAngleConstants;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
+import frc.robot.utils.ShotCalculator;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AimCommand extends Command {
@@ -21,16 +21,16 @@ public class AimCommand extends Command {
 	private TurretSubsystem turretSubsystem;
 	private DriveSubsystem driveSubsystem;
 	private ShooterHoodSubsystem shooterHoodSubsystem;
-
+	private ShotCalculator shotCalculator;
 
 	public AimCommand(TurretSubsystem turretSubsystem, DriveSubsystem driveSubsystem,
-			ShooterHoodSubsystem shooterHoodSubsystem) {
+			ShooterHoodSubsystem shooterHoodSubsystem, ShotCalculator shotCalculator) {
 		this.turretSubsystem = turretSubsystem;
 		this.driveSubsystem = driveSubsystem;
 		this.shooterHoodSubsystem = shooterHoodSubsystem;
+		this.shotCalculator = shotCalculator;
 		addRequirements(turretSubsystem, shooterHoodSubsystem);
 
-		
 	}
 
 	// Called when the command is initially scheduled.
@@ -41,25 +41,23 @@ public class AimCommand extends Command {
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
-		Pose2d currentRobotPose2d = driveSubsystem.getShootOnTheFlyPose2d().plus(TurretConstants.kTurretOffset);
-		Pose2d hubPose2d = TurretSubsystem.getHub();
+		Translation3d target = TurretSubsystem.getHub();
 
-    if(driveSubsystem.getPose().getTranslation().getX() < Constants.FieldConstants.kRedAllianceLine.getX()){
-       if(driveSubsystem.getPose().getTranslation().getY() > Constants.FieldConstants.kCenterLine) {
-        hubPose2d = Constants.FieldConstants.flipPoseY(Constants.FieldConstants.kRedPassTargetRight);
-       } else {
-          hubPose2d = Constants.FieldConstants.kRedPassTargetRight;
-       }
-    }
+		if (driveSubsystem.getPose().getTranslation().getX() < Constants.FieldConstants.kRedAllianceLine) {
+			if (driveSubsystem.getPose().getTranslation().getY() > Constants.FieldConstants.kCenterLine) {
+				target = Constants.FieldConstants.flipPoseY(Constants.FieldConstants.kRedPassTargetRight);
+			} else {
+				target = Constants.FieldConstants.kRedPassTargetRight;
+			}
+		}
 
+		shotCalculator.setTarget(target);
+		turretSubsystem.moveToPosition(MathUtil.clamp(TurretConstants.kMin, TurretConstants.kMax,
+				-1 * shotCalculator.turretYaw));
 
-		turretSubsystem.moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
-				-1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees())));
+		shooterHoodSubsystem.moveToPosition(MathUtil.clamp(ShooterAngleConstants.kMax, ShooterAngleConstants.kMin,
+			shotCalculator.hoodPitch));
 
-		shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
-				Math.max(ShooterAngleConstants.kMin, turretSubsystem.getHoodAngle()))));
-
-		
 	}
 
 	// Called once the command ends or is interrupted.

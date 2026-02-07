@@ -14,9 +14,13 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -65,16 +69,18 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kTurretBackwardPosition = 360.0;
 
 		// Turret Offset
-		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(5.75),
-				Units.inchesToMeters(5.25), Rotation2d.fromDegrees(180));
+		public static final Transform3d kTurretOffset = new Transform3d(
+				Units.inchesToMeters(5.75),
+				Units.inchesToMeters(5.25),
+				Units.inchesToMeters(19.0),
+				new Rotation3d(Rotation2d.fromDegrees(180))
+		);
 
 		// Min/Max
 		public static final double kMin = -180;
 		public static final double kMax = 50;
 
-		public static final double kHubTargetHeight = 1.4351;
-		public static final double kTurretHeight = 0.5;
-		public static final double kDeltaZ = kHubTargetHeight - kTurretHeight;
+		public static final double kDeltaZ = FieldConstants.kHubHeight - kTurretOffset.getZ();
 		public static final double kVelocityZ = 7.3;
 		public static final double kTimeOfFlight = (kVelocityZ
 				+ Math.sqrt(Math.pow(kVelocityZ, 2) - (2 * 9.81 * kDeltaZ))) / 9.81;
@@ -85,14 +91,12 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	private TalonFX turretMotor;
-	private DriveSubsystem driveSubsystem;
 	public static double xTransform = 0;
 	public static double yTransform = 0;
 	
 
-	public TurretSubsystem(DriveSubsystem driveSubsystem, HardwareMonitor hardwareMonitor) {
+	public TurretSubsystem(HardwareMonitor hardwareMonitor) {
 		turretMotor = new TalonFX(TurretConstants.kMotorID);
-		this.driveSubsystem = driveSubsystem;
 
 		turretMotor.setNeutralMode(NeutralModeValue.Brake);
 
@@ -147,47 +151,18 @@ public class TurretSubsystem extends SubsystemBase {
 		double owlHeadPosition = robotHeading.getAsDouble() + desiredDirection;
 		this.moveToPosition((owlHeadPosition % 360 + 360) % 360);
 	}
-
-	public static Transform2d changeTargetLocation(String direction) {
-		Optional<Alliance> alliance = DriverStation.getAlliance();
-		if(direction == "up") {
-			xTransform += -1 * TurretConstants.kManualChangeAmount;
-		} else if (direction == "down") {
-			xTransform += TurretConstants.kManualChangeAmount;
-		} else if(direction == "left") {
-			yTransform += -1 * TurretConstants.kManualChangeAmount;
-		} else if(direction == "right") {
-			yTransform += TurretConstants.kManualChangeAmount;
-		}
-
-		if(xTransform >= TurretConstants.kManualChangeLimit) {
-			xTransform = TurretConstants.kManualChangeLimit;
-		} if(xTransform <= -1 * TurretConstants.kManualChangeLimit) {
-			xTransform = -1 * TurretConstants.kManualChangeLimit;
-		} if(yTransform >= TurretConstants.kManualChangeLimit) {
-			yTransform = TurretConstants.kManualChangeLimit;
-		} if(yTransform <= -1 * TurretConstants.kManualChangeLimit) {
-			yTransform = -1 * TurretConstants.kManualChangeLimit;
-		} 
-		if(alliance.get() == Alliance.Red) {
-			return new Transform2d(xTransform, yTransform, new Rotation2d(0));
-		} else {
-			return new Transform2d(-1 * xTransform, -1 * yTransform, new Rotation2d(0));
-		}
-	}
-
 	
 
-	public static Pose2d getHub() {
+	public static Translation3d getHub() {
 		Optional<Alliance> alliance = DriverStation.getAlliance();
 		if (alliance.isPresent()) {
 			if (alliance.get() == Alliance.Red) {
-				return FieldConstants.kRedHub.plus(changeTargetLocation("67"));
+				return FieldConstants.kRedHub;
 			} else {
-				return FieldConstants.kBlueHub.plus(changeTargetLocation("67"));
+				return FieldConstants.kBlueHub;
 			}
 		}
-		return FieldConstants.kRedHub.plus(changeTargetLocation("67"));
+		return FieldConstants.kRedHub;
 	}
 
 	public void stopMotor() {
@@ -195,21 +170,10 @@ public class TurretSubsystem extends SubsystemBase {
 		System.out.println("Trying to disable turret motor");
 	}
 
-	public double getXVelocity() {
-		return driveSubsystem.getDistanceFromHub() / TurretConstants.kTimeOfFlight;
-	}
-
-	public double getOutputVelocity() {
-		return Math.sqrt(Math.pow(this.getXVelocity(), 2) + Math.pow(TurretConstants.kVelocityZ, 2));
-	}
-
-	public double getHoodAngle() {
-		return Units.radiansToDegrees(Math.atan2(TurretConstants.kVelocityZ, getXVelocity()));
-	}
-
-	public Pose2d getTurretPose() {
-		return driveSubsystem.getPose()
+	public Pose2d getTurretPose(Pose2d drivebasePose) {
+		return new Pose3d(drivebasePose)
 				.plus(TurretConstants.kTurretOffset)
+				.toPose2d()
 				.plus(new Transform2d(
 						new Translation2d(),
 						Rotation2d.fromDegrees(-1 * this.getTurretPosition())));
@@ -232,8 +196,6 @@ public class TurretSubsystem extends SubsystemBase {
 			}
 			return 0;
 		}, null);
-		builder.addDoubleProperty("Shooter Target", () -> this.getOutputVelocity(), null);
-		builder.addDoubleProperty("Target", () -> driveSubsystem.getDistanceFromHub(), null);
 		// builder.addDoubleProperty("Turret Target",() -> {
 		// moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
 		// Pose2d currentRobotPose2d = driveSubsystem.getPose().plus(TurretConstants.kTurretOffset);

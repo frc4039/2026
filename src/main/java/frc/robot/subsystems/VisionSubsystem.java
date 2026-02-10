@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
 
@@ -38,7 +39,8 @@ public class VisionSubsystem extends SubsystemBase {
 
   public static class VisionConstants {
     //public static final String kFrontRightCameraName = "LimelightFrontRight";
-    public static final String kFrontLeftCameraName = "AprilTag-Camera";
+    public static final String kFrontLeftCameraName = "FrontLeft-Camera";
+    public static final String kFrontRightCameraName = "FrontRight-Camera";
    // public static final String kBackCameraName = "LimelightBack";
     public static final double xOffset = Helpers.isBabycakes() ?0.42 + .105: 0.42 + .11; // 0.42m is the offest from the center of the robot to the edge of the bumper.  
     public static final double yOffsetRight = 0.164;  //  Distance from the center of the tag to the center of the branch right.
@@ -49,7 +51,11 @@ public class VisionSubsystem extends SubsystemBase {
     public static final double rightAngleOffset = -22.17;
     public static final double leftAngleOffset = 22.17;
     
-    
+    public static final Pose2d redTower = new Pose2d(15.44, 5.6, new Rotation2d(Units.degreesToRadians(0)));
+    public static final Pose2d blueTower = new Pose2d(1, 1, new Rotation2d(1));
+
+    public static final Pose2d KFinalRedTower = new Pose2d(15.44, 5.37, new Rotation2d(Units.degreesToRadians(0)));
+
 
     //  Array of Tag specific Offsets, For quick refernce Array index is Tag ID
     //  Values are robot centric, x + is away from the reef, y + is right
@@ -84,22 +90,16 @@ public class VisionSubsystem extends SubsystemBase {
 
     // Cam mounted facing forward, half a meter forward of center, half a meter up
     // from center.
-    // public static final Transform3d kRobotToCamFrontRight =
-    //   Helpers.isBabycakes()?
-    //     new Transform3d(
-    //       new Translation3d(0.168,-0.255, 0.328),
-    //       new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0),
-    //       Units.degreesToRadians(30))) :
-    //     new Transform3d(
-    //       new Translation3d(0.168,-0.255, 0.328),
-    //       new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0),
-    //       Units.degreesToRadians(30)));//28.35
-//
+    public static final Transform3d kRobotToCamFrontRight =
+        new Transform3d(
+          new Translation3d(Units.inchesToMeters(12), Units.inchesToMeters(-11.25), Units.inchesToMeters(20)),
+          new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-24.5),
+          Units.degreesToRadians(-13.5)));
 
     public static final Transform3d kRobotToCamFrontLeft =
         new Transform3d(
-          new Translation3d(Units.inchesToMeters(13), Units.inchesToMeters(10), Units.inchesToMeters(11.5)),
-          new Rotation3d(0, Units.degreesToRadians(-24.5), Units.degreesToRadians(10)));
+          new Translation3d(Units.inchesToMeters(11 + (1/16)), Units.inchesToMeters(13), Units.inchesToMeters(16 + (5/6))),
+          new Rotation3d(0, Units.degreesToRadians(0), Units.degreesToRadians(90)));
         
   
 /*     public static final Transform3d kRobotToCamBack = 
@@ -123,10 +123,11 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     private final AprilTagFieldLayout aprilTagFieldLayout;
-    //private final PhotonCamera frontRightCam;
+    private final PhotonCamera frontRightCam;
     private final PhotonCamera frontLeftCam;
 //    private final PhotonCamera backCam;
     private final DriveSubsystem m_driveSubsystem;
+    private final TurretSubsystem turretSubsystem;
     private Field2d fieldDisplay = new Field2d();
     private List<Pose2d> blueTargets = new ArrayList<>();
     private List<Pose2d> redTargets = new ArrayList<>();
@@ -143,24 +144,25 @@ public class VisionSubsystem extends SubsystemBase {
     private Pose2d redCage3 = new Pose2d(9.45, 2.95, Rotation2d.fromDegrees(0));  
 
     // Construct PhotonPoseEstimator
-   // public final PhotonPoseEstimator frontRightPhotonPoseEstimator;
+   public final PhotonPoseEstimator frontRightPhotonPoseEstimator;
     public final PhotonPoseEstimator frontLeftPhotonPoseEstimator;
 //    public final PhotonPoseEstimator backPhotonPoseEstimator;
 
-    public VisionSubsystem(DriveSubsystem driveSubsystem) {
+    public VisionSubsystem(DriveSubsystem driveSubsystem, TurretSubsystem turretSubsystem) {
         m_driveSubsystem = driveSubsystem;
-        aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+        this.turretSubsystem = turretSubsystem;
+        aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
-    //frontRightCam = new PhotonCamera(VisionConstants.kFrontRightCameraName);
+    frontRightCam = new PhotonCamera(VisionConstants.kFrontRightCameraName);
     frontLeftCam = new PhotonCamera(VisionConstants.kFrontLeftCameraName);
 //    backCam = new PhotonCamera(VisionConstants.kBackCameraName);
     // hw.registerDevice(this, frontRightCam);
     // hw.registerDevice(this, frontLeftCam);
 //    hw.registerDevice(this, backCam);
     
-    // frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
-    //         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontRight);
-    // frontRightPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+    frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontRight);
+    frontRightPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
 
     frontLeftPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontLeft);
@@ -225,12 +227,14 @@ public class VisionSubsystem extends SubsystemBase {
             }
         }
   }
-  public Pose2d getBlueCagePose() {
-    return  m_driveSubsystem.getPose().nearest(blueCages);
+  public Pose2d getBlueTowerPose() {
+    return VisionSubsystem.VisionConstants.blueTower;
+    // return  m_driveSubsystem.getPose().nearest(VisionSubsystem.VisionConstants.blueTower);
   }
 
-  public Pose2d getRedCagePose() {
-    return  m_driveSubsystem.getPose().nearest(redCages);
+  public Pose2d getRedTowerPose() {
+    return VisionSubsystem.VisionConstants.redTower;
+    // return  m_driveSubsystem.getPose().nearest(VisionSubsystem.VisionConstants.redTower);
   }
 
   public Pose2d getClosestReefTargetRed() {
@@ -283,8 +287,8 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        // frontRightPhotonPoseEstimator.setReferencePose(m_driveSubsystem.getPose());
-        // updateCamera(frontRightCam, frontRightPhotonPoseEstimator, "RightFrontPose");
+        frontRightPhotonPoseEstimator.setReferencePose(m_driveSubsystem.getPose());
+        updateCamera(frontRightCam, frontRightPhotonPoseEstimator, "RightFrontPose");
         
         frontLeftPhotonPoseEstimator.setReferencePose(m_driveSubsystem.getPose());
         updateCamera(frontLeftCam, frontLeftPhotonPoseEstimator, "LeftFrontPose");
@@ -293,7 +297,10 @@ public class VisionSubsystem extends SubsystemBase {
 //        updateCamera(backCam, backPhotonPoseEstimator, "BackPose");
 
         fieldDisplay.setRobotPose(m_driveSubsystem.getPose());
-        fieldDisplay.getObject("blueHub").setPose(TurretSubsystem.getHub());
+        fieldDisplay.getObject("blueHub").setPose(TurretSubsystem.getHub().plus(TurretSubsystem.changeTargetLocation("67")));
+        fieldDisplay.getObject("Turret").setPose(turretSubsystem.getTurretPose());
+        fieldDisplay.getObject("Shoot On The Fly Pose").setPose(m_driveSubsystem.getShootOnTheFlyPose2d());
+
 
     }
 }

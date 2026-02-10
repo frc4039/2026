@@ -13,22 +13,17 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 
 public class IntakeSlideSubsystem extends SubsystemBase {
   public final class IntakeSlideSubsystemConstants {
@@ -57,10 +52,13 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		public static final double kAcceleration = 0.0 / kDegreesPerRotation;
 		public static final double kJerk = 0.0 / kDegreesPerRotation;
 
+		public static final int kLeftLimitSwitchChannel = 0;
+		public static final int kRightLimitSwitchChannel = 1;
+
 	}
 
-	private TalonFX intakeSlideLeaderMotor, intakeSlideFollowerMotor;
-
+	private TalonFX intakeSlideLeftMotor, intakeSlideRightMotor;
+	private final DigitalInput limitSwitchLeft, limitSwitchRight;
 	private double manualVelocity = 10.0;
 
 	private VoltageOut voltRequest = new VoltageOut(0.0);
@@ -72,62 +70,102 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 				(state) -> SignalLogger.writeString("state", state.toString())
 			),
 			new SysIdRoutine.Mechanism(
-					(volts) -> intakeSlideLeaderMotor.setControl(voltRequest.withOutput(volts.in(Volts))),
+					(volts) -> intakeSlideLeftMotor.setControl(voltRequest.withOutput(volts.in(Volts))),
 					null,
 					this));
 
 	public IntakeSlideSubsystem() {
-		intakeSlideLeaderMotor = new TalonFX(IntakeSlideSubsystemConstants.kLeaderMotorID);
-		intakeSlideFollowerMotor = new TalonFX(IntakeSlideSubsystemConstants.kFollowerMotorID);
+		intakeSlideLeftMotor = new TalonFX(IntakeSlideSubsystemConstants.kLeaderMotorID);
+		intakeSlideRightMotor = new TalonFX(IntakeSlideSubsystemConstants.kFollowerMotorID);
 
-		intakeSlideLeaderMotor.setNeutralMode(NeutralModeValue.Brake);
-		intakeSlideFollowerMotor.setNeutralMode(NeutralModeValue.Brake);
+		limitSwitchLeft = new DigitalInput(IntakeSlideSubsystemConstants.kLeftLimitSwitchChannel);
+		limitSwitchRight = new DigitalInput(IntakeSlideSubsystemConstants.kRightLimitSwitchChannel);
 
-		var follower = new Follower(IntakeSlideSubsystemConstants.kLeaderMotorID, MotorAlignmentValue.Opposed);
+		
+		//var follower = new Follower(IntakeSlideSubsystemConstants.kLeaderMotorID, MotorAlignmentValue.Opposed);
 
-		intakeSlideLeaderMotor.setControl(follower);
-		MotorOutputConfigs mcfg = new MotorOutputConfigs();
+		//intakeSlideLeftMotor.setControl(follower);
+		MotorOutputConfigs mcfgLeaderMotor = new MotorOutputConfigs();
+		MotorOutputConfigs mcfgFollowerMotor = new MotorOutputConfigs();
 
-		mcfg.withInverted(InvertedValue.CounterClockwise_Positive);
-		mcfg.withNeutralMode(NeutralModeValue.Coast);
 
-		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration().withMotorOutput(mcfg);
+		mcfgLeaderMotor.withInverted(InvertedValue.CounterClockwise_Positive);
+		mcfgLeaderMotor.withNeutralMode(NeutralModeValue.Coast);
+		mcfgFollowerMotor.withInverted(InvertedValue.Clockwise_Positive);
+		mcfgFollowerMotor.withNeutralMode(NeutralModeValue.Coast);
 
-		Slot0Configs slotConfigs = talonFXConfigs.Slot0;
+		TalonFXConfiguration talonFXConfigurationLeader = new TalonFXConfiguration().withMotorOutput(mcfgLeaderMotor);
+		TalonFXConfiguration talonFXConfigurationFollower = new TalonFXConfiguration().withMotorOutput(mcfgFollowerMotor);
 
-		slotConfigs.kS = IntakeSlideSubsystemConstants.kSIntakeSlide;
-		slotConfigs.kV = IntakeSlideSubsystemConstants.kVIntakeSlide;
-		slotConfigs.kA = IntakeSlideSubsystemConstants.kAIntakeSlide;
-		slotConfigs.kP = IntakeSlideSubsystemConstants.kPIntakeSlide;
-		slotConfigs.kI = IntakeSlideSubsystemConstants.kIIntakeSlide;
-		slotConfigs.kD = IntakeSlideSubsystemConstants.kDIntakeSlide;
 
-    MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
+		Slot0Configs slotConfigsLeader = talonFXConfigurationLeader.Slot0;
+		Slot0Configs slotConfigsFollower = talonFXConfigurationFollower.Slot0;
 
-		motionMagicConfigs.MotionMagicCruiseVelocity = IntakeSlideSubsystemConstants.kCruiseVelocity;
-		motionMagicConfigs.MotionMagicAcceleration = IntakeSlideSubsystemConstants.kAcceleration;
-		motionMagicConfigs.MotionMagicJerk = IntakeSlideSubsystemConstants.kJerk;
 
-		intakeSlideLeaderMotor.getConfigurator().apply(talonFXConfigs);
+		slotConfigsLeader.kS = IntakeSlideSubsystemConstants.kSIntakeSlide;
+		slotConfigsLeader.kV = IntakeSlideSubsystemConstants.kVIntakeSlide;
+		slotConfigsLeader.kA = IntakeSlideSubsystemConstants.kAIntakeSlide;
+		slotConfigsLeader.kP = IntakeSlideSubsystemConstants.kPIntakeSlide;
+		slotConfigsLeader.kI = IntakeSlideSubsystemConstants.kIIntakeSlide;
+		slotConfigsLeader.kD = IntakeSlideSubsystemConstants.kDIntakeSlide;
+
+		slotConfigsFollower.kS = IntakeSlideSubsystemConstants.kSIntakeSlide;
+		slotConfigsFollower.kV = IntakeSlideSubsystemConstants.kVIntakeSlide;
+		slotConfigsFollower.kA = IntakeSlideSubsystemConstants.kAIntakeSlide;
+		slotConfigsFollower.kP = IntakeSlideSubsystemConstants.kPIntakeSlide;
+		slotConfigsFollower.kI = IntakeSlideSubsystemConstants.kIIntakeSlide;
+		slotConfigsFollower.kD = IntakeSlideSubsystemConstants.kDIntakeSlide;
+
+    MotionMagicConfigs motionMagicConfigsLeader = talonFXConfigurationLeader.MotionMagic;
+	MotionMagicConfigs motionMagicConfigsFollower = talonFXConfigurationFollower.MotionMagic;
+
+
+		motionMagicConfigsLeader.MotionMagicCruiseVelocity = IntakeSlideSubsystemConstants.kCruiseVelocity;
+		motionMagicConfigsLeader.MotionMagicAcceleration = IntakeSlideSubsystemConstants.kAcceleration;
+		motionMagicConfigsLeader.MotionMagicJerk = IntakeSlideSubsystemConstants.kJerk;
+
+		motionMagicConfigsFollower.MotionMagicCruiseVelocity = IntakeSlideSubsystemConstants.kCruiseVelocity;
+		motionMagicConfigsFollower.MotionMagicAcceleration = IntakeSlideSubsystemConstants.kAcceleration;
+		motionMagicConfigsFollower.MotionMagicJerk = IntakeSlideSubsystemConstants.kJerk;
+
+
+		intakeSlideLeftMotor.getConfigurator().apply(talonFXConfigurationLeader);
+		intakeSlideRightMotor.getConfigurator().apply(talonFXConfigurationFollower);
 	}
 
 	public void run(Boolean forward) {
 		final VelocityVoltage request = new VelocityVoltage(IntakeSlideSubsystemConstants.KMotorVelocity).withSlot(0);
 
 		if (forward) {
-			intakeSlideLeaderMotor.setControl(request.withVelocity(IntakeSlideSubsystemConstants.KMotorVelocity));
+			intakeSlideLeftMotor.setControl(request.withVelocity(IntakeSlideSubsystemConstants.KMotorVelocity));
 		} else {
-			intakeSlideLeaderMotor.setControl(request.withVelocity(-1 * IntakeSlideSubsystemConstants.KMotorVelocity));
+			intakeSlideLeftMotor.setControl(request.withVelocity(-1 * IntakeSlideSubsystemConstants.KMotorVelocity));
 		}
 	}
 
 	public void moveInput(double velocity) {
 		final VelocityVoltage request = new VelocityVoltage(velocity).withSlot(0);
-		intakeSlideLeaderMotor.setControl(request.withVelocity(velocity));
+		intakeSlideLeftMotor.setControl(request.withVelocity(velocity));
 	}
 
 	public void stop() {
-		intakeSlideLeaderMotor.stopMotor();
+		intakeSlideLeftMotor.stopMotor();
+	}
+
+	public void driveUntilLimit() {
+		if (limitSwitchLeft.get()) {
+			intakeSlideLeftMotor.set(-0.5);
+		} else {
+			intakeSlideLeftMotor.stopMotor();
+			intakeSlideLeftMotor.setPosition(0);
+		}
+		 
+		if(limitSwitchRight.get()) {
+			intakeSlideRightMotor.set(-0.5);
+		} else {
+			intakeSlideRightMotor.stopMotor();
+			intakeSlideRightMotor.setPosition(0);
+		}
 	}
 
   public void moveToPosition(double position) {
@@ -135,9 +173,14 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 
 		final double newPosition = position / IntakeSlideSubsystemConstants.kDegreesPerRotation;
 
-		intakeSlideLeaderMotor.setControl(request.withPosition(newPosition)
+		intakeSlideLeftMotor.setControl(request.withPosition(newPosition)
 				.withSlot(0)
-				.withOverrideBrakeDurNeutral(true));  }
+				.withOverrideBrakeDurNeutral(true));  
+		
+		intakeSlideRightMotor.setControl(request.withPosition(newPosition)
+				.withSlot(0)
+				.withOverrideBrakeDurNeutral(true)); 
+	}
 
 	@Override
 	public void periodic() {
@@ -146,7 +189,12 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 
 	@Override
 	public void initSendable(SendableBuilder builder) {
-		builder.addDoubleProperty("Intake Slide Position", () -> intakeSlideLeaderMotor.getPosition().getValueAsDouble(), null);
+		builder.addDoubleProperty("Intake Slide Left Position", () -> intakeSlideLeftMotor.getPosition().getValueAsDouble(), null);
+		builder.addDoubleProperty("Intake Slide Right Position", () -> intakeSlideRightMotor.getPosition().getValueAsDouble(), null);
+		builder.addBooleanProperty("Left Limit Switch", () -> limitSwitchLeft.get(), null);
+		builder.addBooleanProperty("Right Limit Switch", () -> limitSwitchRight.get(), null);
+		builder.addDoubleProperty("Right Motor Current", () -> intakeSlideRightMotor.getStatorCurrent().getValueAsDouble(), null);
+		builder.addDoubleProperty("Left Motor Current", () -> intakeSlideLeftMotor.getStatorCurrent().getValueAsDouble(), null);
   }
 
 }

@@ -28,7 +28,7 @@ public class MoveIntakeSlideCommand extends Command {
   @Override
   public void execute() {
     if(in) {
-      intakeSlideSubsystem.moveToPosition(IntakeSlideSubsystemConstants.kInPosition);
+      intakeSlideSubsystem.driveUntilLimit();
     } else {
       intakeSlideSubsystem.moveToPosition(IntakeSlideSubsystemConstants.kOutPosition);
     }

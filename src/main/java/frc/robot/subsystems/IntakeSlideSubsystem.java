@@ -31,8 +31,8 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		public static final double KMotorVelocity = 20;
 
 		// Device ids
-		public static final int kLeaderMotorID = 17;
-		public static final int kFollowerMotorID = 18;
+		public static final int kLeaderMotorID = 22;
+		public static final int kFollowerMotorID = 23;
 
 		// Pid values
 		public static final double kVIntakeSlide = 0.0;

@@ -7,10 +7,12 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -52,8 +54,19 @@ public class FeederSubsystem extends SubsystemBase {
 
 	}
 
-	private final TalonFX feederMotor;
-	
+	private TalonFX feederMotor;
+	private VoltageOut voltRequest = new VoltageOut(0.0);
+	private SysIdRoutine sysid = new SysIdRoutine(
+			new SysIdRoutine.Config(
+				Volts.of(0.5).per(Second),
+				Volts.of(4),
+				Seconds.of(5),
+				(state) -> SignalLogger.writeString("state", state.toString())
+			),
+			new SysIdRoutine.Mechanism(
+					(volts) -> feederMotor.setControl(voltRequest.withOutput(volts.in(Volts))),
+					null,
+					this));
 
 	public FeederSubsystem(HardwareMonitor hardwareMonitor) {
 		feederMotor = new TalonFX(SpindexerConstants.kSpindexerMotorId);
@@ -80,6 +93,10 @@ public class FeederSubsystem extends SubsystemBase {
 
 		hardwareMonitor.registerDevice(this, feederMotor);
 
+		SmartDashboard.putData("FeederSubsystem/QuasiStatic Forward",sysid.quasistatic(Direction.kForward));
+		SmartDashboard.putData("FeederSubsystem/QuasiStatic Backward",sysid.quasistatic(Direction.kReverse));
+		SmartDashboard.putData("FeederSubsystem/Dynamic Forward",sysid.dynamic(Direction.kForward));
+		SmartDashboard.putData("FeederSubsystem/Dynamic Backward",sysid.dynamic(Direction.kReverse));
 	}
 
 	public void feed(Boolean forward) {

@@ -18,10 +18,12 @@ import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -51,8 +53,19 @@ public class SpindexerSubsystem extends SubsystemBase {
 		public static final SimpleMotorFeedforward kFeedForward = new SimpleMotorFeedforward(kS, kV);
 	}
 
-	private final TalonFX spindexerMotor;
-	
+	private TalonFX spindexerMotor;
+	private VoltageOut voltRequest = new VoltageOut(0.0);
+	private SysIdRoutine sysid = new SysIdRoutine(
+			new SysIdRoutine.Config(
+				Volts.of(0.5).per(Second),
+				Volts.of(4),
+				Seconds.of(5),
+				(state) -> SignalLogger.writeString("state", state.toString())
+			),
+			new SysIdRoutine.Mechanism(
+					(volts) -> spindexerMotor.setControl(voltRequest.withOutput(volts.in(Volts))),
+					null,
+					this));
 
 	public SpindexerSubsystem(HardwareMonitor hardwareMonitor) {
 		spindexerMotor = new TalonFX(SpindexerConstants.kSpindexerMotorId);
@@ -79,6 +92,10 @@ public class SpindexerSubsystem extends SubsystemBase {
 
 		hardwareMonitor.registerDevice(this, spindexerMotor);
 
+		SmartDashboard.putData("SpindexerSubsystem/QuasiStatic Forward",sysid.quasistatic(Direction.kForward));
+		SmartDashboard.putData("SpindexerSubsystem/QuasiStatic Backward",sysid.quasistatic(Direction.kReverse));
+		SmartDashboard.putData("SpindexerSubsystem/Dynamic Forward",sysid.dynamic(Direction.kForward));
+		SmartDashboard.putData("SpindexerSubsystem/Dynamic Backward",sysid.dynamic(Direction.kReverse));
 	}
 
 	public void spin(Boolean forward) {

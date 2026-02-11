@@ -3,8 +3,9 @@
   "robotLength": 0.812,
   "holonomicMode": true,
   "pathFolders": [
-    "shootOnSpot",
+    "redShootAndCollect",
     "shootAndMove",
+    "shootOnSpot",
     "testAuto"
   ],
   "autoFolders": [],

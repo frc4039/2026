@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5838333333333345,
-        "y": 4.067392857142857
+        "x": 6.833916666666668,
+        "y": 5.96777380952381
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.5691548344007895,
-        "y": 3.8178241458245368
+        "x": 7.833916666666668,
+        "y": 5.96777380952381
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "rsacToNeutralZone"
     },
     {
       "anchor": {
-        "x": 3.5838333333333345,
-        "y": 4.067392857142857
+        "x": 7.794904761904762,
+        "y": 5.96777380952381
       },
       "prevControl": {
-        "x": 3.5985118322658796,
-        "y": 4.316961568461177
+        "x": 6.794904761904762,
+        "y": 5.96777380952381
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,14 +33,20 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "",
+      "name": "StartIntake",
       "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "StopIntake",
+      "waypointRelativePos": 0.9875930521091782,
       "endWaypointRelativePos": null,
       "command": null
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 0.7,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -52,10 +58,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "shootOnSpot",
+  "folder": "redShootAndCollect",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

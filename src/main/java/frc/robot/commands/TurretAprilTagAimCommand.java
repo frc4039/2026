@@ -51,7 +51,8 @@ public class TurretAprilTagAimCommand extends Command {
   public void execute() {
     Pose2d currentRobotPose2d = driveSubsystem.getPose().plus(TurretConstants.kTurretOffset);
     Pose2d hubPose2d = TurretSubsystem.getHub();
-    turretSubsystem.moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin, -1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees())));
+    turretSubsystem.moveToPosition(-1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees());
+    //turretSubsystem.moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin, -1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees())));
   }
 
   // Called once the command ends or is interrupted.

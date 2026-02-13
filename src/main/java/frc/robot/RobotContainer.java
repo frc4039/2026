@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ManualVelocityCommand;
+import frc.robot.commands.MoveIntakeSlideCommand;
 import frc.robot.commands.MoveHubTargetCommand;
 import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.ResetTurretGyro;
@@ -17,6 +18,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.SpindexerCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
+import frc.robot.commands.ZeroIntakeSlideCommand;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -25,6 +27,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
+import frc.robot.subsystems.IntakeSlideSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.ShooterHoodCommand;
 import frc.robot.commands.SpinUpCommand;
@@ -69,6 +72,7 @@ public class RobotContainer {
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
+	private final IntakeSlideSubsystem intakeSlideSubsystem = new IntakeSlideSubsystem();
 
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
@@ -94,6 +98,7 @@ public class RobotContainer {
 	SmartDashboard.putData(turretSubsystem);
 	SmartDashboard.putData(shooterSubsystem);
 	SmartDashboard.putData(shooterHoodSubsystem);
+	SmartDashboard.putData(intakeSlideSubsystem);
 
 
 	hardwareMonitor.registerDevice(null, driver);
@@ -140,53 +145,57 @@ public class RobotContainer {
 						driver::getRightX, -1.0));
 
 		// Robot centric driving
-		driver.povUp().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0.035, 0));
-		driver.povDown().whileTrue(new RobotCentricDriveCommand(driveSubsystem, -0.035, 0));
-		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
-		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
-
-
-    	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-    	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
-
-		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
-		driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
-      	driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
-		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
-		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
-		driver.y().whileTrue(new ManualVelocityCommand(shooterSubsystem));
-	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
-	    
-		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
-		//driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
-		// driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
-		// driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
-		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
-			.or(
-				operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
-			)
-			.whileTrue(
-				new TurretWithJoystickCommand(
-					turretSubsystem,
-					() -> operator.getRightX(),
-					() -> operator.getRightY(),
-					() -> driveSubsystem.getHeading()
-				)
-			); //moves turrettttttttttttttttttttt
-
-		operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, true));
-		operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
-
-		operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
-
-		operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
-		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
-
-		operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
-		operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));
-		operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
-		operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
+		// driver.povUp().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0.035, 0));
+		// driver.povDown().whileTrue(new RobotCentricDriveCommand(driveSubsystem, -0.035, 0));
+		// driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
+		// driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
+		//
+		//
+		//   	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+		//   	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
+		//
+		// driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
+		// driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
+		//     	driver.x().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, true));
+		// driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
+		// driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
+		// driver.y().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, false));
+		// // driver.y().whileTrue(new ManualVelocityCommand(shooterSubsystem));
+		//    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
+		//
+		// //driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
+		// //driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
+		// // driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
+		// // driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
+		// operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
+		// 	.or(
+		// 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
+		// 	)
+		// 	.whileTrue(
+		// 		new TurretWithJoystickCommand(
+		// 			turretSubsystem,
+		// 			() -> operator.getRightX(),
+		// 			() -> operator.getRightY(),
+		// 			() -> driveSubsystem.getHeading()
+		// 		)
+		// 	); //moves turrettttttttttttttttttttt
+		//
+		// operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, true));
+		// operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
+		//
+		// operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+		// operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
+		//
+		// operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
+		// operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		//
+		// operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
+		// operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));
+		// operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
+		// operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
+		operator.a().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, true));
+		operator.b().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, false));
+		operator.y().onTrue(new ZeroIntakeSlideCommand(intakeSlideSubsystem).ignoringDisable(true));
 	}
 
 }

@@ -10,37 +10,50 @@ import frc.robot.subsystems.IntakeSlideSubsystem.IntakeSlideSubsystemConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveIntakeSlideCommand extends Command {
-  /** Creates a new MoveIntakeSlideCommand. */
-  private final IntakeSlideSubsystem intakeSlideSubsystem;
-  private boolean in;
-  public MoveIntakeSlideCommand(IntakeSlideSubsystem intakeSlideSubsystem, boolean in) {
-    this.intakeSlideSubsystem = intakeSlideSubsystem;
-    this.in = in;
-    addRequirements(intakeSlideSubsystem);
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
+	/** Creates a new MoveIntakeSlideCommand. */
+	private final IntakeSlideSubsystem intakeSlideSubsystem;
+	private double targetPosition;
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
+	public MoveIntakeSlideCommand(IntakeSlideSubsystem intakeSlideSubsystem, boolean in) {
+		this.intakeSlideSubsystem = intakeSlideSubsystem;
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    if(this.in) {
-      intakeSlideSubsystem.moveToPosition(IntakeSlideSubsystemConstants.kInPosition);
-    } else {
-      intakeSlideSubsystem.moveToPosition(IntakeSlideSubsystemConstants.kOutPosition);
-    }
-  }
+		if (in) {
+			this.targetPosition = IntakeSlideSubsystemConstants.kInPosition;
+		} else {
+			this.targetPosition = IntakeSlideSubsystemConstants.kOutPosition;
+		}
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
+		addRequirements(intakeSlideSubsystem);
+		// Use addRequirements() here to declare subsystem dependencies.
+	}
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+	// Called when the command is initially scheduled.
+	@Override
+	public void initialize() {
+	}
+
+	// Called every time the scheduler runs while the command is scheduled.
+	@Override
+	public void execute() {
+		intakeSlideSubsystem.moveToPosition(this.targetPosition);
+	}
+
+	// Called once the command ends or is interrupted.
+	@Override
+	public void end(boolean interrupted) {
+		intakeSlideSubsystem.stop();
+	}
+
+	// Returns true when the command should end.
+	@Override
+	public boolean isFinished() {
+		double positionAverage = (intakeSlideSubsystem.intakeSlideLeftMotor.getPosition().getValueAsDouble()
+				+ intakeSlideSubsystem.intakeSlideRightMotor.getPosition().getValueAsDouble()) / 2;
+
+		if (Math.abs(positionAverage - this.targetPosition) < IntakeSlideSubsystemConstants.kPositionThreshold) {
+			return true;
+		}
+
+		return false;
+	}
 }

@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class IntakeSlideSubsystem extends SubsystemBase {
-  public final class IntakeSlideSubsystemConstants {
+	public final class IntakeSlideSubsystemConstants {
 		// How fast the turret rotates from one point to another.
 		public static final double KMotorVelocity = 20;
 
@@ -42,12 +42,15 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		public static final double kIIntakeSlide = 0.0;
 		public static final double kDIntakeSlide = 0.0;
 
-    public static final double kDegreesPerRotation = 0.0;
+		public static final double kDegreesPerRotation = 0.0;
 
-    public static final double kOutPosition = -19.0;
-    public static final double kInPosition = 0.0;
+		public static final double kOutPosition = -19.0;
+		public static final double kInPosition = 0.0;
 
-    // Motion magic
+		// Used for determining when the command ends.
+		public static final double kPositionThreshold = 0.1;
+
+		// Motion magic
 		public static final double kCruiseVelocity = 20.0;
 		public static final double kAcceleration = 15.0;
 		public static final double kJerk = 10.0;
@@ -57,18 +60,17 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 
 	}
 
-	private TalonFX intakeSlideLeftMotor, intakeSlideRightMotor;
+	public TalonFX intakeSlideLeftMotor, intakeSlideRightMotor;
 	private final DigitalInput limitSwitchLeft, limitSwitchRight;
 	private double manualVelocity = 10.0;
 
 	private VoltageOut voltRequest = new VoltageOut(0.0);
 	private SysIdRoutine sysid = new SysIdRoutine(
 			new SysIdRoutine.Config(
-				Volts.of(0.5).per(Second),
-				Volts.of(4),
-				Seconds.of(5),
-				(state) -> SignalLogger.writeString("state", state.toString())
-			),
+					Volts.of(0.5).per(Second),
+					Volts.of(4),
+					Seconds.of(5),
+					(state) -> SignalLogger.writeString("state", state.toString())),
 			new SysIdRoutine.Mechanism(
 					(volts) -> intakeSlideLeftMotor.setControl(voltRequest.withOutput(volts.in(Volts))),
 					null,
@@ -81,13 +83,12 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		limitSwitchLeft = new DigitalInput(IntakeSlideSubsystemConstants.kLeftLimitSwitchChannel);
 		limitSwitchRight = new DigitalInput(IntakeSlideSubsystemConstants.kRightLimitSwitchChannel);
 
-		
-		//var follower = new Follower(IntakeSlideSubsystemConstants.kLeaderMotorID, MotorAlignmentValue.Opposed);
+		// var follower = new Follower(IntakeSlideSubsystemConstants.kLeaderMotorID,
+		// MotorAlignmentValue.Opposed);
 
-		//intakeSlideLeftMotor.setControl(follower);
+		// intakeSlideLeftMotor.setControl(follower);
 		MotorOutputConfigs mcfgLeaderMotor = new MotorOutputConfigs();
 		MotorOutputConfigs mcfgFollowerMotor = new MotorOutputConfigs();
-
 
 		mcfgLeaderMotor.withInverted(InvertedValue.CounterClockwise_Positive);
 		mcfgLeaderMotor.withNeutralMode(NeutralModeValue.Coast);
@@ -95,12 +96,11 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		mcfgFollowerMotor.withNeutralMode(NeutralModeValue.Coast);
 
 		TalonFXConfiguration talonFXConfigurationLeader = new TalonFXConfiguration().withMotorOutput(mcfgLeaderMotor);
-		TalonFXConfiguration talonFXConfigurationFollower = new TalonFXConfiguration().withMotorOutput(mcfgFollowerMotor);
-
+		TalonFXConfiguration talonFXConfigurationFollower = new TalonFXConfiguration()
+				.withMotorOutput(mcfgFollowerMotor);
 
 		Slot0Configs slotConfigsLeader = talonFXConfigurationLeader.Slot0;
 		Slot0Configs slotConfigsFollower = talonFXConfigurationFollower.Slot0;
-
 
 		slotConfigsLeader.kS = IntakeSlideSubsystemConstants.kSIntakeSlide;
 		slotConfigsLeader.kV = IntakeSlideSubsystemConstants.kVIntakeSlide;
@@ -116,9 +116,8 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		slotConfigsFollower.kI = IntakeSlideSubsystemConstants.kIIntakeSlide;
 		slotConfigsFollower.kD = IntakeSlideSubsystemConstants.kDIntakeSlide;
 
-    MotionMagicConfigs motionMagicConfigsLeader = talonFXConfigurationLeader.MotionMagic;
-	MotionMagicConfigs motionMagicConfigsFollower = talonFXConfigurationFollower.MotionMagic;
-
+		MotionMagicConfigs motionMagicConfigsLeader = talonFXConfigurationLeader.MotionMagic;
+		MotionMagicConfigs motionMagicConfigsFollower = talonFXConfigurationFollower.MotionMagic;
 
 		motionMagicConfigsLeader.MotionMagicCruiseVelocity = IntakeSlideSubsystemConstants.kCruiseVelocity;
 		motionMagicConfigsLeader.MotionMagicAcceleration = IntakeSlideSubsystemConstants.kAcceleration;
@@ -127,7 +126,6 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		motionMagicConfigsFollower.MotionMagicCruiseVelocity = IntakeSlideSubsystemConstants.kCruiseVelocity;
 		motionMagicConfigsFollower.MotionMagicAcceleration = IntakeSlideSubsystemConstants.kAcceleration;
 		motionMagicConfigsFollower.MotionMagicJerk = IntakeSlideSubsystemConstants.kJerk;
-
 
 		intakeSlideLeftMotor.getConfigurator().apply(talonFXConfigurationLeader);
 		intakeSlideRightMotor.getConfigurator().apply(talonFXConfigurationFollower);
@@ -150,6 +148,7 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 
 	public void stop() {
 		intakeSlideLeftMotor.stopMotor();
+		intakeSlideRightMotor.stopMotor();
 	}
 
 	public void driveUntilLimit() {
@@ -159,8 +158,8 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 			intakeSlideLeftMotor.stopMotor();
 			intakeSlideLeftMotor.setPosition(0);
 		}
-		 
-		if(limitSwitchRight.get()) {
+
+		if (limitSwitchRight.get()) {
 			intakeSlideRightMotor.set(0.1);
 		} else {
 			intakeSlideRightMotor.stopMotor();
@@ -168,23 +167,23 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		}
 	}
 
-  public void moveToPosition(double position) {
-    final MotionMagicVoltage request = new MotionMagicVoltage(position);
+	public void moveToPosition(double position) {
+		final MotionMagicVoltage request = new MotionMagicVoltage(position);
 
 		intakeSlideRightMotor.setControl(request.withPosition(position)
 				.withSlot(0)
-				.withOverrideBrakeDurNeutral(true)); 
+				.withOverrideBrakeDurNeutral(true));
 
 		intakeSlideLeftMotor.setControl(request.withPosition(position)
 				.withSlot(0)
 				.withOverrideBrakeDurNeutral(true));
-		
+
 		if (!limitSwitchLeft.get() && position == IntakeSlideSubsystemConstants.kInPosition) {
 			intakeSlideLeftMotor.stopMotor();
 			intakeSlideLeftMotor.setPosition(0);
 		}
-		 
-		if(!limitSwitchRight.get() && position == IntakeSlideSubsystemConstants.kInPosition) {
+
+		if (!limitSwitchRight.get() && position == IntakeSlideSubsystemConstants.kInPosition) {
 			intakeSlideRightMotor.stopMotor();
 			intakeSlideRightMotor.setPosition(0);
 		}
@@ -200,17 +199,18 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		// For safety, stop the turret whenever the robot is disabled.
 	}
 
-
-
 	@Override
 	public void initSendable(SendableBuilder builder) {
-		builder.addDoubleProperty("Intake Slide Left Position", () -> intakeSlideLeftMotor.getPosition().getValueAsDouble(), null);
-		builder.addDoubleProperty("Intake Slide Right Position", () -> intakeSlideRightMotor.getPosition().getValueAsDouble(), null);
+		builder.addDoubleProperty("Intake Slide Left Position",
+				() -> intakeSlideLeftMotor.getPosition().getValueAsDouble(), null);
+		builder.addDoubleProperty("Intake Slide Right Position",
+				() -> intakeSlideRightMotor.getPosition().getValueAsDouble(), null);
 		builder.addBooleanProperty("Left Limit Switch", () -> limitSwitchLeft.get(), null);
 		builder.addBooleanProperty("Right Limit Switch", () -> limitSwitchRight.get(), null);
-		builder.addDoubleProperty("Right Motor Current", () -> intakeSlideRightMotor.getStatorCurrent().getValueAsDouble(), null);
-		builder.addDoubleProperty("Left Motor Current", () -> intakeSlideLeftMotor.getStatorCurrent().getValueAsDouble(), null);
-  }
+		builder.addDoubleProperty("Right Motor Current",
+				() -> intakeSlideRightMotor.getStatorCurrent().getValueAsDouble(), null);
+		builder.addDoubleProperty("Left Motor Current",
+				() -> intakeSlideLeftMotor.getStatorCurrent().getValueAsDouble(), null);
+	}
 
 }
-

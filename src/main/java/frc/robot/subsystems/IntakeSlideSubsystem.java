@@ -153,14 +153,14 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 
 	public void driveUntilLimit() {
 		if (limitSwitchLeft.get()) {
-			intakeSlideLeftMotor.set(0.1);
+			intakeSlideLeftMotor.set(0.07);
 		} else {
 			intakeSlideLeftMotor.stopMotor();
 			intakeSlideLeftMotor.setPosition(0);
 		}
 
 		if (limitSwitchRight.get()) {
-			intakeSlideRightMotor.set(0.1);
+			intakeSlideRightMotor.set(0.07);
 		} else {
 			intakeSlideRightMotor.stopMotor();
 			intakeSlideRightMotor.setPosition(0);
@@ -197,6 +197,13 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// For safety, stop the turret whenever the robot is disabled.
+		if (!limitSwitchLeft.get()) {
+			intakeSlideLeftMotor.setPosition(0);
+		}
+
+		if (!limitSwitchRight.get()) {
+			intakeSlideRightMotor.setPosition(0);
+		}
 	}
 
 	@Override

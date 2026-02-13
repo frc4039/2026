@@ -99,7 +99,7 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 
 	@Override
 	public void initSendable(SendableBuilder builder) {
-		builder.addDoubleProperty("Hood Angle", () -> this.getHoodPosition(), null);
+		builder.addDoubleProperty("Hood Angle", () -> this.getHoodPosition(), position -> this.moveToPosition(position));
 		builder.addDoubleProperty("Current", () -> hoodMotor.getStatorCurrent().getValueAsDouble(), null);
 	}
 }

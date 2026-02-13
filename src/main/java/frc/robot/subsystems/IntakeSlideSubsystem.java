@@ -38,19 +38,19 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		public static final double kVIntakeSlide = 0.0;
 		public static final double kSIntakeSlide = 0.0;
 		public static final double kAIntakeSlide = 0.0;
-		public static final double kPIntakeSlide = 0.0;
+		public static final double kPIntakeSlide = 1.0;
 		public static final double kIIntakeSlide = 0.0;
 		public static final double kDIntakeSlide = 0.0;
 
     public static final double kDegreesPerRotation = 0.0;
 
-    public static final double kOutPosition = 0.0;
+    public static final double kOutPosition = -19.0;
     public static final double kInPosition = 0.0;
 
     // Motion magic
-		public static final double kCruiseVelocity = 0.0 / kDegreesPerRotation;
-		public static final double kAcceleration = 0.0 / kDegreesPerRotation;
-		public static final double kJerk = 0.0 / kDegreesPerRotation;
+		public static final double kCruiseVelocity = 20.0;
+		public static final double kAcceleration = 15.0;
+		public static final double kJerk = 10.0;
 
 		public static final int kLeftLimitSwitchChannel = 0;
 		public static final int kRightLimitSwitchChannel = 1;
@@ -154,14 +154,14 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 
 	public void driveUntilLimit() {
 		if (limitSwitchLeft.get()) {
-			intakeSlideLeftMotor.set(-0.5);
+			intakeSlideLeftMotor.set(0.1);
 		} else {
 			intakeSlideLeftMotor.stopMotor();
 			intakeSlideLeftMotor.setPosition(0);
 		}
 		 
 		if(limitSwitchRight.get()) {
-			intakeSlideRightMotor.set(-0.5);
+			intakeSlideRightMotor.set(0.1);
 		} else {
 			intakeSlideRightMotor.stopMotor();
 			intakeSlideRightMotor.setPosition(0);
@@ -171,21 +171,36 @@ public class IntakeSlideSubsystem extends SubsystemBase {
   public void moveToPosition(double position) {
     final MotionMagicVoltage request = new MotionMagicVoltage(position);
 
-		final double newPosition = position / IntakeSlideSubsystemConstants.kDegreesPerRotation;
-
-		intakeSlideLeftMotor.setControl(request.withPosition(newPosition)
-				.withSlot(0)
-				.withOverrideBrakeDurNeutral(true));  
-		
-		intakeSlideRightMotor.setControl(request.withPosition(newPosition)
+		intakeSlideRightMotor.setControl(request.withPosition(position)
 				.withSlot(0)
 				.withOverrideBrakeDurNeutral(true)); 
+
+		intakeSlideLeftMotor.setControl(request.withPosition(position)
+				.withSlot(0)
+				.withOverrideBrakeDurNeutral(true));
+		
+		if (!limitSwitchLeft.get() && position == IntakeSlideSubsystemConstants.kInPosition) {
+			intakeSlideLeftMotor.stopMotor();
+			intakeSlideLeftMotor.setPosition(0);
+		}
+		 
+		if(!limitSwitchRight.get() && position == IntakeSlideSubsystemConstants.kInPosition) {
+			intakeSlideRightMotor.stopMotor();
+			intakeSlideRightMotor.setPosition(0);
+		}
+	}
+
+	public void zeroIntake() {
+		intakeSlideLeftMotor.setPosition(0);
+		intakeSlideRightMotor.setPosition(0);
 	}
 
 	@Override
 	public void periodic() {
 		// For safety, stop the turret whenever the robot is disabled.
 	}
+
+
 
 	@Override
 	public void initSendable(SendableBuilder builder) {

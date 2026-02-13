@@ -17,6 +17,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.SpindexerCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
+import frc.robot.commands.ZeroIntakeSlideCommand;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -164,27 +165,33 @@ public class RobotContainer {
 		//driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
 		// driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
 		// driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
-		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
-			.or(
-				operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
-			)
-			.whileTrue(
-				new TurretWithJoystickCommand(
-					turretSubsystem,
-					() -> operator.getRightX(),
-					() -> operator.getRightY(),
-					() -> driveSubsystem.getHeading()
-				)
-			); //moves turrettttttttttttttttttttt
+		// operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
+		// 	.or(
+		// 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
+		// 	)
+		// 	.whileTrue(
+		// 		new TurretWithJoystickCommand(
+		// 			turretSubsystem,
+		// 			() -> operator.getRightX(),
+		// 			() -> operator.getRightY(),
+		// 			() -> driveSubsystem.getHeading()
+		// 		)
+		// 	); //moves turrettttttttttttttttttttt
 
-		operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, true));
-		operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
+		// operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, true));
+		// operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
 
-		operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
+		// operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+		// operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
 
-		operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
-		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		// operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
+		// operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+
+		operator.a().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, true));
+		operator.b().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, false));
+		operator.y().onTrue(new ZeroIntakeSlideCommand(intakeSlideSubsystem).ignoringDisable(true));
+
+
 	}
 
 }

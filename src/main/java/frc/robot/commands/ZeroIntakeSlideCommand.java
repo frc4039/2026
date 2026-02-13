@@ -6,16 +6,14 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSlideSubsystem;
-import frc.robot.subsystems.IntakeSlideSubsystem.IntakeSlideSubsystemConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class MoveIntakeSlideCommand extends Command {
-  /** Creates a new MoveIntakeSlideCommand. */
-  private final IntakeSlideSubsystem intakeSlideSubsystem;
-  private boolean in;
-  public MoveIntakeSlideCommand(IntakeSlideSubsystem intakeSlideSubsystem, boolean in) {
+public class ZeroIntakeSlideCommand extends Command {
+  /** Creates a new ZeroIntakeSlideCommand. */
+  private IntakeSlideSubsystem intakeSlideSubsystem;
+  public ZeroIntakeSlideCommand(IntakeSlideSubsystem intakeSlideSubsystem) {
+
     this.intakeSlideSubsystem = intakeSlideSubsystem;
-    this.in = in;
     addRequirements(intakeSlideSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -27,11 +25,7 @@ public class MoveIntakeSlideCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(this.in) {
-      intakeSlideSubsystem.moveToPosition(IntakeSlideSubsystemConstants.kInPosition);
-    } else {
-      intakeSlideSubsystem.moveToPosition(IntakeSlideSubsystemConstants.kOutPosition);
-    }
+    intakeSlideSubsystem.zeroIntake();
   }
 
   // Called once the command ends or is interrupted.
@@ -41,6 +35,6 @@ public class MoveIntakeSlideCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

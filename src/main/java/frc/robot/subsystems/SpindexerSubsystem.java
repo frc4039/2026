@@ -118,6 +118,10 @@ public class SpindexerSubsystem extends SubsystemBase {
 		spindexerMotor.stopMotor();
 	}
 
+	public void run() {
+		spindexerMotor.set(-0.2);
+	}
+
 	@Override
 	public void periodic() {
 		// For safety, stop the turret whenever the robot is disabled.

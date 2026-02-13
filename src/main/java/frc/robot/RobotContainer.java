@@ -26,6 +26,7 @@ import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
+import frc.robot.commands.RunSpindexerCommand;
 import frc.robot.commands.ShooterHoodCommand;
 import frc.robot.commands.SpinUpCommand;
 import frc.robot.commands.ShootCommand;
@@ -146,15 +147,15 @@ public class RobotContainer {
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
 
 
-    	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-    	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
+    	//driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+    	//driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 
-		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
-		driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
-      	driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
-		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
-		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
-	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
+		//driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
+		// driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
+      	// driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
+		// driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
+		// driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
+	    // //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
 	    
 		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
 		//driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
@@ -173,19 +174,21 @@ public class RobotContainer {
 				)
 			); //moves turrettttttttttttttttttttt
 
-		operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, true));
-		operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
+		// operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, true));
+		// operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
 
-		operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
+		operator.leftBumper().whileTrue(new RunSpindexerCommand(spindexerSubsystem));		
 
-		operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
-		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		// operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
+		// operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
 
-		operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
-		operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));
-		operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
-		operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
+		// operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
+		// operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+
+		// operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
+		// operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));
+		// operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
+		// operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
 	}
 
 }

@@ -34,11 +34,11 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 
 		public static final double angleThreshold = 0.5;
 
-		public static final double kHoodOffset = 80;
+		public static final double kHoodOffset = 75;
 
 		//Hard limits for hood angle
-		public static final double kMin = 50;
-		public static final double kMax = 80;
+		public static final double kMin = 45;
+		public static final double kMax = 75;
     }
 
     private TalonFX hoodMotor;
@@ -99,7 +99,7 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 
 	@Override
 	public void initSendable(SendableBuilder builder) {
-		builder.addDoubleProperty("Hood Angle", () -> this.getHoodPosition(), null);
+		builder.addDoubleProperty("Hood Angle", () -> this.getHoodPosition(), position -> this.moveToPosition(position));
 		builder.addDoubleProperty("Current", () -> hoodMotor.getStatorCurrent().getValueAsDouble(), null);
 	}
 }

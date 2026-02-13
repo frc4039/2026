@@ -297,8 +297,10 @@ public class VisionSubsystem extends SubsystemBase {
 //        updateCamera(backCam, backPhotonPoseEstimator, "BackPose");
 
         fieldDisplay.setRobotPose(m_driveSubsystem.getPose());
-        fieldDisplay.getObject("blueHub").setPose(TurretSubsystem.getHub());
+        fieldDisplay.getObject("blueHub").setPose(TurretSubsystem.getHub().plus(TurretSubsystem.changeTargetLocation("67")));
         fieldDisplay.getObject("Turret").setPose(turretSubsystem.getTurretPose());
+        fieldDisplay.getObject("Shoot On The Fly Pose").setPose(m_driveSubsystem.getShootOnTheFlyPose2d());
+
 
     }
 }

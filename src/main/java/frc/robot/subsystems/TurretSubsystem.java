@@ -176,6 +176,10 @@ public class TurretSubsystem extends SubsystemBase {
 						Rotation2d.fromDegrees(-1 * this.getTurretPosition())));
 	}
 
+	public boolean isAtPosition() {
+		return (Math.abs((this.getTurretPosition()) - (turretMotor.getClosedLoopReference().getValueAsDouble())) < 2);
+	}
+
 	@Override
 	public void periodic() {
 		// For safety, stop the turret whenever the robot is disabled.

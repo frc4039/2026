@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.IntakeOutCommand;
+import frc.robot.commands.IntakeShimmyCommand;
 import frc.robot.commands.ManualVelocityCommand;
 import frc.robot.commands.MoveIntakeSlideCommand;
 import frc.robot.commands.MoveHubTargetCommand;
@@ -23,6 +24,7 @@ import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.commands.ZeroIntakeSlideCommand;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.IntakeSlideSubsystem.IntakeSlideSubsystemConstants;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -56,6 +58,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -152,7 +155,7 @@ public class RobotContainer {
 		driver.povDown().whileTrue(new RobotCentricDriveCommand(driveSubsystem, -0.035, 0));
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
-    
+
 		driver.b()
 				.onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
 						.alongWith(new ZeroIntakeSlideCommand(intakeSlideSubsystem))
@@ -160,29 +163,35 @@ public class RobotContainer {
 
 		// Operator commands
 		operator.leftTrigger().onTrue(new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
-		operator.rightTrigger().onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, true));
+		operator.rightTrigger()
+				.onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition));
+
+		driver.leftTrigger().onTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)));
 
 		operator.leftBumper().onTrue(new StopIntakeCommand(intakeSubsystem));
 		operator.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, false))
 				.onFalse(new IntakeCommand(intakeSubsystem, true));
 
-		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
+		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true)
+				.alongWith(new FeederCommand(turretFeederSubsystem, true)));
 		driver.rightTrigger().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 		driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 60));
 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
-			.whileTrue(
-				new RunTurretPowerCommand(
-					turretSubsystem,
-					operator::getRightX
-				)
-			); //moves turrettttttttttttttttttttt
+				.whileTrue(
+						new RunTurretPowerCommand(
+								turretSubsystem,
+								operator::getRightX)); // moves turrettttttttttttttttttttt
 
 		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 
-		// operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
-		// operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));
-		// operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
-		// operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
+		// operator.povUp().onTrue(new MoveHubTargetCommand("up",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povDown().onTrue(new MoveHubTargetCommand("down",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povLeft().onTrue(new MoveHubTargetCommand("left",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povRight().onTrue(new MoveHubTargetCommand("right",
+		// turretSubsystem).ignoringDisable(true));
 	}
 
 }

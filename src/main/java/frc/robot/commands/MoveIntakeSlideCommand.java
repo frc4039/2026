@@ -14,14 +14,10 @@ public class MoveIntakeSlideCommand extends Command {
 	private final IntakeSlideSubsystem intakeSlideSubsystem;
 	private double targetPosition;
 
-	public MoveIntakeSlideCommand(IntakeSlideSubsystem intakeSlideSubsystem, boolean in) {
+	public MoveIntakeSlideCommand(IntakeSlideSubsystem intakeSlideSubsystem, double position) {
 		this.intakeSlideSubsystem = intakeSlideSubsystem;
 
-		if (in) {
-			this.targetPosition = IntakeSlideSubsystemConstants.kInPosition;
-		} else {
-			this.targetPosition = IntakeSlideSubsystemConstants.kOutPosition;
-		}
+		this.targetPosition = position;
 
 		addRequirements(intakeSlideSubsystem);
 		// Use addRequirements() here to declare subsystem dependencies.

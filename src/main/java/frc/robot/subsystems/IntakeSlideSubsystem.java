@@ -171,22 +171,12 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		final MotionMagicVoltage request = new MotionMagicVoltage(position);
 
 		intakeSlideRightMotor.setControl(request.withPosition(position)
-				.withSlot(0)
+				.withSlot(0).withLimitForwardMotion(!limitSwitchRight.get())
 				.withOverrideBrakeDurNeutral(true));
 
 		intakeSlideLeftMotor.setControl(request.withPosition(position)
-				.withSlot(0)
+				.withSlot(0).withLimitForwardMotion(!limitSwitchLeft.get())
 				.withOverrideBrakeDurNeutral(true));
-
-		if (!limitSwitchLeft.get() && position == IntakeSlideSubsystemConstants.kInPosition) {
-			intakeSlideLeftMotor.stopMotor();
-			intakeSlideLeftMotor.setPosition(0);
-		}
-
-		if (!limitSwitchRight.get() && position == IntakeSlideSubsystemConstants.kInPosition) {
-			intakeSlideRightMotor.stopMotor();
-			intakeSlideRightMotor.setPosition(0);
-		}
 	}
 
 	public void zeroIntake() {

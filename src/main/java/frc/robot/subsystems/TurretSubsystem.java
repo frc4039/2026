@@ -47,7 +47,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 		// Gear Stuff
 		public static final double kTurretPulleyTeeth = 120.0;
-		public static final double kMotorPulleyTeeth = 23.0;
+		public static final double kMotorPulleyTeeth = 24.0;
 		public static final double kGearRatio = (kTurretPulleyTeeth / kMotorPulleyTeeth) * 4;
 
 		// Encoder Conversions;

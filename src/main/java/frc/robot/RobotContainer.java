@@ -160,7 +160,6 @@ public class RobotContainer {
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
     
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
-						.alongWith(new ZeroIntakeSlideCommand(intakeSlideSubsystem).ignoringDisable(true))
 						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true)));
 
 		// Operator commands

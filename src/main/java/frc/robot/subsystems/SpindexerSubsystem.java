@@ -43,7 +43,9 @@ public class SpindexerSubsystem extends SubsystemBase {
 	// Constants of the feeder subsystem
 	public static final class SpindexerConstants {
 		public static final int kSpindexerMotorId = 41;
-		public static final double kSpindexerSpeed = -60;
+		
+		// RPS: gear ratio 3:!
+		public static final double kSpindexerSpeed = -90;
 
 		public static final double kSpindexerWheelP = 0.021206;
 		public static final double kSpindexerWheelI = 0.0;

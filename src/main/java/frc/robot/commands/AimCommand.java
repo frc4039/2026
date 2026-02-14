@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -56,9 +57,15 @@ public class AimCommand extends Command {
 		turretSubsystem.moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
 				-1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees())));
 
-		shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
+		if((driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(157) && driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(205)) || (driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(444) && driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(492))) {
+			shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
+				Math.max(ShooterAngleConstants.kMin, ShooterAngleConstants.kMax))));
+
+		} else {
+				shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
 				Math.max(ShooterAngleConstants.kMin, turretSubsystem.getHoodAngle()))));
 
+		}
 		
 	}
 

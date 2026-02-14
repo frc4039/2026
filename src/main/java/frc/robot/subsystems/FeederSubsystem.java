@@ -41,7 +41,7 @@ import frc.robot.utils.HardwareMonitor;;
 public class FeederSubsystem extends SubsystemBase {
 	public static final class FeederConstants {
 		static int kTurretFeederMotorId = 45;
-		static double kTurretFeederSpeed = 40;
+		static double kTurretFeederSpeed = 50;
 
 	public static final double kTurretFeederWheelP = 0.073959;
 	public static final double kTurretFeederWheelI = 0.0;

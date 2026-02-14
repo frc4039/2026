@@ -60,9 +60,10 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kPTurret = 18.192;
 		public static final double kITurret = 0.0;
 		public static final double kDTurret = 0.05;
+		public static final double kGTurret = -1.73;
 
 		// Motion magic
-		public static final double kCruiseVelocity = 50.0;
+		public static final double kCruiseVelocity = 10.0;
 		public static final double kAcceleration = 250.0;
 		public static final double kJerk = 1600.0;
 
@@ -79,8 +80,8 @@ public class TurretSubsystem extends SubsystemBase {
 				Units.inchesToMeters(5.25), Rotation2d.fromDegrees(180));
 
 		// Min/Max
-		public static final double kMin = -180;
-		public static final double kMax = 50;
+		public static final double kMin = -130;
+		public static final double kMax = 130;
 
 		public static final double kHubTargetHeight = 1.4351;
 		public static final double kTurretHeight = 0.5;
@@ -135,6 +136,7 @@ public class TurretSubsystem extends SubsystemBase {
 		slotConfigs.kP = TurretConstants.kPTurret;
 		slotConfigs.kI = TurretConstants.kITurret;
 		slotConfigs.kD = TurretConstants.kDTurret;
+		slotConfigs.kG = TurretConstants.kGTurret;
 
 		MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
 

@@ -150,10 +150,11 @@ public class RobotContainer {
 				new TeleopDriveCommand(driveSubsystem, driver::getLeftY, driver::getLeftX,
 						driver::getRightX, -1.0));
 
-		driver.rightTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, false)
-				.alongWith(new FeederCommand(turretFeederSubsystem, false)));
+		driver.rightTrigger().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, false)
+				.alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, false)));
 		driver.leftTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
 		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem));
+		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, () -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem)));
 
 		// Robot centric driving
 		driver.povUp().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0.035, 0));
@@ -169,7 +170,7 @@ public class RobotContainer {
 		operator.rightTrigger().onTrue(
 				new StopIntakeCommand(intakeSubsystem).andThen(new MoveIntakeSlideCommand(intakeSlideSubsystem, true)));
 
-		operator.x().onTrue(new InstantCommand(() -> currentAimState = AimState.RIGHT))
+		operator.b().onTrue(new InstantCommand(() -> currentAimState = AimState.RIGHT))
 				.onFalse(new InstantCommand(() -> currentAimState = AimState.AUTOMATIC));
 		operator.x().onTrue(new InstantCommand(() -> currentAimState = AimState.LEFT))
 				.onFalse(new InstantCommand(() -> currentAimState = AimState.AUTOMATIC));

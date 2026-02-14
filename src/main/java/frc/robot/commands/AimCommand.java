@@ -4,7 +4,9 @@
 
 package frc.robot.commands;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -28,10 +30,10 @@ public class AimCommand extends Command {
 	private DriveSubsystem driveSubsystem;
 	private ShooterHoodSubsystem shooterHoodSubsystem;
 
-	private DoubleSupplier currentAim;
+	private Supplier<AimState> currentAim;
 
 	public AimCommand(TurretSubsystem turretSubsystem, DriveSubsystem driveSubsystem,
-			ShooterHoodSubsystem shooterHoodSubsystem, DoubleSupplier currentAim) {
+			ShooterHoodSubsystem shooterHoodSubsystem, Supplier<AimState> currentAim) {
 		this.turretSubsystem = turretSubsystem;
 		this.driveSubsystem = driveSubsystem;
 		this.shooterHoodSubsystem = shooterHoodSubsystem;
@@ -50,18 +52,20 @@ public class AimCommand extends Command {
 		Pose2d currentRobotPose2d = driveSubsystem.getShootOnTheFlyPose2d().plus(TurretConstants.kTurretOffset);
 		Pose2d hubPose2d = TurretSubsystem.getHub();
 
+		Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+
 		double driveX = driveSubsystem.getPose().getTranslation().getX();
 
 		if(driveX < Constants.FieldConstants.kRedAllianceLine.getX() && driveX > Constants.FieldConstants.kBlueAllianceLine.getX()){
 			// Change target for shuttling
-			if(DriverStation.getAlliance().get() == Alliance.Red){
+			if(alliance == Alliance.Red){
 				hubPose2d = Constants.FieldConstants.kRedPassTargetRight;
 			}else{
 				hubPose2d = Constants.FieldConstants.kBluePassTargetRight;
 			}
 
 			// Adjust target to left or right side
-			if((driveSubsystem.getPose().getTranslation().getY() > Constants.FieldConstants.kCenterLine && currentAim.getAsDouble() == AimState.AUTOMATIC.ordinal()) || currentAim.getAsDouble() == AimState.LEFT.ordinal()){
+			if((driveSubsystem.getPose().getTranslation().getY() < Constants.FieldConstants.kCenterLine && currentAim.get().equals(AimState.AUTOMATIC)) || currentAim.get().equals(AimState.LEFT)){
 				hubPose2d = Constants.FieldConstants.flipPoseY(hubPose2d);
 			}
 		}
@@ -79,7 +83,6 @@ public class AimCommand extends Command {
 		} else {
 			shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
 					Math.max(ShooterAngleConstants.kMin, turretSubsystem.getHoodAngle()))));
-
 		}
 
 	}

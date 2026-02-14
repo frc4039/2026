@@ -2,15 +2,22 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.FeederSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class FeederCommand extends Command {
 	FeederSubsystem turretFeederSubsystem;
 	private boolean reverseMotor;
+	private ShooterSubsystem shooterSubsystem;
+	private TurretSubsystem turretSubsystem;
 
-	public FeederCommand(FeederSubsystem turretFeederSubsystem, Boolean reverseMotor) {
+	public 
+	FeederCommand(ShooterSubsystem shooterSubsystem, TurretSubsystem turretSubsystem, FeederSubsystem turretFeederSubsystem, Boolean reverseMotor) {
 		addRequirements(turretFeederSubsystem);
 		this.turretFeederSubsystem = turretFeederSubsystem;
 		this.reverseMotor = reverseMotor;
+		this.turretSubsystem = turretSubsystem;
+		this.shooterSubsystem = shooterSubsystem;
 	}
 
 	@Override
@@ -20,11 +27,16 @@ public class FeederCommand extends Command {
 
 	@Override
 	public void execute() {
+		
+		if(Math.abs(shooterSubsystem.getShooterError()) < 5 && Math.abs(turretSubsystem.getTurretError()) < 5) {
 		if (reverseMotor) {
 			turretFeederSubsystem.feed(true);
 		} else {
 			turretFeederSubsystem.feed(false);
 		}
+	} else {
+		turretFeederSubsystem.stop();
+	}
 	}
 
 	@Override

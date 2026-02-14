@@ -64,7 +64,7 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kGTurret = -2.0;
 
 		// Motion magic
-		public static final double kCruiseVelocity = 10.0;
+		public static final double kCruiseVelocity = 30.0;
 		public static final double kAcceleration = 250.0;
 		public static final double kJerk = 1600.0;
 
@@ -264,6 +264,10 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public void runTurretPercentage(double power) {
 		turretMotor.set(power);
+	}
+
+	public double getTurretError() {
+		return turretMotor.getClosedLoopError().getValueAsDouble();
 	}
 
 	@Override

@@ -29,6 +29,7 @@ public class SpinUpCommand extends Command {
 		shootingEstimator.put(7.424679017251541, 22.5);
 		shootingEstimator.put(8.20870640915173, 31.0);
     		shootingEstimator.put(8.575, 35.0); // Calculated using line of close enoughish fit
+        shootingEstimator.put(9.812910955375385, 47.0);
 
   }
 

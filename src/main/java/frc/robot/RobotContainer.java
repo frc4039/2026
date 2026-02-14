@@ -46,7 +46,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SpindexerSubsystem;
 import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
-import jdk.internal.icu.text.ReplaceableString;
 
 import java.util.Optional;
 
@@ -156,7 +155,7 @@ public class RobotContainer {
 		driver.povDown().whileTrue(new RobotCentricDriveCommand(driveSubsystem, -0.035, 0));
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
-    
+
 		driver.b()
 				.onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
 						.alongWith(new ZeroIntakeSlideCommand(intakeSlideSubsystem))
@@ -164,7 +163,8 @@ public class RobotContainer {
 
 		// Operator commands
 		operator.leftTrigger().onTrue(new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
-		operator.rightTrigger().onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition));
+		operator.rightTrigger()
+				.onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition));
 
 		driver.leftTrigger().onTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)));
 
@@ -172,23 +172,26 @@ public class RobotContainer {
 		operator.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, false))
 				.onFalse(new IntakeCommand(intakeSubsystem, true));
 
-		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
+		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true)
+				.alongWith(new FeederCommand(turretFeederSubsystem, true)));
 		driver.rightTrigger().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 		driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 60));
 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
-			.whileTrue(
-				new RunTurretPowerCommand(
-					turretSubsystem,
-					operator::getRightX
-				)
-			); //moves turrettttttttttttttttttttt
+				.whileTrue(
+						new RunTurretPowerCommand(
+								turretSubsystem,
+								operator::getRightX)); // moves turrettttttttttttttttttttt
 
 		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 
-		// operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
-		// operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));
-		// operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
-		// operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
+		// operator.povUp().onTrue(new MoveHubTargetCommand("up",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povDown().onTrue(new MoveHubTargetCommand("down",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povLeft().onTrue(new MoveHubTargetCommand("left",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povRight().onTrue(new MoveHubTargetCommand("right",
+		// turretSubsystem).ignoringDisable(true));
 	}
 
 }

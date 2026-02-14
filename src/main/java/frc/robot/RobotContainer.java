@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.ManualVelocityCommand;
+import frc.robot.commands.MoveIntakeSlideCommand;
 import frc.robot.commands.MoveHubTargetCommand;
 import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.ResetTurretGyro;
@@ -17,6 +18,7 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.SpindexerCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
+import frc.robot.commands.ZeroIntakeSlideCommand;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -25,6 +27,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
+import frc.robot.subsystems.IntakeSlideSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
 import frc.robot.commands.RunFeederCommand;
 import frc.robot.commands.RunSpindexerCommand;
@@ -72,6 +75,7 @@ public class RobotContainer {
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
+	private final IntakeSlideSubsystem intakeSlideSubsystem = new IntakeSlideSubsystem();
 
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
@@ -97,6 +101,7 @@ public class RobotContainer {
 	SmartDashboard.putData(turretSubsystem);
 	SmartDashboard.putData(shooterSubsystem);
 	SmartDashboard.putData(shooterHoodSubsystem);
+	SmartDashboard.putData(intakeSlideSubsystem);
 
 
 	hardwareMonitor.registerDevice(null, driver);

@@ -88,12 +88,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
 		shooterLeaderMotor.getConfigurator().apply(talonFXConfigs);
 
-		SmartDashboard.putData("ShooterSubsystem/Start Logging", Commands.runOnce(SignalLogger::start));
-		SmartDashboard.putData("ShooterSubsystem/Stop Logging", Commands.runOnce(SignalLogger::stop));
-		SmartDashboard.putData("ShooterSubsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
-		SmartDashboard.putData("ShooterSubsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
-		SmartDashboard.putData("ShooterSubsystem/Dynamic Forward", sysid.dynamic(Direction.kForward));
-		SmartDashboard.putData("ShooterSubsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
+		// SmartDashboard.putData("ShooterSubsystem/Start Logging", Commands.runOnce(SignalLogger::start));
+		// SmartDashboard.putData("ShooterSubsystem/Stop Logging", Commands.runOnce(SignalLogger::stop));
+		// SmartDashboard.putData("ShooterSubsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
+		// SmartDashboard.putData("ShooterSubsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
+		// SmartDashboard.putData("ShooterSubsystem/Dynamic Forward", sysid.dynamic(Direction.kForward));
+		// SmartDashboard.putData("ShooterSubsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
 
 	}
 

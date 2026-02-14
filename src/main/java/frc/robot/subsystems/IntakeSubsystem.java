@@ -4,18 +4,13 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.HardwareMonitor;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new Intake. */
@@ -25,17 +20,16 @@ public class IntakeSubsystem extends SubsystemBase {
     static double kOutakeSpeed = 1;
   }
 
-  private final SparkFlex intakeMotor;
-  private final SparkFlexConfig intakeMotorConfig = new SparkFlexConfig();
+  private final TalonFX intakeMotor;
+  private final TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
 
   public IntakeSubsystem(HardwareMonitor hardwareMonitor) {
-    intakeMotor = new SparkFlex(IntakeSubsystem.IntakeContants.kIntakeMotorCanID, MotorType.kBrushless);
+    intakeMotor = new TalonFX(IntakeSubsystem.IntakeContants.kIntakeMotorCanID);
 
-    intakeMotorConfig.idleMode(IdleMode.kBrake);
-    //intakeMotorConfig.smartCurrentLimit(80);
-
-    intakeMotor.configure(intakeMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
+    MotorOutputConfigs mcfg = new MotorOutputConfigs();
+    mcfg.withNeutralMode(NeutralModeValue.Brake);
+    intakeMotorConfig.withMotorOutput(mcfg);
+    intakeMotor.getConfigurator().apply(intakeMotorConfig);
     hardwareMonitor.registerDevice(this, intakeMotor);
   }
 
@@ -52,13 +46,6 @@ public class IntakeSubsystem extends SubsystemBase {
   public void stopMotor() {
     intakeMotor.stopMotor();
   }
-  @Override
-
-  public void initSendable(SendableBuilder builder) {
-		builder.addDoubleProperty("Spindexer Wheel Speed", () -> intakeMotor.getEncoder().getVelocity(), null);
-		builder.addDoubleProperty("Current", () -> intakeMotor.getOutputCurrent(), null);
-
-	}
 
   public void periodic() {
     // This method will be called once per scheduler run

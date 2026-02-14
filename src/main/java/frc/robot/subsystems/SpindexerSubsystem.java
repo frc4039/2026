@@ -5,6 +5,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -42,13 +43,14 @@ public class SpindexerSubsystem extends SubsystemBase {
 	// Constants of the feeder subsystem
 	public static final class SpindexerConstants {
 		public static final int kSpindexerMotorId = 41;
-		public static final double kSpindexerSpeed = -1100;
+		public static final double kSpindexerSpeed = -60;
 
-		public static final double kSpindexerWheelP = 0.0004;//0.0002
-		public static final double kSpindexerWheelI = 0;
-		public static final double kSpindexerWheelD = 0.01;
-		public static final double kS = 0.18837;
-		public static final double kV = 0.10525 / 60.0;
+		public static final double kSpindexerWheelP = 0.021206;
+		public static final double kSpindexerWheelI = 0.0;
+		public static final double kSpindexerWheelD = 0.0;
+		public static final double kS = 0.32889;
+		public static final double kV = 0.10262;
+		public static final double kA = 0.0025405;
 
 		public static final SimpleMotorFeedforward kFeedForward = new SimpleMotorFeedforward(kS, kV);
 	}
@@ -96,6 +98,10 @@ public class SpindexerSubsystem extends SubsystemBase {
 		SmartDashboard.putData("SpindexerSubsystem/QuasiStatic Backward",sysid.quasistatic(Direction.kReverse));
 		SmartDashboard.putData("SpindexerSubsystem/Dynamic Forward",sysid.dynamic(Direction.kForward));
 		SmartDashboard.putData("SpindexerSubsystem/Dynamic Backward",sysid.dynamic(Direction.kReverse));
+		SmartDashboard.putData("ShooterSubsystem/Start Logging", Commands.runOnce(SignalLogger::start));
+		SmartDashboard.putData("ShooterSubsystem/Stop Logging", Commands.runOnce(SignalLogger::stop));
+		
+
 	}
 
 	public void spin(Boolean forward) {

@@ -20,9 +20,9 @@ public class SpindexerCommand extends Command {
 	@Override
 	public void execute() {
 		if (reverseMotor) {
-			feederSubsystem.spin(true);
-		} else {
 			feederSubsystem.spin(false);
+		} else {
+			feederSubsystem.spin(true);
 		}
 	}
 

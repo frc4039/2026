@@ -31,6 +31,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -40,15 +41,15 @@ import frc.robot.utils.HardwareMonitor;;
 public class FeederSubsystem extends SubsystemBase {
 	public static final class FeederConstants {
 		static int kTurretFeederMotorId = 45;
-		static double kTurretFeederSpeed = 1500;
+		static double kTurretFeederSpeed = 40;
 
-	public static final double kTurretFeederWheelP = 0.00009;
-	public static final double kTurretFeederWheelI = 0.000003;
-    public static final double kTurretFeederWheelD = 0.003;
+	public static final double kTurretFeederWheelP = 0.073959;
+	public static final double kTurretFeederWheelI = 0.0;
+    public static final double kTurretFeederWheelD = 0.0;
 	public static final double kTurretFeederWheelFF = 0;
 
-	public static final double kS = 0.2355;
-	public static final double kV = 0.11445 / 60.0;
+	public static final double kS = 0.72627;
+	public static final double kV = 0.10219;
 
 	public static final SimpleMotorFeedforward kFeedForward = new SimpleMotorFeedforward(kS, kV);
 
@@ -58,7 +59,7 @@ public class FeederSubsystem extends SubsystemBase {
 	private VoltageOut voltRequest = new VoltageOut(0.0);
 	private SysIdRoutine sysid = new SysIdRoutine(
 			new SysIdRoutine.Config(
-				Volts.of(0.5).per(Second),
+				Volts.of(1).per(Second),
 				Volts.of(4),
 				Seconds.of(5),
 				(state) -> SignalLogger.writeString("state", state.toString())
@@ -69,7 +70,7 @@ public class FeederSubsystem extends SubsystemBase {
 					this));
 
 	public FeederSubsystem(HardwareMonitor hardwareMonitor) {
-		feederMotor = new TalonFX(SpindexerConstants.kSpindexerMotorId);
+		feederMotor = new TalonFX(FeederConstants.kTurretFeederMotorId);
 
 		feederMotor.setNeutralMode(NeutralModeValue.Coast);
 
@@ -97,6 +98,9 @@ public class FeederSubsystem extends SubsystemBase {
 		SmartDashboard.putData("FeederSubsystem/QuasiStatic Backward",sysid.quasistatic(Direction.kReverse));
 		SmartDashboard.putData("FeederSubsystem/Dynamic Forward",sysid.dynamic(Direction.kForward));
 		SmartDashboard.putData("FeederSubsystem/Dynamic Backward",sysid.dynamic(Direction.kReverse));
+		SmartDashboard.putData("FeederSubsystem/Start Logging", Commands.runOnce(SignalLogger::start));
+		SmartDashboard.putData("FeederSubsystem/Stop Logging", Commands.runOnce(SignalLogger::stop));
+		
 	}
 
 	public void feed(Boolean forward) {
@@ -117,6 +121,10 @@ public class FeederSubsystem extends SubsystemBase {
 
 	public void stop() {
 		feederMotor.stopMotor();
+	}
+
+	public void run() {
+		feederMotor.set(-0.2);
 	}
 
 	@Override

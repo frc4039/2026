@@ -215,6 +215,10 @@ public class TurretSubsystem extends SubsystemBase {
 						Rotation2d.fromDegrees(-1 * this.getTurretPosition())));
 	}
 
+	public void runTurretPercentage(double power) {
+		turretMotor.set(power);
+	}
+
 	@Override
 	public void periodic() {
 		// For safety, stop the turret whenever the robot is disabled.
@@ -234,6 +238,7 @@ public class TurretSubsystem extends SubsystemBase {
 		}, null);
 		builder.addDoubleProperty("Shooter Target", () -> this.getOutputVelocity(), null);
 		builder.addDoubleProperty("Target", () -> driveSubsystem.getDistanceFromHub(), null);
+		builder.addDoubleProperty("Turret Voltage", () -> turretMotor.getMotorVoltage().getValueAsDouble(), null);
 		// builder.addDoubleProperty("Turret Target",() -> {
 		// moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
 		// Pose2d currentRobotPose2d = driveSubsystem.getPose().plus(TurretConstants.kTurretOffset);

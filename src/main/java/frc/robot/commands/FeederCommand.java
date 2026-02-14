@@ -29,7 +29,7 @@ public class FeederCommand extends Command {
 
 	@Override
 	public void end(boolean interrupted) {
-		turretFeederSubsystem.stopMotor();
+		turretFeederSubsystem.stop();
 	}
 
 	@Override

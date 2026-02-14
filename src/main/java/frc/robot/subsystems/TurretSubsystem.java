@@ -61,7 +61,7 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kPTurret = 18.192;
 		public static final double kITurret = 0.0;
 		public static final double kDTurret = 0.05;
-		public static final double kGTurret = -1.73;
+		public static final double kGTurret = -2.0;
 
 		// Motion magic
 		public static final double kCruiseVelocity = 10.0;
@@ -280,6 +280,7 @@ public class TurretSubsystem extends SubsystemBase {
 		builder.addDoubleProperty("Shooter Target", () -> this.getOutputVelocity(), null);
 		builder.addDoubleProperty("Target", () -> driveSubsystem.getDistanceFromHub(), null);
 		builder.addDoubleProperty("Turret Voltage", () -> turretMotor.getMotorVoltage().getValueAsDouble(), null);
+		builder.addDoubleProperty("Turret Error", () -> turretMotor.getClosedLoopError().getValueAsDouble() /  TurretConstants.kDegreesPerRotation, null);
 		// builder.addDoubleProperty("Turret Target",() -> {
 		// moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
 		// Pose2d currentRobotPose2d = driveSubsystem.getPose().plus(TurretConstants.kTurretOffset);

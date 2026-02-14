@@ -45,7 +45,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 		public static final int kSpindexerMotorId = 41;
 		
 		// RPS: gear ratio 3:!
-		public static final double kSpindexerSpeed = -90;
+		public static final double kSpindexerSpeed = -120;
 
 		public static final double kSpindexerWheelP = 0.021206;
 		public static final double kSpindexerWheelI = 0.0;

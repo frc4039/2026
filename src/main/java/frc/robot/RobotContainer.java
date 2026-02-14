@@ -153,6 +153,7 @@ public class RobotContainer {
 		driver.rightTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, false)
 				.alongWith(new FeederCommand(turretFeederSubsystem, false)));
 		driver.leftTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
+		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 
 		// Robot centric driving
 		driver.povUp().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0.035, 0));

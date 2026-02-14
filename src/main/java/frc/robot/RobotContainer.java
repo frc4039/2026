@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.IntakeOutCommand;
+import frc.robot.commands.IntakeShimmyCommand;
 import frc.robot.commands.ManualVelocityCommand;
 import frc.robot.commands.MoveIntakeSlideCommand;
 import frc.robot.commands.MoveHubTargetCommand;
@@ -23,6 +24,7 @@ import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.commands.ZeroIntakeSlideCommand;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.IntakeSlideSubsystem.IntakeSlideSubsystemConstants;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -44,6 +46,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SpindexerSubsystem;
 import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
+import jdk.internal.icu.text.ReplaceableString;
 
 import java.util.Optional;
 
@@ -56,6 +59,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -160,7 +164,9 @@ public class RobotContainer {
 
 		// Operator commands
 		operator.leftTrigger().onTrue(new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
-		operator.rightTrigger().onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, true));
+		operator.rightTrigger().onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition));
+
+		driver.leftTrigger().onTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)));
 
 		operator.leftBumper().onTrue(new StopIntakeCommand(intakeSubsystem));
 		operator.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, false))

@@ -96,6 +96,12 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kManualChangeAmount = Units.inchesToMeters(3);
 	}
 
+	public static enum AimState {
+		AUTOMATIC,
+		LEFT,
+		RIGHT
+	};
+
 	private TalonFX turretMotor;
 	private DriveSubsystem driveSubsystem;
 	public static double xTransform = 0;

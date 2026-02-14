@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
@@ -16,6 +18,7 @@ import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem.ShooterAngleConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.TurretSubsystem.AimState;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -25,15 +28,15 @@ public class AimCommand extends Command {
 	private DriveSubsystem driveSubsystem;
 	private ShooterHoodSubsystem shooterHoodSubsystem;
 
+	private DoubleSupplier currentAim;
 
 	public AimCommand(TurretSubsystem turretSubsystem, DriveSubsystem driveSubsystem,
-			ShooterHoodSubsystem shooterHoodSubsystem) {
+			ShooterHoodSubsystem shooterHoodSubsystem, DoubleSupplier currentAim) {
 		this.turretSubsystem = turretSubsystem;
 		this.driveSubsystem = driveSubsystem;
 		this.shooterHoodSubsystem = shooterHoodSubsystem;
+		this.currentAim = currentAim;
 		addRequirements(turretSubsystem, shooterHoodSubsystem);
-
-		
 	}
 
 	// Called when the command is initially scheduled.
@@ -47,28 +50,38 @@ public class AimCommand extends Command {
 		Pose2d currentRobotPose2d = driveSubsystem.getShootOnTheFlyPose2d().plus(TurretConstants.kTurretOffset);
 		Pose2d hubPose2d = TurretSubsystem.getHub();
 
-    if(driveSubsystem.getPose().getTranslation().getX() < Constants.FieldConstants.kRedAllianceLine.getX() && DriverStation.getAlliance().get() == Alliance.Red){
-       if(driveSubsystem.getPose().getTranslation().getY() > Constants.FieldConstants.kCenterLine) {
-        hubPose2d = Constants.FieldConstants.flipPoseY(Constants.FieldConstants.kRedPassTargetRight);
-       } else {
-          hubPose2d = Constants.FieldConstants.kRedPassTargetRight;
-       }
-    }
+		double driveX = driveSubsystem.getPose().getTranslation().getX();
 
+		if(driveX < Constants.FieldConstants.kRedAllianceLine.getX() && driveX > Constants.FieldConstants.kBlueAllianceLine.getX()){
+			// Change target for shuttling
+			if(DriverStation.getAlliance().get() == Alliance.Red){
+				hubPose2d = Constants.FieldConstants.kRedPassTargetRight;
+			}else{
+				hubPose2d = Constants.FieldConstants.kBluePassTargetRight;
+			}
+
+			// Adjust target to left or right side
+			if((driveSubsystem.getPose().getTranslation().getY() > Constants.FieldConstants.kCenterLine && currentAim.getAsDouble() == AimState.AUTOMATIC.ordinal()) || currentAim.getAsDouble() == AimState.LEFT.ordinal()){
+				hubPose2d = Constants.FieldConstants.flipPoseY(hubPose2d);
+			}
+		}
 
 		turretSubsystem.moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
 				-1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees())));
 
-		if((driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(157) && driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(205)) || (driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(444) && driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(492))) {
+		if ((driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(157)
+				&& driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(205))
+				|| (driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(444)
+						&& driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(492))) {
 			shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
-				Math.max(ShooterAngleConstants.kMin, ShooterAngleConstants.kMax))));
+					Math.max(ShooterAngleConstants.kMin, ShooterAngleConstants.kMax))));
 
 		} else {
-				shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
-				Math.max(ShooterAngleConstants.kMin, turretSubsystem.getHoodAngle()))));
+			shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
+					Math.max(ShooterAngleConstants.kMin, turretSubsystem.getHoodAngle()))));
 
 		}
-		
+
 	}
 
 	// Called once the command ends or is interrupted.

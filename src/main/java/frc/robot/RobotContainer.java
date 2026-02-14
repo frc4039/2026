@@ -155,7 +155,7 @@ public class RobotContainer {
 
 		driver.rightTrigger().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, false)
 				.alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, false)));
-				driver.leftTrigger().whileTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)));
+		driver.leftTrigger().whileTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true)));
 
 		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, () -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem)));
@@ -191,15 +191,6 @@ public class RobotContainer {
 		operator.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
 		// .onFalse(new IntakeCommand(intakeSubsystem, true));
 
-		driver.rightBumper().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, true)
-				.alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, true)));
-		driver.rightTrigger().whileTrue(new ManualVelocityCommand(shooterSubsystem));
-		driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 60));
-		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
-				.whileTrue(
-						new RunTurretPowerCommand(
-								turretSubsystem,
-								operator::getRightX)); // moves turrettttttttttttttttttttt
 
 		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 		// operator.b().onTrue(new InstantCommand(() ->

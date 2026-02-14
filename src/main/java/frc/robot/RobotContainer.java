@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.IntakeOutCommand;
 import frc.robot.commands.ManualVelocityCommand;
 import frc.robot.commands.MoveIntakeSlideCommand;
 import frc.robot.commands.MoveHubTargetCommand;
@@ -16,6 +17,7 @@ import frc.robot.commands.AlignToTowerCommand;
 import frc.robot.commands.AlignToTowerCommandGroup;
 import frc.robot.commands.Autos;
 import frc.robot.commands.SpindexerCommand;
+import frc.robot.commands.StopIntakeCommand;
 import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.commands.ZeroIntakeSlideCommand;
@@ -65,10 +67,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
- 
+	// The robot's subsystems and commands are defined here...
+
 	private HardwareMonitor hardwareMonitor = new HardwareMonitor();
- 	private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(hardwareMonitor);
+	private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(hardwareMonitor);
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem, hardwareMonitor);
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem);
@@ -82,45 +84,43 @@ public class RobotContainer {
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
 
-  private final CommandXboxController operator = 
-    new CommandXboxController(OperatorConstants.kOperatorPort);
+	private final CommandXboxController operator = new CommandXboxController(OperatorConstants.kOperatorPort);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
+	/**
+	 * The container for the robot. Contains subsystems, OI devices, and commands.
+	 */
+	public RobotContainer() {
+		// Configure the trigger bindings
+		configureBindings();
 
-    
-    SmartDashboard.putData(
-      new InstantCommand(() -> turretSubsystem.resetTurret())
-        .withName("ResetTurret")
-        .ignoringDisable(true)
-    );
-	SmartDashboard.putData(spindexerSubsystem);
-	SmartDashboard.putData(intakeSubsystem);
-	SmartDashboard.putData(turretSubsystem);
-	SmartDashboard.putData(shooterSubsystem);
-	SmartDashboard.putData(shooterHoodSubsystem);
-	SmartDashboard.putData(intakeSlideSubsystem);
+		SmartDashboard.putData(
+				new InstantCommand(() -> turretSubsystem.resetTurret())
+						.withName("ResetTurret")
+						.ignoringDisable(true));
+		SmartDashboard.putData(spindexerSubsystem);
+		SmartDashboard.putData(intakeSubsystem);
+		SmartDashboard.putData(turretSubsystem);
+		SmartDashboard.putData(shooterSubsystem);
+		SmartDashboard.putData(shooterHoodSubsystem);
+		SmartDashboard.putData(intakeSlideSubsystem);
 
-
-	hardwareMonitor.registerDevice(null, driver);
+		hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
 		SmartDashboard.putData(CommandScheduler.getInstance());
 
 		SmartDashboard.putData(driveSubsystem);
 
-		 // Put the BuildInfo so we can see what version of the code is running.
-    SmartDashboard.putData("BuildInfo", new Sendable() {
-      @Override
-      public void initSendable(SendableBuilder builder) {
-        builder.publishConstString("Robot Name", Helpers.getRobotName());
-        builder.publishConstString("Git Branch", Helpers.getGitBranch());
-        builder.publishConstString("Git SHA", Helpers.getGitSHA());
-        builder.publishConstString("Build Date", Helpers.getBuildDate());
-      }
-    });
-  }
+		// Put the BuildInfo so we can see what version of the code is running.
+		SmartDashboard.putData("BuildInfo", new Sendable() {
+			@Override
+			public void initSendable(SendableBuilder builder) {
+				builder.publishConstString("Robot Name", Helpers.getRobotName());
+				builder.publishConstString("Git Branch", Helpers.getGitBranch());
+				builder.publishConstString("Git SHA", Helpers.getGitSHA());
+				builder.publishConstString("Build Date", Helpers.getBuildDate());
+			}
+		});
+	}
 
 	/**
 	 * Use this method to define your trigger->command mappings. Triggers can be
@@ -152,22 +152,23 @@ public class RobotContainer {
 		driver.povDown().whileTrue(new RobotCentricDriveCommand(driveSubsystem, -0.035, 0));
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
+    
+		driver.b()
+				.onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
+						.alongWith(new ZeroIntakeSlideCommand(intakeSlideSubsystem))
+						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret())));
 
+		// Operator commands
+		operator.leftTrigger().onTrue(new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
+		operator.rightTrigger().onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, true));
 
-    	//driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-    	//driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
+		operator.leftBumper().onTrue(new StopIntakeCommand(intakeSubsystem));
+		operator.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, false))
+				.onFalse(new IntakeCommand(intakeSubsystem, true));
 
 		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
 		driver.rightTrigger().whileTrue(new ManualVelocityCommand(shooterSubsystem));
-      	// driver.x().whileTrue(new TurretAprilTagAimCommand(turretSubsystem, driveSubsystem));
-		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
-		// driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
-	    // //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
-	    
-		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
 		driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 60));
-		// driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
-		// driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
 			.whileTrue(
 				new RunTurretPowerCommand(
@@ -176,16 +177,6 @@ public class RobotContainer {
 				)
 			); //moves turrettttttttttttttttttttt
 
-		// operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
-		// // operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
-
-		// operator.leftBumper().whileTrue(new RunSpindexerCommand(spindexerSubsystem));	
-		// operator.rightBumper().whileTrue(new RunFeederCommand(turretFeederSubsystem));	
-
-		// operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-		// operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
-
-		// operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
 		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 
 		// operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));

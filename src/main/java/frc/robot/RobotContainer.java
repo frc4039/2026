@@ -23,6 +23,7 @@ import frc.robot.commands.TurretWithJoystickCommand;
 import frc.robot.commands.ZeroIntakeSlideCommand;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.TurretSubsystem.AimState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -86,6 +87,8 @@ public class RobotContainer {
 
 	private final CommandXboxController operator = new CommandXboxController(OperatorConstants.kOperatorPort);
 
+	private AimState currentAimState = AimState.AUTOMATIC;
+
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
 	 */
@@ -147,32 +150,36 @@ public class RobotContainer {
 				new TeleopDriveCommand(driveSubsystem, driver::getLeftY, driver::getLeftX,
 						driver::getRightX, -1.0));
 
-		
-		driver.rightTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, false).alongWith(new FeederCommand(turretFeederSubsystem, false)));
-		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
+		driver.rightTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, false)
+				.alongWith(new FeederCommand(turretFeederSubsystem, false)));
 		driver.leftTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, turretSubsystem));
 		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem));
-		
+
 		// Robot centric driving
 		driver.povUp().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0.035, 0));
 		driver.povDown().whileTrue(new RobotCentricDriveCommand(driveSubsystem, -0.035, 0));
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
-    
+
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
 						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true)));
 
 		// Operator commands
 		operator.leftTrigger().onTrue(new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
-		operator.rightTrigger().onTrue(new StopIntakeCommand(intakeSubsystem).andThen(new MoveIntakeSlideCommand(intakeSlideSubsystem, true)));
+		operator.rightTrigger().onTrue(
+				new StopIntakeCommand(intakeSubsystem).andThen(new MoveIntakeSlideCommand(intakeSlideSubsystem, true)));
+
+		operator.x().onTrue(new InstantCommand(() -> currentAimState = AimState.RIGHT))
+				.onFalse(new InstantCommand(() -> currentAimState = AimState.AUTOMATIC));
+		operator.x().onTrue(new InstantCommand(() -> currentAimState = AimState.LEFT))
+				.onFalse(new InstantCommand(() -> currentAimState = AimState.AUTOMATIC));
 
 		operator.leftBumper().onTrue(new StopIntakeCommand(intakeSubsystem));
 		operator.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
-		// 		.onFalse(new IntakeCommand(intakeSubsystem, true));
+		// .onFalse(new IntakeCommand(intakeSubsystem, true));
 
-		
-
-		//operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		// operator.b().onTrue(new InstantCommand(() ->
+		// shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 
 		operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
 		operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));

@@ -18,6 +18,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -46,7 +47,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 		// Gear Stuff
 		public static final double kTurretPulleyTeeth = 120.0;
-		public static final double kMotorPulleyTeeth = 23.0;
+		public static final double kMotorPulleyTeeth = 24.0;
 		public static final double kGearRatio = (kTurretPulleyTeeth / kMotorPulleyTeeth) * 4;
 
 		// Encoder Conversions;
@@ -60,10 +61,10 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kPTurret = 18.192;
 		public static final double kITurret = 0.0;
 		public static final double kDTurret = 0.05;
-		public static final double kGTurret = -1.73;
+		public static final double kGTurret = -2.0;
 
 		// Motion magic
-		public static final double kCruiseVelocity = 10.0;
+		public static final double kCruiseVelocity = 30.0;
 		public static final double kAcceleration = 250.0;
 		public static final double kJerk = 1600.0;
 
@@ -80,8 +81,8 @@ public class TurretSubsystem extends SubsystemBase {
 				Units.inchesToMeters(5.25), Rotation2d.fromDegrees(180));
 
 		// Min/Max
-		public static final double kMin = -130;
-		public static final double kMax = 130;
+		public static final double kMin = -165;
+		public static final double kMax = 165;
 
 		public static final double kHubTargetHeight = 1.4351;
 		public static final double kTurretHeight = 0.5;
@@ -94,6 +95,12 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kManualChangeLimit = Units.inchesToMeters(18);
 		public static final double kManualChangeAmount = Units.inchesToMeters(3);
 	}
+
+	public static enum AimState {
+		AUTOMATIC,
+		LEFT,
+		RIGHT
+	};
 
 	private TalonFX turretMotor;
 	private DriveSubsystem driveSubsystem;
@@ -182,6 +189,7 @@ public class TurretSubsystem extends SubsystemBase {
 
 	public static Transform2d changeTargetLocation(String direction) {
 		Optional<Alliance> alliance = DriverStation.getAlliance();
+		
 		if(direction == "up") {
 			xTransform += -1 * TurretConstants.kManualChangeAmount;
 		} else if (direction == "down") {
@@ -201,11 +209,18 @@ public class TurretSubsystem extends SubsystemBase {
 		} if(yTransform <= -1 * TurretConstants.kManualChangeLimit) {
 			yTransform = -1 * TurretConstants.kManualChangeLimit;
 		} 
+		
+		
+		if(alliance.isPresent()) {
 		if(alliance.get() == Alliance.Red) {
 			return new Transform2d(xTransform, yTransform, new Rotation2d(0));
 		} else {
 			return new Transform2d(-1 * xTransform, -1 * yTransform, new Rotation2d(0));
 		}
+		} else {
+			return new Transform2d(xTransform, yTransform, new Rotation2d(0));
+		}
+		
 	}
 
 	
@@ -251,6 +266,10 @@ public class TurretSubsystem extends SubsystemBase {
 		turretMotor.set(power);
 	}
 
+	public double getTurretError() {
+		return turretMotor.getClosedLoopError().getValueAsDouble();
+	}
+
 	@Override
 	public void periodic() {
 		// For safety, stop the turret whenever the robot is disabled.
@@ -271,6 +290,7 @@ public class TurretSubsystem extends SubsystemBase {
 		builder.addDoubleProperty("Shooter Target", () -> this.getOutputVelocity(), null);
 		builder.addDoubleProperty("Target", () -> driveSubsystem.getDistanceFromHub(), null);
 		builder.addDoubleProperty("Turret Voltage", () -> turretMotor.getMotorVoltage().getValueAsDouble(), null);
+		builder.addDoubleProperty("Turret Error", () -> turretMotor.getClosedLoopError().getValueAsDouble() /  TurretConstants.kDegreesPerRotation, null);
 		// builder.addDoubleProperty("Turret Target",() -> {
 		// moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
 		// Pose2d currentRobotPose2d = driveSubsystem.getPose().plus(TurretConstants.kTurretOffset);

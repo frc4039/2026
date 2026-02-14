@@ -40,7 +40,7 @@ public class DriveSubsystem extends SubsystemBase {
 	public static final class DriveConstants {
 		// Driving Parameters - Note that these are not the maximum capable speeds of
 		// the robot, rather the allowed maximum speeds
-		public static final double kMaxSpeedMetersPerSecond = 2.0; // was 5.0 //Keep Lower Than Real Max
+		public static final double kMaxSpeedMetersPerSecond = 3.75; // was 5.0 //Keep Lower Than Real Max
 		public static final double kMaxAngularSpeed = Helpers.isBabycakes() ? (1.35 * Math.PI) : (1.8 * Math.PI); // radians per second for turning
 
 		public static final double kAimP = 1.8;

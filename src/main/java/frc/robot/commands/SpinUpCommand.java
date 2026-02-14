@@ -19,10 +19,18 @@ public class SpinUpCommand extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
     this.shooterSubsystem = shooterSubsystem; 
     this.turretSubsystem = turretSubsystem;
-    shootingEstimator.put(7.517, 27.0);
-		shootingEstimator.put(7.77, 31.0);
-		shootingEstimator.put(8.24, 35.5);
-		shootingEstimator.put(7.39, 24.0);
+    // shootingEstimator.put(7.517, 27.0);
+		// shootingEstimator.put(7.77, 31.0);
+		// shootingEstimator.put(8.24, 35.5);
+		// shootingEstimator.put(7.39, 24.0);
+
+    shootingEstimator.put(7.545886001168923, 27.0);
+		shootingEstimator.put(7.707313889261361, 28.0);
+		shootingEstimator.put(7.424679017251541, 22.5);
+		shootingEstimator.put(8.20870640915173, 31.0);
+    		shootingEstimator.put(8.575, 35.0); // Calculated using line of close enoughish fit
+        shootingEstimator.put(9.812910955375385, 47.0);
+
   }
 
   // Called when the command is initially scheduled.

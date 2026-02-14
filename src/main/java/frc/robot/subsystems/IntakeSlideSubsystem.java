@@ -48,12 +48,12 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		public static final double kInPosition = 0.0;
 
 		// Used for determining when the command ends.
-		public static final double kPositionThreshold = 0.1;
+		public static final double kPositionThreshold = 0.5;
 
 		// Motion magic
-		public static final double kCruiseVelocity = 20.0;
-		public static final double kAcceleration = 15.0;
-		public static final double kJerk = 10.0;
+		public static final double kCruiseVelocity = 100.0;
+		public static final double kAcceleration = 100.0;
+		public static final double kJerk = 400.0;
 
 		public static final int kLeftLimitSwitchChannel = 0;
 		public static final int kRightLimitSwitchChannel = 1;
@@ -171,22 +171,12 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		final MotionMagicVoltage request = new MotionMagicVoltage(position);
 
 		intakeSlideRightMotor.setControl(request.withPosition(position)
-				.withSlot(0)
+				.withSlot(0).withLimitForwardMotion(!limitSwitchRight.get())
 				.withOverrideBrakeDurNeutral(true));
 
 		intakeSlideLeftMotor.setControl(request.withPosition(position)
-				.withSlot(0)
+				.withSlot(0).withLimitForwardMotion(!limitSwitchLeft.get())
 				.withOverrideBrakeDurNeutral(true));
-
-		if (!limitSwitchLeft.get() && position == IntakeSlideSubsystemConstants.kInPosition) {
-			intakeSlideLeftMotor.stopMotor();
-			intakeSlideLeftMotor.setPosition(0);
-		}
-
-		if (!limitSwitchRight.get() && position == IntakeSlideSubsystemConstants.kInPosition) {
-			intakeSlideRightMotor.stopMotor();
-			intakeSlideRightMotor.setPosition(0);
-		}
 	}
 
 	public void zeroIntake() {

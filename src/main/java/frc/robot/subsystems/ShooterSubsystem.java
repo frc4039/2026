@@ -121,6 +121,10 @@ public class ShooterSubsystem extends SubsystemBase {
 		shooterLeaderMotor.stopMotor();
 	}
 
+	public double getShooterError() {
+		return shooterLeaderMotor.getClosedLoopError().getValueAsDouble();
+	}
+
 	@Override
 	public void periodic() {
 		// For safety, stop the turret whenever the robot is disabled.

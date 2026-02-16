@@ -98,7 +98,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
 	public boolean atTargetSpeed(){
-		if (Math.abs(shooterLeaderMotor.getClosedLoopReference().getValue() - shooterLeaderMotor.getVelocity().getValueAsDouble()) < 0.5){
+		if (Math.abs(shooterLeaderMotor.getClosedLoopError().getValueAsDouble()) < 0.5){
 			return true;
 		}
 		return false;

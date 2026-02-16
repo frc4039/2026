@@ -24,12 +24,25 @@ public class SpinUpCommand extends Command {
 		// shootingEstimator.put(8.24, 35.5);
 		// shootingEstimator.put(7.39, 24.0);
 
-    shootingEstimator.put(7.545886001168923, 27.0);
-		shootingEstimator.put(7.707313889261361, 28.0);
-		shootingEstimator.put(7.424679017251541, 22.5);
-		shootingEstimator.put(8.20870640915173, 31.0);
-    		shootingEstimator.put(8.575, 35.0); // Calculated using line of close enoughish fit
-        shootingEstimator.put(9.812910955375385, 47.0);
+    shootingEstimator.put(4.208, 15.0);
+		shootingEstimator.put(4.757, 17.0);
+		shootingEstimator.put(5.488, 19.5);
+		shootingEstimator.put(5.987, 21.0);
+    shootingEstimator.put(6.555, 23.0);
+    shootingEstimator.put(7.016, 25.0);
+    shootingEstimator.put(7.362, 27.0);
+    shootingEstimator.put(7.874, 29.0);
+    shootingEstimator.put(8.346, 31.0);
+    shootingEstimator.put(8.677, 33.0);
+    shootingEstimator.put(8.728, 35.0);
+    shootingEstimator.put(9.101, 37.0);
+    shootingEstimator.put(9.405, 39.0);
+    shootingEstimator.put(9.779, 41.0);
+    shootingEstimator.put(10.295, 43.0);
+
+
+
+
 
   }
 
@@ -40,7 +53,7 @@ public class SpinUpCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double shootingSpeed = shootingEstimator.get(turretSubsystem.getOutputVelocity());
+    double shootingSpeed = (shootingEstimator.get(turretSubsystem.getOutputVelocity())) * 1.02;
 		shooterSubsystem.shootInput(shootingSpeed);
   }
 

@@ -491,13 +491,13 @@ public class DriveSubsystem extends SubsystemBase {
 
 	public double getDistanceFromHub() {
 		Pose2d hubPose = TurretSubsystem.getHub();
-		Pose2d currentRobotPose2d = this.getPose().plus(TurretConstants.kTurretOffset);
+		Pose2d currentRobotPose2d = this.getShootOnTheFlyPose2d().plus(TurretConstants.kTurretOffset);
 		return Math.sqrt(Math.pow(hubPose.relativeTo(currentRobotPose2d).getX(), 2) + Math.pow(hubPose.relativeTo(currentRobotPose2d).getY(), 2));
 	}
 
 	public Pose2d getShootOnTheFlyPose2d() {
 		Pose2d currentPose2d = this.getPose();
-		Pose2d latencyPose2d = currentPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * DriveConstants.kLatencyOffset), (this.getRobotRelativeSpeeds().vyMetersPerSecond * DriveConstants.kLatencyOffset), new Rotation2d(0)));
+		Pose2d latencyPose2d = currentPose2d.plus(new Transform2d((this.getRobotFieldSpeedX() * TurretConstants.kLatencyOffset), (this.getRobotFieldSpeedY() * TurretConstants.kLatencyOffset), new Rotation2d(0)));
 		return latencyPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * TurretConstants.kTimeOfFlight), (this.getRobotRelativeSpeeds().vyMetersPerSecond * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
 	}
 	

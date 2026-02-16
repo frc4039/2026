@@ -77,12 +77,12 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kTurretBackwardPosition = 360.0;
 
 		// Turret Offset
-		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(5.75),
-				Units.inchesToMeters(5.25), Rotation2d.fromDegrees(180));
+		public static final Transform2d kTurretOffset = new Transform2d(Units.inchesToMeters(-5.75),
+				Units.inchesToMeters(-5.25), Rotation2d.fromDegrees(180));
 
 		// Min/Max
-		public static final double kMin = -165;
-		public static final double kMax = 165;
+		public static final double kMin = -180;
+		public static final double kMax = 180;
 
 		public static final double kHubTargetHeight = 1.4351;
 		public static final double kTurretHeight = 0.5;
@@ -94,6 +94,8 @@ public class TurretSubsystem extends SubsystemBase {
 
 		public static final double kManualChangeLimit = Units.inchesToMeters(18);
 		public static final double kManualChangeAmount = Units.inchesToMeters(3);
+
+		public static final double kLatencyOffset = 0.0;
 	}
 
 	public static enum AimState {

@@ -74,8 +74,8 @@ public class AimCommand extends Command {
 
 		shotCalculator.setTarget(target);
 
-		turretSubsystem.moveToPosition(MathUtil.clamp(TurretConstants.kMin, TurretConstants.kMax,
-				-1 * shotCalculator.turretYaw));
+		turretSubsystem.moveToPosition(MathUtil.clamp( shotCalculator.turretYaw, TurretConstants.kMin,
+				TurretConstants.kMax));
 
 		if ((driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(157)
 				&& driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(205))

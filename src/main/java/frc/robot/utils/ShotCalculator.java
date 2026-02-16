@@ -86,7 +86,6 @@ public class ShotCalculator {
 	public void setTarget(Translation3d target) {
 		if (!this.target.equals(target)) {
 			this.target = target;
-			this.calculate();
 		}
 	}
 

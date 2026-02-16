@@ -158,9 +158,6 @@ public class RobotContainer {
 				new TeleopDriveCommand(driveSubsystem, keyboard::getLeftX, keyboard::getLeftY,
 						keyboard::getRightX, -1.0));
 		}
-
-		driver.rightTrigger().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, false)
-				.alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, false)));
 		driver.leftTrigger().whileTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true)));
 
 		// Robot centric driving
@@ -169,12 +166,12 @@ public class RobotContainer {
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
 
-		driver.rightBumper().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, true).alongWith(new FeederCommand(shooterSubsystem,turretSubsystem, turretFeederSubsystem, true)));
-		driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, shotCalculator));
+		driver.rightTrigger().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, false).alongWith(new FeederCommand(shooterSubsystem,turretSubsystem, turretFeederSubsystem, false)));
 
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
 						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true)));
-		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, shotCalculator,() -> currentAimState));
+		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, shotCalculator,() -> currentAimState)
+			.alongWith(new SpinUpCommand(shooterSubsystem, shotCalculator)));
 		driver.y().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 
 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)

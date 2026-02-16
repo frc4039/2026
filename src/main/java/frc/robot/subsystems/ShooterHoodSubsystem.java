@@ -38,7 +38,7 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 
 		//Hard limits for hood angle
 		public static final double kMin = 45;
-		public static final double kMax = 75;
+		public static final double kMax = 76;
     }
 
     private TalonFX hoodMotor;

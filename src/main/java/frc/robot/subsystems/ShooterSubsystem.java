@@ -33,11 +33,11 @@ public class ShooterSubsystem extends SubsystemBase {
 		public static final int kFollowerMotorID = 33;
 
 		// Pid values
-		public static final double kVShooter = 0.13305;
-		public static final double kSShooter = 0.4636;
+		public static final double kVShooter = 0.12341;
+		public static final double kSShooter = 0.32361;
 		// public static final double kAShooter = 0.010104;
 		public static final double kAShooter = 0.0;
-		public static final double kPShooter = 0.60;
+		public static final double kPShooter = 0.079764;
 		public static final double kIShooter = 0.0;
 		public static final double kDShooter = 0.0;
 
@@ -119,6 +119,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
 	public void stop() {
 		shooterLeaderMotor.stopMotor();
+	}
+
+	public double getShooterError() {
+		return shooterLeaderMotor.getClosedLoopError().getValueAsDouble();
 	}
 
 	@Override

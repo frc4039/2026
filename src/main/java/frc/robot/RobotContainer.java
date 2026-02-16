@@ -6,20 +6,33 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.IntakeOutCommand;
+import frc.robot.commands.IntakeShimmyCommand;
 import frc.robot.commands.ManualVelocityCommand;
+import frc.robot.commands.MoveIntakeSlideCommand;
+import frc.robot.commands.OwlHeadTurretCommand;
 import frc.robot.commands.ResetTurretGyro;
 import frc.robot.commands.AimCommand;
 import frc.robot.commands.SpindexerCommand;
+import frc.robot.commands.StopIntakeCommand;
+import frc.robot.commands.TurretMoveCommand;
 import frc.robot.commands.TurretWithJoystickCommand;
+import frc.robot.commands.ZeroIntakeSlideCommand;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.subsystems.TurretSubsystem.AimState;
+import frc.robot.subsystems.IntakeSlideSubsystem.IntakeSlideSubsystemConstants;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.FeederSubsystem;
+import frc.robot.subsystems.IntakeSlideSubsystem;
 import frc.robot.commands.RobotCentricDriveCommand;
+import frc.robot.commands.RunFeederCommand;
+import frc.robot.commands.RunSpindexerCommand;
+import frc.robot.commands.RunTurretPowerCommand;
 import frc.robot.commands.ShooterHoodCommand;
 import frc.robot.commands.SpinUpCommand;
 import frc.robot.commands.TeleopDriveCommand;
@@ -43,6 +56,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -60,11 +74,12 @@ public class RobotContainer {
 	private final ShotCalculator shotCalculator = new ShotCalculator();
  	private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(hardwareMonitor);
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor, shotCalculator);
-	private final TurretSubsystem turretSubsystem = new TurretSubsystem(hardwareMonitor);
+	private final TurretSubsystem turretSubsystem = new TurretSubsystem( hardwareMonitor);
 	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem, shotCalculator);
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
+	private final IntakeSlideSubsystem intakeSlideSubsystem = new IntakeSlideSubsystem();
 
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
@@ -76,41 +91,43 @@ public class RobotContainer {
 	
 	private final CommandXboxController keyboard = new CommandXboxController(3);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    // Configure the trigger bindings
-    configureBindings();
+	private AimState currentAimState = AimState.AUTOMATIC;
 
-    
-    SmartDashboard.putData(
-      new InstantCommand(() -> turretSubsystem.resetTurret())
-        .withName("ResetTurret")
-        .ignoringDisable(true)
-    );
-	SmartDashboard.putData(spindexerSubsystem);
-	SmartDashboard.putData(intakeSubsystem);
-	SmartDashboard.putData(turretSubsystem);
-	SmartDashboard.putData(shooterSubsystem);
-	SmartDashboard.putData(shooterHoodSubsystem);
+	/**
+	 * The container for the robot. Contains subsystems, OI devices, and commands.
+	 */
+	public RobotContainer() {
+		// Configure the trigger bindings
+		configureBindings();
 
+		SmartDashboard.putData(
+				new InstantCommand(() -> turretSubsystem.resetTurret())
+						.withName("ResetTurret")
+						.ignoringDisable(true));
+		SmartDashboard.putData(spindexerSubsystem);
+		SmartDashboard.putData(intakeSubsystem);
+		SmartDashboard.putData(turretSubsystem);
+		SmartDashboard.putData(shooterSubsystem);
+		SmartDashboard.putData(shooterHoodSubsystem);
+		SmartDashboard.putData(intakeSlideSubsystem);
 
-	hardwareMonitor.registerDevice(null, driver);
+		hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
 		SmartDashboard.putData(CommandScheduler.getInstance());
 
 		SmartDashboard.putData(driveSubsystem);
 
-		 // Put the BuildInfo so we can see what version of the code is running.
-    SmartDashboard.putData("BuildInfo", new Sendable() {
-      @Override
-      public void initSendable(SendableBuilder builder) {
-        builder.publishConstString("Robot Name", Helpers.getRobotName());
-        builder.publishConstString("Git Branch", Helpers.getGitBranch());
-        builder.publishConstString("Git SHA", Helpers.getGitSHA());
-        builder.publishConstString("Build Date", Helpers.getBuildDate());
-      }
-    });
-  }
+		// Put the BuildInfo so we can see what version of the code is running.
+		SmartDashboard.putData("BuildInfo", new Sendable() {
+			@Override
+			public void initSendable(SendableBuilder builder) {
+				builder.publishConstString("Robot Name", Helpers.getRobotName());
+				builder.publishConstString("Git Branch", Helpers.getGitBranch());
+				builder.publishConstString("Git SHA", Helpers.getGitSHA());
+				builder.publishConstString("Build Date", Helpers.getBuildDate());
+			}
+		});
+	}
 
 	/**
 	 * Use this method to define your trigger->command mappings. Triggers can be
@@ -141,27 +158,24 @@ public class RobotContainer {
 				new TeleopDriveCommand(driveSubsystem, keyboard::getLeftX, keyboard::getLeftY,
 						keyboard::getRightX, -1.0));
 		}
+
+		driver.rightTrigger().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, false)
+				.alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, false)));
+		driver.leftTrigger().whileTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true)));
+
 		// Robot centric driving
 		driver.povUp().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0.035, 0));
 		driver.povDown().whileTrue(new RobotCentricDriveCommand(driveSubsystem, -0.035, 0));
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
 
-
-    	driver.leftTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-    	driver.leftBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
-
-		driver.rightBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, true).alongWith(new FeederCommand(turretFeederSubsystem, true)));
+		driver.rightBumper().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, true).alongWith(new FeederCommand(shooterSubsystem,turretSubsystem, turretFeederSubsystem, true)));
 		driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, shotCalculator));
+
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
-		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, shotCalculator));
+		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, shotCalculator,() -> currentAimState));
 		driver.y().whileTrue(new ManualVelocityCommand(shooterSubsystem));
-	    //driver.rightTrigger().whileTrue(new OwlHeadTurretCommand(() -> driveSubsystem.getHeading(), turretSubsystem));
-	    
-		//driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
-		//driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
-		// driver.rightBumper().whileTrue(new AlignToTowerCommandGroup(driveSubsystem, visionSubsystem));
-		// driver.x().whileTrue(new ShooterHoodCommand(shooterHoodSubsystem, 5));
+
 		operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightX.value, 0.25)
 			.or(
 				operator.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.25)
@@ -174,18 +188,40 @@ public class RobotContainer {
 					() -> driveSubsystem.getHeading()
 				)
 			); //moves turrettttttttttttttttttttt
+		// Operator commands
+		operator.leftTrigger().onTrue(new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
+		operator.rightTrigger()
+				.onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition));
 
-		operator.leftTrigger().whileTrue(new SpindexerCommand(spindexerSubsystem, true));
-		operator.leftBumper().whileTrue(new SpindexerCommand(spindexerSubsystem, false));
+		operator.rightTrigger().onTrue(
+				new StopIntakeCommand(intakeSubsystem).andThen(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition)));
 
-		operator.rightTrigger().whileTrue(new IntakeCommand(intakeSubsystem, true));
-		operator.rightBumper().whileTrue(new FeederCommand(turretFeederSubsystem, false));
+		operator.b().onTrue(new InstantCommand(() -> currentAimState = AimState.RIGHT))
+				.onFalse(new InstantCommand(() -> currentAimState = AimState.AUTOMATIC));
+		operator.x().onTrue(new InstantCommand(() -> currentAimState = AimState.LEFT))
+				.onFalse(new InstantCommand(() -> currentAimState = AimState.AUTOMATIC));
 
-		operator.a().onTrue(new ShooterHoodCommand(shooterHoodSubsystem, 70));
+		operator.leftBumper().onTrue(new StopIntakeCommand(intakeSubsystem));
+		operator.rightBumper().whileTrue(new IntakeCommand(intakeSubsystem, false));
+		// .onFalse(new IntakeCommand(intakeSubsystem, true));
+
+
 		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		// operator.b().onTrue(new InstantCommand(() ->
+		// shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 
-		keyboard.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, shotCalculator));
-
+		// operator.povUp().onTrue(new MoveHubTargetCommand("up",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povDown().onTrue(new MoveHubTargetCommand("down",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povLeft().onTrue(new MoveHubTargetCommand("left",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povRight().onTrue(new MoveHubTargetCommand("right",
+		// turretSubsystem).ignoringDisable(true));
+		// operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
+		// operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));
+		// operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
+		// operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
 	}
 
 }

@@ -1,17 +1,24 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -25,10 +32,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.subsystems.ShooterSubsystem.ShooterConstants;
 import frc.robot.utils.HardwareMonitor;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
 
 public class TurretSubsystem extends SubsystemBase {
 	public final class TurretConstants {
@@ -40,25 +51,26 @@ public class TurretSubsystem extends SubsystemBase {
 
 		// Gear Stuff
 		public static final double kTurretPulleyTeeth = 120.0;
-		public static final double kMotorPulleyTeeth = 23.0;
-		public static final double kGearRatio = kTurretPulleyTeeth / kMotorPulleyTeeth;
+		public static final double kMotorPulleyTeeth = 24.0;
+		public static final double kGearRatio = (kTurretPulleyTeeth / kMotorPulleyTeeth) * 4;
 
 		// Encoder Conversions;
 		public static final double kTickersPerRotation = 4096;
 		public static final double kDegreesPerRotation = 360.0 / kGearRatio;
 
 		// Pid values
-		public static final double kSTurret = 0.0;
-		public static final double kVTurret = 0.0;
-		public static final double kATurret = 0.1;
-		public static final double kPTurret = 100.0;
-		public static final double kITurret = 1.0;
-		public static final double kDTurret = 0.0;
+		public static final double kSTurret = 0.2673;
+		public static final double kVTurret = 0.05462;
+		public static final double kATurret = 0.0052418;
+		public static final double kPTurret = 18.192;
+		public static final double kITurret = 0.0;
+		public static final double kDTurret = 0.05;
+		public static final double kGTurret = -2.0;
 
 		// Motion magic
-		public static final double kCruiseVelocity = 1500.0 / kDegreesPerRotation;
-		public static final double kAcceleration = 2000.0 / kDegreesPerRotation;
-		public static final double kJerk = 10000.0 / kDegreesPerRotation;
+		public static final double kCruiseVelocity = 30.0;
+		public static final double kAcceleration = 250.0;
+		public static final double kJerk = 1600.0;
 
 		// The accuracy (in degrees) that the turret has to be from it's target position
 		// for the command to be considered done.
@@ -77,8 +89,8 @@ public class TurretSubsystem extends SubsystemBase {
 		);
 
 		// Min/Max
-		public static final double kMin = -180;
-		public static final double kMax = 50;
+		public static final double kMin = -165;
+		public static final double kMax = 165;
 
 		public static final double kDeltaZ = FieldConstants.kHubHeight - kTurretOffset.getZ();
 		public static final double kVelocityZ = 7.3;
@@ -90,9 +102,29 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kManualChangeAmount = Units.inchesToMeters(3);
 	}
 
+	public static enum AimState {
+		AUTOMATIC,
+		LEFT,
+		RIGHT
+	};
+
 	private TalonFX turretMotor;
 	public static double xTransform = 0;
 	public static double yTransform = 0;
+
+	
+	// private VoltageOut voltRequest = new VoltageOut(0.0);
+	// private SysIdRoutine sysid = new SysIdRoutine(
+	// 		new SysIdRoutine.Config(
+	// 			Volts.of(1.0).per(Second),
+	// 			Volts.of(5),
+	// 			Seconds.of(5),
+	// 			(state) -> SignalLogger.writeString("state", state.toString())
+	// 		),
+	// 		new SysIdRoutine.Mechanism(
+	// 				(volts) -> turretMotor.setControl(voltRequest.withOutput(volts.in(Volts))),
+	// 				null,
+	// 				this));
 	
 
 	public TurretSubsystem(HardwareMonitor hardwareMonitor) {
@@ -115,6 +147,7 @@ public class TurretSubsystem extends SubsystemBase {
 		slotConfigs.kP = TurretConstants.kPTurret;
 		slotConfigs.kI = TurretConstants.kITurret;
 		slotConfigs.kD = TurretConstants.kDTurret;
+		slotConfigs.kG = TurretConstants.kGTurret;
 
 		MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
 
@@ -126,7 +159,13 @@ public class TurretSubsystem extends SubsystemBase {
 
 		hardwareMonitor.registerDevice(this, turretMotor);
 
-		
+
+		// SmartDashboard.putData("Turret Subsystem/Start Logging", Commands.runOnce(SignalLogger::start));
+		// SmartDashboard.putData("Turret Subsystem/Stop Logging", Commands.runOnce(SignalLogger::stop));
+		// SmartDashboard.putData("Turret Subsystem/QuasiStatic Forward", sysid.quasistatic(Direction.kForward));
+		// SmartDashboard.putData("Turret Subsystem/Quasistatic Backward", sysid.quasistatic(Direction.kReverse));
+		// SmartDashboard.putData("Turret Subsystem/Dynamic Forward", sysid.dynamic(Direction.kForward));
+		// SmartDashboard.putData("Turret Subsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
 	}
 
 	public void moveToPosition(double position) {
@@ -151,7 +190,42 @@ public class TurretSubsystem extends SubsystemBase {
 		double owlHeadPosition = robotHeading.getAsDouble() + desiredDirection;
 		this.moveToPosition((owlHeadPosition % 360 + 360) % 360);
 	}
-	
+	public static Transform2d changeTargetLocation(String direction) {
+		Optional<Alliance> alliance = DriverStation.getAlliance();
+		
+		if(direction == "up") {
+			xTransform += -1 * TurretConstants.kManualChangeAmount;
+		} else if (direction == "down") {
+			xTransform += TurretConstants.kManualChangeAmount;
+		} else if(direction == "left") {
+			yTransform += -1 * TurretConstants.kManualChangeAmount;
+		} else if(direction == "right") {
+			yTransform += TurretConstants.kManualChangeAmount;
+		}
+
+		if(xTransform >= TurretConstants.kManualChangeLimit) {
+			xTransform = TurretConstants.kManualChangeLimit;
+		} if(xTransform <= -1 * TurretConstants.kManualChangeLimit) {
+			xTransform = -1 * TurretConstants.kManualChangeLimit;
+		} if(yTransform >= TurretConstants.kManualChangeLimit) {
+			yTransform = TurretConstants.kManualChangeLimit;
+		} if(yTransform <= -1 * TurretConstants.kManualChangeLimit) {
+			yTransform = -1 * TurretConstants.kManualChangeLimit;
+		} 
+		
+		
+		if(alliance.isPresent()) {
+		if(alliance.get() == Alliance.Red) {
+			return new Transform2d(xTransform, yTransform, new Rotation2d(0));
+		} else {
+			return new Transform2d(-1 * xTransform, -1 * yTransform, new Rotation2d(0));
+		}
+		} else {
+			return new Transform2d(xTransform, yTransform, new Rotation2d(0));
+		}
+		
+	}
+
 
 	public static Translation3d getHub() {
 		Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -177,6 +251,14 @@ public class TurretSubsystem extends SubsystemBase {
 				.plus(new Transform2d(
 						new Translation2d(),
 						Rotation2d.fromDegrees(-1 * this.getTurretPosition())));
+	}
+
+	public void runTurretPercentage(double power) {
+		turretMotor.set(power);
+	}
+
+	public double getTurretError() {
+		return turretMotor.getClosedLoopError().getValueAsDouble();
 	}
 
 	@Override

@@ -33,7 +33,9 @@ public final class Constants {
     public static final Translation3d kRedHub = new Translation3d(Units.inchesToMeters(469.11), Units.inchesToMeters(159), kHubHeight);
     public static final Translation3d kRedPassTargetRight = new Translation3d(Units.inchesToMeters(560), Units.inchesToMeters(75), 0);
     public static final Translation3d kLeftPassTarget = new Translation3d(Units.inchesToMeters(560), Units.inchesToMeters(240), 0);
-    public static final double kRedAllianceLine = Units.inchesToMeters(469.11);
+    public static final Translation3d kBluePassTargetRight = new Translation3d(Units.inchesToMeters(651.22 - 560), Units.inchesToMeters(317.69 - 75), 0);
+    public static final Pose2d kRedAllianceLine = new Pose2d(Units.inchesToMeters(469.11), 0, new Rotation2d(0));
+    public static final Pose2d kBlueAllianceLine = new Pose2d(Units.inchesToMeters(651.22 - 469.11), 0, new Rotation2d(0));
     public static final double kCenterLine = Units.inchesToMeters(158.32);
     public static Translation3d flipPoseY(Translation3d yPose2d) {
       return new Translation3d(yPose2d.getX(), Units.inchesToMeters(316.64) - yPose2d.getY(), yPose2d.getZ());

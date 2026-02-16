@@ -6,12 +6,22 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
+import java.util.Optional;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem.ShooterAngleConstants;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.TurretSubsystem.AimState;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 import frc.robot.utils.ShotCalculator;
 
@@ -21,16 +31,17 @@ public class AimCommand extends Command {
 	private TurretSubsystem turretSubsystem;
 	private DriveSubsystem driveSubsystem;
 	private ShooterHoodSubsystem shooterHoodSubsystem;
+	private Supplier<AimState> currentAim;
 	private ShotCalculator shotCalculator;
 
 	public AimCommand(TurretSubsystem turretSubsystem, DriveSubsystem driveSubsystem,
-			ShooterHoodSubsystem shooterHoodSubsystem, ShotCalculator shotCalculator) {
+			ShooterHoodSubsystem shooterHoodSubsystem, ShotCalculator shotCalculator, Supplier<AimState> currentAim) {
 		this.turretSubsystem = turretSubsystem;
 		this.driveSubsystem = driveSubsystem;
 		this.shooterHoodSubsystem = shooterHoodSubsystem;
 		this.shotCalculator = shotCalculator;
+		this.currentAim = currentAim;
 		addRequirements(turretSubsystem, shooterHoodSubsystem);
-
 	}
 
 	// Called when the command is initially scheduled.
@@ -43,21 +54,39 @@ public class AimCommand extends Command {
 	public void execute() {
 		Translation3d target = TurretSubsystem.getHub();
 
-		if (driveSubsystem.getPose().getTranslation().getX() < Constants.FieldConstants.kRedAllianceLine) {
-			if (driveSubsystem.getPose().getTranslation().getY() > Constants.FieldConstants.kCenterLine) {
-				target = Constants.FieldConstants.flipPoseY(Constants.FieldConstants.kRedPassTargetRight);
-			} else {
+		Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+
+		double driveX = driveSubsystem.getPose().getTranslation().getX();
+
+		if(driveX < Constants.FieldConstants.kRedAllianceLine.getX() && driveX > Constants.FieldConstants.kBlueAllianceLine.getX()){
+			// Change target for shuttling
+			if(alliance == Alliance.Red){
 				target = Constants.FieldConstants.kRedPassTargetRight;
+			}else{
+				target = Constants.FieldConstants.kBluePassTargetRight;
+			}
+
+			// Adjust target to left or right side
+			if((driveSubsystem.getPose().getTranslation().getY() < Constants.FieldConstants.kCenterLine && currentAim.get().equals(AimState.AUTOMATIC)) || currentAim.get().equals(AimState.LEFT)){
+				target = Constants.FieldConstants.flipPoseY(target);
 			}
 		}
 
 		shotCalculator.setTarget(target);
+
 		turretSubsystem.moveToPosition(MathUtil.clamp(TurretConstants.kMin, TurretConstants.kMax,
 				-1 * shotCalculator.turretYaw));
 
+		if ((driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(157)
+				&& driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(205))
+				|| (driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(444)
+						&& driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(492))) {
+			shooterHoodSubsystem.moveToPosition(ShooterAngleConstants.kMax);
+
+		} else {
 		shooterHoodSubsystem.moveToPosition(MathUtil.clamp(ShooterAngleConstants.kMax, ShooterAngleConstants.kMin,
 			shotCalculator.hoodPitch));
-
+		}
 	}
 
 	// Called once the command ends or is interrupted.

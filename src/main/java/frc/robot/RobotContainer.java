@@ -157,7 +157,7 @@ public class RobotContainer {
 				.alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, false)));
 		driver.leftTrigger().whileTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true)));
 
-		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem));
+		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem).alongWith(new InstantCommand(() -> shooterHoodSubsystem.moveToPosition(65)).alongWith(new InstantCommand(() -> turretSubsystem.moveToPosition(180)))));
 		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, () -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem)));
 
 		// Robot centric driving
@@ -166,19 +166,13 @@ public class RobotContainer {
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
 
-		driver.b()
-				.onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
-						.alongWith(new ZeroIntakeSlideCommand(intakeSlideSubsystem))
-						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret())));
-
+		
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
 						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true)));
 
 		// Operator commands
 		operator.leftTrigger().onTrue(new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
-		operator.rightTrigger()
-				.onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition));
-
+		
 		operator.rightTrigger().onTrue(
 				new StopIntakeCommand(intakeSubsystem).andThen(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition)));
 
@@ -192,7 +186,7 @@ public class RobotContainer {
 		// .onFalse(new IntakeCommand(intakeSubsystem, true));
 
 
-		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		//operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 		// operator.b().onTrue(new InstantCommand(() ->
 		// shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 

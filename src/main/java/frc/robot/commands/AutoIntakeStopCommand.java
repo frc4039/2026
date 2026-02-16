@@ -3,7 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 
-public class AutoIntakeCommand extends Command {
+public class AutoIntakeStopCommand extends Command {
 	IntakeSubsystem intakeSubsystem;
 	private boolean intake;
 

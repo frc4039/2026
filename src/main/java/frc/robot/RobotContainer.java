@@ -172,7 +172,8 @@ public class RobotContainer {
 		driver.rightBumper().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, true).alongWith(new FeederCommand(shooterSubsystem,turretSubsystem, turretFeederSubsystem, true)));
 		driver.rightTrigger().whileTrue(new SpinUpCommand(shooterSubsystem, shotCalculator));
 
-		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true));
+		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
+						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true)));
 		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, shotCalculator,() -> currentAimState));
 		driver.y().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 
@@ -190,9 +191,7 @@ public class RobotContainer {
 			); //moves turrettttttttttttttttttttt
 		// Operator commands
 		operator.leftTrigger().onTrue(new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
-		operator.rightTrigger()
-				.onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition));
-
+		
 		operator.rightTrigger().onTrue(
 				new StopIntakeCommand(intakeSubsystem).andThen(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition)));
 
@@ -206,7 +205,7 @@ public class RobotContainer {
 		// .onFalse(new IntakeCommand(intakeSubsystem, true));
 
 
-		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		//operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 		// operator.b().onTrue(new InstantCommand(() ->
 		// shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 

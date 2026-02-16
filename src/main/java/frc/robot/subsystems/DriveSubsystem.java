@@ -502,7 +502,8 @@ public class DriveSubsystem extends SubsystemBase {
 
 	public Pose2d getShootOnTheFlyPose2d() {
 		Pose2d currentPose2d = this.getPose();
-		return currentPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * TurretConstants.kTimeOfFlight), (this.getRobotRelativeSpeeds().vyMetersPerSecond * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
+		Pose2d latencyPose2d = currentPose2d.plus(new Transform2d((this.getRobotFieldSpeedX() * TurretConstants.kLatencyOffset), (this.getRobotFieldSpeedY() * TurretConstants.kLatencyOffset), new Rotation2d(0)));
+		return latencyPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * TurretConstants.kTimeOfFlight), (this.getRobotRelativeSpeeds().vyMetersPerSecond * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
 	}
 	
 	

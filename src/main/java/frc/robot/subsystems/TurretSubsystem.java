@@ -89,8 +89,8 @@ public class TurretSubsystem extends SubsystemBase {
 		);
 
 		// Min/Max
-		public static final double kMin = -165;
-		public static final double kMax = 165;
+		public static final double kMin = -180;
+		public static final double kMax = 180;
 
 		public static final double kDeltaZ = FieldConstants.kHubHeight - kTurretOffset.getZ();
 		public static final double kVelocityZ = 7.3;
@@ -100,6 +100,8 @@ public class TurretSubsystem extends SubsystemBase {
 
 		public static final double kManualChangeLimit = Units.inchesToMeters(18);
 		public static final double kManualChangeAmount = Units.inchesToMeters(3);
+
+		public static final double kLatencyOffset = 0.0;
 	}
 
 	public static enum AimState {

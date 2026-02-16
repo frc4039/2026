@@ -5,23 +5,17 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 public class AutoIntakeStopCommand extends Command {
 	IntakeSubsystem intakeSubsystem;
-	private boolean intake;
 
-	public AutoIntakeCommand(IntakeSubsystem intakeSubsystem, Boolean intake) {
+	public AutoIntakeStopCommand(IntakeSubsystem intakeSubsystem) {
 		// Use addRequirements() here to declare subsystem dependencies.
 		addRequirements(intakeSubsystem);
 		this.intakeSubsystem = intakeSubsystem;
-		this.intake = intake;
 	}
 
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		if (intake) {
-			intakeSubsystem.intake();
-		} else {
-			intakeSubsystem.outtake();
-		}
+		intakeSubsystem.stopMotor();
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.

@@ -15,7 +15,7 @@ public class AutoSpindexerFeedStopCommand extends InstantCommand{
 
 	@Override
 	public void initialize() {
-        spindexerSubsystem.stopMotor();
-        feederSubsystem.stopMotor();
+        spindexerSubsystem.stop();
+        feederSubsystem.stop();
 	}
 }

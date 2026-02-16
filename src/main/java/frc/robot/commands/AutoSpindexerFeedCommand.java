@@ -30,11 +30,11 @@ public class AutoSpindexerFeedCommand extends Command{
 	@Override
 	public void execute() {
 		if (shooterSubsystem.atTargetSpeed() == false) {
-			spindexerSubsystem.stopMotor();
+			spindexerSubsystem.stop();
 			return;
 		}
 		if(!turretSubsystem.isAtPosition()) {
-			spindexerSubsystem.stopMotor();
+			spindexerSubsystem.stop();
 			return;
 		}
 		if (spindexerReverseMotor) {
@@ -52,7 +52,7 @@ public class AutoSpindexerFeedCommand extends Command{
 
 	@Override
 	public void end(boolean interrupted) {
-		spindexerSubsystem.stopMotor();
+		spindexerSubsystem.stop();
 	}
 
 	@Override

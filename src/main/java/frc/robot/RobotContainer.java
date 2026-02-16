@@ -30,6 +30,7 @@ import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.TurretSubsystem.AimState;
 import frc.robot.subsystems.IntakeSlideSubsystem.IntakeSlideSubsystemConstants;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
@@ -56,6 +57,7 @@ import java.security.spec.NamedParameterSpec;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -64,6 +66,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
@@ -101,7 +104,7 @@ public class RobotContainer {
 			OperatorConstants.kDriverControllerPort);
 
 	private final CommandXboxController operator = new CommandXboxController(OperatorConstants.kOperatorPort);
-
+	public final SendableChooser<Command> AutoChooser = new SendableChooser<Command>();
 	private AimState currentAimState = AimState.AUTOMATIC;
 
 	/**
@@ -120,9 +123,14 @@ public class RobotContainer {
 	NamedCommands.registerCommand("Aim", new AutoAimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
 	NamedCommands.registerCommand("Retract Hood", new HoodGoToZeroPositionComand(shooterHoodSubsystem));
 	NamedCommands.registerCommand("Wait", new WaitCommand(5));
+	NamedCommands.registerCommand("IntakeOut", new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
 
 
 		configureBindings();
+
+
+		AutoChooser.setDefaultOption("testAuto", new PathPlannerAuto("testAuto"));
+		SmartDashboard.putData("Auto",AutoChooser);
 
 		SmartDashboard.putData(
 				new InstantCommand(() -> turretSubsystem.resetTurret())
@@ -192,10 +200,10 @@ public class RobotContainer {
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
 
-		driver.b()
-				.onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
-						.alongWith(new ZeroIntakeSlideCommand(intakeSlideSubsystem))
-						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret())));
+		//driver.b()
+		//		.onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
+		//				.alongWith(new ZeroIntakeSlideCommand(intakeSlideSubsystem))
+		//				.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret())));
 
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
 						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true)));
@@ -205,8 +213,8 @@ public class RobotContainer {
 		operator.rightTrigger()
 				.onTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition));
 
-		operator.rightTrigger().onTrue(
-				new StopIntakeCommand(intakeSubsystem).andThen(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition)));
+		//operator.rightTrigger().onTrue(
+		//		new StopIntakeCommand(intakeSubsystem).andThen(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition)));
 
 		operator.b().onTrue(new InstantCommand(() -> currentAimState = AimState.RIGHT))
 				.onFalse(new InstantCommand(() -> currentAimState = AimState.AUTOMATIC));
@@ -218,7 +226,7 @@ public class RobotContainer {
 		// .onFalse(new IntakeCommand(intakeSubsystem, true));
 
 
-		operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
+		//operator.b().onTrue(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 		// operator.b().onTrue(new InstantCommand(() ->
 		// shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 
@@ -235,5 +243,7 @@ public class RobotContainer {
 		operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
 		operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
 	}
-
+	public Command getAutonomousCommand() {
+    	return AutoChooser.getSelected();
+  	}
 }

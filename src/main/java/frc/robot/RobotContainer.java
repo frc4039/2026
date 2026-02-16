@@ -114,13 +114,13 @@ public class RobotContainer {
 		// Configure the trigger bindings
 
 	NamedCommands.registerCommand("Shoot", new ShootCommand(shooterSubsystem));
-	NamedCommands.registerCommand("StartIntake", new AutoIntakeCommand(intakeSubsystem,true));
+	NamedCommands.registerCommand("StartIntake", new IntakeCommand(intakeSubsystem,true));
 	NamedCommands.registerCommand("StopIntake", new AutoStopIntakeCommand(intakeSubsystem));
 	NamedCommands.registerCommand("SpindexerFeed", new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, shooterSubsystem,false, false, turretSubsystem));
 	NamedCommands.registerCommand("StopSpindexerFeed", new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
 	NamedCommands.registerCommand("ShooterSpinUp", new AutoSpinUpCommand(shooterSubsystem, turretSubsystem));
 	NamedCommands.registerCommand("ShooterStopSpinUp", new AutoSpinUpStopCommand(shooterSubsystem));
-	NamedCommands.registerCommand("Aim", new AutoAimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem));
+	NamedCommands.registerCommand("Aim", new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem,() -> currentAimState));
 	NamedCommands.registerCommand("Retract Hood", new HoodGoToZeroPositionComand(shooterHoodSubsystem));
 	NamedCommands.registerCommand("Wait", new WaitCommand(5));
 	NamedCommands.registerCommand("IntakeOut", new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));

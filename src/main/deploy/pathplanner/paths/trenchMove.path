@@ -3,32 +3,57 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.605797720797721,
-        "y": 7.277977207977208
+        "x": 3.540642857142858,
+        "y": 7.382261904761903
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.37242867317868,
-        "y": 7.277977207977208
+        "x": 6.045690476190478,
+        "y": 7.4362499999999985
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.797345238095238,
-        "y": 7.382261904761905
+        "x": 7.136250000000001,
+        "y": 7.382261904761903
       },
       "prevControl": {
-        "x": 4.361261904765041,
-        "y": 7.360666666661943
+        "x": 6.86900892857143,
+        "y": 7.37753794642857
+      },
+      "nextControl": {
+        "x": 7.403491071428572,
+        "y": 7.386985863095236
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.859690476190478,
+        "y": 4.466904761904761
+      },
+      "prevControl": {
+        "x": 8.075642857142858,
+        "y": 7.641404761904761
       },
       "nextControl": null,
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": "TrenchMove"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.55,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1.15,
+      "rotationDegrees": -90.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
@@ -39,26 +64,10 @@
       "command": null
     },
     {
-      "name": "",
-      "waypointRelativePos": 0,
-      "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "Retract Hood"
-        }
-      }
-    },
-    {
       "name": "StartIntake",
-      "waypointRelativePos": 0.5892687559354056,
+      "waypointRelativePos": 1.0302729528536223,
       "endWaypointRelativePos": null,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "StartIntake"
-        }
-      }
+      "command": null
     }
   ],
   "globalConstraints": {
@@ -70,8 +79,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 3.0,
-    "rotation": -4.224403217083857
+    "velocity": 0.0,
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": "shootAndMove",

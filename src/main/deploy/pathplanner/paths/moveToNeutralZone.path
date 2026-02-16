@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.797345238095238,
-        "y": 7.382261904761905
+        "x": 7.859690476190478,
+        "y": 4.466904761904761
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.693547619047621,
-        "y": 7.285083333333334
+        "x": 8.755892857142861,
+        "y": 4.3697261904761895
       },
       "isLocked": false,
       "linkedName": "TrenchMove"
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.5,
+    "maxVelocity": 1.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 1.0,
+    "velocity": 0.0,
     "rotation": -90.0
   },
   "reversed": false,
   "folder": "shootAndMove",
   "idealStartingState": {
     "velocity": 3.0,
-    "rotation": -4.224403217083857
+    "rotation": -90.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

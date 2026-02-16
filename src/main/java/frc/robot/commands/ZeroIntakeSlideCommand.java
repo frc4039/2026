@@ -5,18 +5,17 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.IntakeSlideSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class ShootCommand extends Command {
-  /** Creates a new ShootCommand. */
+public class ZeroIntakeSlideCommand extends Command {
+  /** Creates a new ZeroIntakeSlideCommand. */
+  private IntakeSlideSubsystem intakeSlideSubsystem;
+  public ZeroIntakeSlideCommand(IntakeSlideSubsystem intakeSlideSubsystem) {
 
-  private final ShooterSubsystem shooterSubsystem;
-  public ShootCommand(ShooterSubsystem shooterSubsystem) {
+    this.intakeSlideSubsystem = intakeSlideSubsystem;
+    addRequirements(intakeSlideSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
-    this.shooterSubsystem = shooterSubsystem;
-    addRequirements(shooterSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -26,18 +25,16 @@ public class ShootCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-      shooterSubsystem.shoot(true);
+    intakeSlideSubsystem.zeroIntake();
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    shooterSubsystem.stop();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

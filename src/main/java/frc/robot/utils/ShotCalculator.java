@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -83,6 +84,8 @@ public class ShotCalculator {
 	private ChassisSpeeds robotSpeeds;
 	private Pose3d robotPosition;
 
+	private double posLatency = 0.0;
+
 	public void setTarget(Translation3d target) {
 		if (!this.target.equals(target)) {
 			this.target = target;
@@ -104,6 +107,11 @@ public class ShotCalculator {
 		Pose2d currentRobotPose2d = robotPosition.plus(TurretConstants.kTurretOffset).toPose2d();
 		Pose2d hubPose2d = new Pose2d(this.target.toTranslation2d(), new Rotation2d());
 		double distanceToHub = currentRobotPose2d.getTranslation().getDistance(hubPose2d.getTranslation());
+
+		Transform2d poseAdjuster = new Transform2d(robotVelocity.getX() * posLatency, robotVelocity.getY() * posLatency,
+				currentRobotPose2d.getRotation());
+
+		currentRobotPose2d = currentRobotPose2d.plus(poseAdjuster);
 
 		// From TurretSubsystem.getXVelocity()
 		double xVelocity = distanceToHub / TurretConstants.kTimeOfFlight;

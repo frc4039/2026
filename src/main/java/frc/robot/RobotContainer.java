@@ -155,7 +155,7 @@ public class RobotContainer {
 
 		driver.rightTrigger().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, false)
 				.alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, false)));
-		driver.leftTrigger().whileTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true)));
+		driver.leftTrigger().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kOutPosition + 5).andThen(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true))));
 
 		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem));
 		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, () -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem)));
@@ -166,10 +166,7 @@ public class RobotContainer {
 		driver.povLeft().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, 0.035));
 		driver.povRight().whileTrue(new RobotCentricDriveCommand(driveSubsystem, 0, -0.035));
 
-		driver.b()
-				.onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
-						.alongWith(new ZeroIntakeSlideCommand(intakeSlideSubsystem))
-						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret())));
+		
 
 		driver.b().onTrue(new ResetTurretGyro(turretSubsystem).ignoringDisable(true)
 						.alongWith(new InstantCommand(() -> shooterHoodSubsystem.resetTurret()).ignoringDisable(true)));

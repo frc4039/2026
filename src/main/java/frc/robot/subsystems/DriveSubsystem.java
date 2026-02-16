@@ -43,6 +43,8 @@ public class DriveSubsystem extends SubsystemBase {
 		public static final double kMaxSpeedMetersPerSecond = 3.75; // was 5.0 //Keep Lower Than Real Max
 		public static final double kMaxAngularSpeed = Helpers.isBabycakes() ? (1.35 * Math.PI) : (1.8 * Math.PI); // radians per second for turning
 
+		public static final double kLatencyOffset = 0.3;
+
 		public static final double kAimP = 1.8;
 		public static final double kAimI = 0;
 		public static final double kAimD = 0;
@@ -495,7 +497,8 @@ public class DriveSubsystem extends SubsystemBase {
 
 	public Pose2d getShootOnTheFlyPose2d() {
 		Pose2d currentPose2d = this.getPose();
-		return currentPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * TurretConstants.kTimeOfFlight), (this.getRobotRelativeSpeeds().vyMetersPerSecond * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
+		Pose2d latencyPose2d = currentPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * DriveConstants.kLatencyOffset), (this.getRobotRelativeSpeeds().vyMetersPerSecond * DriveConstants.kLatencyOffset), new Rotation2d(0)));
+		return latencyPose2d.plus(new Transform2d((this.getRobotRelativeSpeeds().vxMetersPerSecond * TurretConstants.kTimeOfFlight), (this.getRobotRelativeSpeeds().vyMetersPerSecond * TurretConstants.kTimeOfFlight), new Rotation2d(0)));
 	}
 	
 }

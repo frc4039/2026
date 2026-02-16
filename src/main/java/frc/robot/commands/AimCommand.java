@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem.ShooterAngleConstants;
@@ -58,7 +59,7 @@ public class AimCommand extends Command {
 
 		double driveX = driveSubsystem.getPose().getTranslation().getX();
 
-		if(driveX < Constants.FieldConstants.kRedAllianceLine.getX() && driveX > Constants.FieldConstants.kBlueAllianceLine.getX()){
+		if((alliance == Alliance.Red && driveX < FieldConstants.kRedAllianceLine.getX()) || (alliance == Alliance.Blue && driveX > FieldConstants.kBlueAllianceLine.getX())){
 			// Change target for shuttling
 			if(alliance == Alliance.Red){
 				target = Constants.FieldConstants.kRedPassTargetRight;
@@ -81,8 +82,8 @@ public class AimCommand extends Command {
 				&& driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(205))
 				|| (driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(444)
 						&& driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(492))) {
+			// Lower hood if approaching trench
 			shooterHoodSubsystem.moveToPosition(ShooterAngleConstants.kMax);
-
 		} else {
 		shooterHoodSubsystem.moveToPosition(MathUtil.clamp(ShooterAngleConstants.kMax, ShooterAngleConstants.kMin,
 			shotCalculator.hoodPitch));

@@ -95,7 +95,6 @@ public class ShotCalculator {
 		this.calculate();
 	}
 
-	@SuppressWarnings("unused")
 	public void calculate() {
 		Translation3d robotVelocity = new Translation3d(
 				robotSpeeds.vxMetersPerSecond, robotSpeeds.vyMetersPerSecond, 0);
@@ -116,7 +115,6 @@ public class ShotCalculator {
 		// From TurretSubsystem.getHoodAngle()
 		this.hoodPitch = Units.radiansToDegrees(Math.atan2(TurretConstants.kVelocityZ, xVelocity));
 
-		// TODO: Calculate the correct shot.
 		Translation3d vecT = new Translation3d(
 				(Math.cos(Units.degreesToRadians(this.turretYaw))) * (Math.cos(Units.degreesToRadians(this.hoodPitch)))
 						* (this.shooterMps),
@@ -129,7 +127,7 @@ public class ShotCalculator {
 				(vecT.getY()) - (robotVelocity.getY()),
 				vecT.getZ());
 
-		ballReleaseVelocity = null;
+		// ballReleaseVelocity = null;
 		if (ballReleaseVelocity != null) {
 			// Convert the theoretical shot into the real values.
 			this.shooterMps = ballReleaseVelocity.getNorm();

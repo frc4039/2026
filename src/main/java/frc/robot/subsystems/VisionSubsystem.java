@@ -156,20 +156,11 @@ public class VisionSubsystem extends SubsystemBase {
     // hw.registerDevice(this, frontLeftCam);
 //    hw.registerDevice(this, backCam);
     
-    // frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
-    //         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontRight);
-    // frontRightPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
-      frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, VisionConstants.kRobotToCamFrontRight);
+    frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, VisionConstants.kRobotToCamFrontRight);
 
-    // frontLeftPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
-    //         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontLeft);
-    // frontLeftPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
     frontLeftPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, VisionConstants.kRobotToCamFrontLeft);
 
-/*      backPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamBack);
-    backPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
-*/
+    // backPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, VisionConstants.kRobotToCamBack)
         SmartDashboard.putData("Field", fieldDisplay);
 
         PathPlannerLogging.setLogTargetPoseCallback((target) -> {
@@ -289,7 +280,6 @@ public class VisionSubsystem extends SubsystemBase {
         
         updateCamera(frontLeftCam, frontLeftPhotonPoseEstimator, "LeftFrontPose");
         
-//        backPhotonPoseEstimator.setReferencePose(m_driveSubsystem.getPose());
 //        updateCamera(backCam, backPhotonPoseEstimator, "BackPose");
 
         fieldDisplay.setRobotPose(m_driveSubsystem.getPose());

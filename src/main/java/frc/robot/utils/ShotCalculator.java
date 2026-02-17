@@ -128,7 +128,7 @@ public class ShotCalculator {
 						* (this.shooterMps),
 				(Math.sin(Units.degreesToRadians(this.turretYaw))) * (Math.cos(Units.degreesToRadians(this.hoodPitch)))
 						* (this.shooterMps),
-				(Math.sin(this.hoodPitch)) * this.shooterMps);
+				(Math.sin(Units.degreesToRadians(this.hoodPitch))) * this.shooterMps);
 
 		Translation3d ballReleaseVelocity = new Translation3d(
 				(vecT.getX()) - (robotVelocity.getX()),
@@ -144,7 +144,7 @@ public class ShotCalculator {
 			double ballDirY = ballReleaseVelocity.getY();
 			this.turretYaw = new Rotation2d(ballReleaseVelocity.getX(), ballReleaseVelocity.getY())
 					.minus(ballReleasePosition.getRotation().toRotation2d()
-							.plus(new Rotation2d(Units.degreesToRadians(180))))
+							.plus(new Rotation2d(Units.degreesToRadians(0))))
 					.getDegrees();
 
 			double ballDirXY = Math.sqrt(ballDirX * ballDirX + ballDirY * ballDirY);

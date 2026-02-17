@@ -85,8 +85,8 @@ public class AimCommand extends Command {
 			// Lower hood if approaching trench
 			shooterHoodSubsystem.moveToPosition(ShooterAngleConstants.kMax);
 		} else {
-		shooterHoodSubsystem.moveToPosition(MathUtil.clamp(ShooterAngleConstants.kMax, ShooterAngleConstants.kMin,
-			shotCalculator.hoodPitch));
+		shooterHoodSubsystem.moveToPosition(MathUtil.clamp(shotCalculator.hoodPitch, ShooterAngleConstants.kMin,
+			ShooterAngleConstants.kMax));
 		}
 	}
 

@@ -9,11 +9,10 @@ import frc.robot.subsystems.ShooterHoodSubsystem.ShooterAngleConstants;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 
-public class AutoAimCommand extends Command{
-    private TurretSubsystem turretSubsystem;
+public class AutoAimCommand extends Command {
+	private TurretSubsystem turretSubsystem;
 	private DriveSubsystem driveSubsystem;
 	private ShooterHoodSubsystem shooterHoodSubsystem;
-
 
 	public AutoAimCommand(TurretSubsystem turretSubsystem, DriveSubsystem driveSubsystem,
 			ShooterHoodSubsystem shooterHoodSubsystem) {
@@ -22,7 +21,6 @@ public class AutoAimCommand extends Command{
 		this.shooterHoodSubsystem = shooterHoodSubsystem;
 		addRequirements(turretSubsystem, shooterHoodSubsystem);
 
-		
 	}
 
 	// Called when the command is initially scheduled.
@@ -36,14 +34,13 @@ public class AutoAimCommand extends Command{
 		Pose2d currentRobotPose2d = driveSubsystem.getPose().plus(TurretConstants.kTurretOffset);
 		Pose2d hubPose2d = TurretSubsystem.getHub();
 
-    if(driveSubsystem.getPose().getTranslation().getX() < Constants.FieldConstants.kRedAllianceLine.getX()){
-       if(driveSubsystem.getPose().getTranslation().getY() > Constants.FieldConstants.kCenterLine) {
-        hubPose2d = Constants.FieldConstants.flipPoseY(Constants.FieldConstants.kRedPassTargetRight);
-       } else {
-          hubPose2d = Constants.FieldConstants.kRedPassTargetRight;
-       }
-    }
-
+		if (driveSubsystem.getPose().getTranslation().getX() < Constants.FieldConstants.kRedAllianceLine.getX()) {
+			if (driveSubsystem.getPose().getTranslation().getY() > Constants.FieldConstants.kCenterLine) {
+				hubPose2d = Constants.FieldConstants.flipPoseY(Constants.FieldConstants.kRedPassTargetRight);
+			} else {
+				hubPose2d = Constants.FieldConstants.kRedPassTargetRight;
+			}
+		}
 
 		turretSubsystem.moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
 				-1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees())));
@@ -51,13 +48,15 @@ public class AutoAimCommand extends Command{
 		shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
 				Math.max(ShooterAngleConstants.kMin, turretSubsystem.getHoodAngle()))));
 
-		
 	}
 
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
-		turretSubsystem.stopMotor();
+		if (interrupted) {
+			turretSubsystem.stopMotor();
+			shooterHoodSubsystem.moveToPosition(ShooterAngleConstants.kMax);
+		}
 	}
 
 	// Returns true when the command should end.

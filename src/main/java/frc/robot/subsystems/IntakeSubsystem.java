@@ -13,41 +13,43 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class IntakeSubsystem extends SubsystemBase {
-  /** Creates a new Intake. */
-  public static final class IntakeContants {
-    static int kIntakeMotorCanID = 21;
-    static double kIntakeSpeed = -0.6;
-    static double kOutakeSpeed = 1;
-  }
+	/** Creates a new Intake. */
+	public static final class IntakeContants {
+		static int kIntakeMotorCanID = 21;
+		static double kIntakeSpeed = -0.6;
+		static double kOutakeSpeed = 1;
+	}
 
-  private final TalonFX intakeMotor;
-  private final TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
+	private final TalonFX intakeMotor;
+	private final TalonFXConfiguration intakeMotorConfig = new TalonFXConfiguration();
 
-  public IntakeSubsystem(HardwareMonitor hardwareMonitor) {
-    intakeMotor = new TalonFX(IntakeSubsystem.IntakeContants.kIntakeMotorCanID);
+	public IntakeSubsystem(HardwareMonitor hardwareMonitor) {
+		intakeMotor = new TalonFX(IntakeSubsystem.IntakeContants.kIntakeMotorCanID);
 
-    MotorOutputConfigs mcfg = new MotorOutputConfigs();
-    mcfg.withNeutralMode(NeutralModeValue.Brake);
-    intakeMotorConfig.withMotorOutput(mcfg);
-    intakeMotor.getConfigurator().apply(intakeMotorConfig);
-    hardwareMonitor.registerDevice(this, intakeMotor);
-  }
+		MotorOutputConfigs mcfg = new MotorOutputConfigs();
+		mcfg.withNeutralMode(NeutralModeValue.Brake);
+		intakeMotorConfig.withMotorOutput(mcfg);
+		intakeMotor.getConfigurator().apply(intakeMotorConfig);
+		hardwareMonitor.registerDevice(this, intakeMotor);
+	}
 
-  public void intake(){
-    //intakeMotor.getClosedLoopController().setSetpoint(IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
-    intakeMotor.set(IntakeSubsystem.IntakeContants.kIntakeSpeed);
-  }
+	public void intake() {
+		// intakeMotor.getClosedLoopController().setSetpoint(IntakeSubsystem.IntakeContants.kIntakeSpeed,
+		// ControlType.kVelocity);
+		intakeMotor.set(IntakeSubsystem.IntakeContants.kIntakeSpeed);
+	}
 
-   public void outtake(){
-    //intakeMotor.getClosedLoopController().setSetpoint(-1 * IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
-    intakeMotor.set(IntakeSubsystem.IntakeContants.kOutakeSpeed);
-  }
+	public void outtake() {
+		// intakeMotor.getClosedLoopController().setSetpoint(-1 *
+		// IntakeSubsystem.IntakeContants.kIntakeSpeed, ControlType.kVelocity);
+		intakeMotor.set(IntakeSubsystem.IntakeContants.kOutakeSpeed);
+	}
 
-  public void stopMotor() {
-    intakeMotor.stopMotor();
-  }
+	public void stopMotor() {
+		intakeMotor.stopMotor();
+	}
 
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+	public void periodic() {
+		// This method will be called once per scheduler run
+	}
 }

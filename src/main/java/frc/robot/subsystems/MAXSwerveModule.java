@@ -15,8 +15,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -103,7 +103,8 @@ public class MAXSwerveModule {
 			double drivingFactor = ModuleConstants.kWheelDiameterMeters * Math.PI
 					/ ModuleConstants.kDrivingMotorReduction;
 			double turningFactor = 2 * Math.PI;
-			double drivingVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeedRps;
+			double nominalVoltage = 12.0;
+			double drivingVelocityFeedForward = nominalVoltage / ModuleConstants.kDriveWheelFreeSpeedRps;
 
 			drivingConfig
 					.idleMode(IdleMode.kBrake)
@@ -115,8 +116,8 @@ public class MAXSwerveModule {
 					.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
 					// These are example gains you may need to them for your own robot!
 					.pid(0.04, 0, 0)
-					.velocityFF(drivingVelocityFeedForward)
-					.outputRange(-1, 1);
+					.outputRange(-1, 1)
+					.feedForward.kV(drivingVelocityFeedForward);
 
 			turningConfig
 					.idleMode(IdleMode.kBrake)
@@ -239,7 +240,7 @@ public class MAXSwerveModule {
 		// Command driving and turning SPARKS MAX towards their respective setpoints.
 		m_drivingTalonFx.setControl(new VelocityDutyCycle(
 				correctedDesiredState.speedMetersPerSecond / ModuleConstants.kDrivingEncoderPositionFactor));
-		m_turningClosedLoopController.setReference(correctedDesiredState.angle.getRadians(), ControlType.kPosition);
+		m_turningClosedLoopController.setSetpoint(correctedDesiredState.angle.getRadians(), ControlType.kPosition);
 
 		m_desiredState = desiredState;
 	}

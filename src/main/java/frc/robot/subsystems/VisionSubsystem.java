@@ -12,7 +12,6 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -29,9 +28,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.FieldConstants;
-import frc.robot.subsystems.TurretSubsystem.TurretConstants;
-import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
 
 public class VisionSubsystem extends SubsystemBase {
@@ -160,13 +156,15 @@ public class VisionSubsystem extends SubsystemBase {
     // hw.registerDevice(this, frontLeftCam);
 //    hw.registerDevice(this, backCam);
     
-    frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontRight);
-    frontRightPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+    // frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
+    //         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontRight);
+    // frontRightPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+      frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, VisionConstants.kRobotToCamFrontRight);
 
-    frontLeftPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontLeft);
-    frontLeftPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+    // frontLeftPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
+    //         PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontLeft);
+    // frontLeftPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+    frontLeftPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, VisionConstants.kRobotToCamFrontLeft);
 
 /*      backPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, 
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamBack);
@@ -213,7 +211,7 @@ public class VisionSubsystem extends SubsystemBase {
 
         if (results.size() > 0) {
             var lastResult = results.get(results.size() - 1);
-            Optional<EstimatedRobotPose> estimatedPose = estimator.update(lastResult);
+            Optional<EstimatedRobotPose> estimatedPose = estimator.estimateClosestToReferencePose(lastResult, new Pose3d(m_driveSubsystem.getPose()));
             if (estimatedPose.isPresent()) {
                 m_driveSubsystem.addVisionPose(estimatedPose.get().estimatedPose.toPose2d(),
                         estimatedPose.get().timestampSeconds,
@@ -287,10 +285,8 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        frontRightPhotonPoseEstimator.setReferencePose(m_driveSubsystem.getPose());
         updateCamera(frontRightCam, frontRightPhotonPoseEstimator, "RightFrontPose");
         
-        frontLeftPhotonPoseEstimator.setReferencePose(m_driveSubsystem.getPose());
         updateCamera(frontLeftCam, frontLeftPhotonPoseEstimator, "LeftFrontPose");
         
 //        backPhotonPoseEstimator.setReferencePose(m_driveSubsystem.getPose());

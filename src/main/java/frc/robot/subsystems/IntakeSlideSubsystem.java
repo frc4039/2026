@@ -51,9 +51,9 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		public static final double kPositionThreshold = 0.5;
 
 		// Motion magic
-		public static final double kCruiseVelocity = 100.0;
-		public static final double kAcceleration = 100.0;
-		public static final double kJerk = 400.0;
+		public static final double kCruiseVelocity = 80.0;
+		public static final double kAcceleration = 200.0;
+		public static final double kJerk = 800.0;
 
 		public static final int kLeftLimitSwitchChannel = 0;
 		public static final int kRightLimitSwitchChannel = 1;

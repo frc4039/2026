@@ -43,6 +43,8 @@ public class DriveSubsystem extends SubsystemBase {
 		public static final double kMaxSpeedMetersPerSecond = 3.75; // was 5.0 //Keep Lower Than Real Max
 		public static final double kMaxAngularSpeed = Helpers.isBabycakes() ? (1.35 * Math.PI) : (1.8 * Math.PI); // radians per second for turning
 
+		public static final double kLatencyOffset = 0.3;
+
 		public static final double kAimP = 1.8;
 		public static final double kAimI = 0;
 		public static final double kAimD = 0;

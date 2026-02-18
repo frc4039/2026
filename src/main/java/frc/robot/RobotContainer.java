@@ -155,7 +155,9 @@ public class RobotContainer {
 
 		driver.rightTrigger().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, false)
 				.alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, false)));
-		driver.leftTrigger().whileTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true)));
+		driver.leftTrigger().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kOutPosition + 5)
+			.andThen(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true))))
+			.onFalse(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kOutPosition));
 
 		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem).alongWith(new InstantCommand(() -> shooterHoodSubsystem.moveToPosition(65)).alongWith(new InstantCommand(() -> turretSubsystem.moveToPosition(180)))));
 		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, () -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem)));

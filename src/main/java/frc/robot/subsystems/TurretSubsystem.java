@@ -95,7 +95,7 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kManualChangeLimit = Units.inchesToMeters(18);
 		public static final double kManualChangeAmount = Units.inchesToMeters(3);
 
-		public static final double kLatencyOffset = 0.0;
+		public static final double kLatencyOffset = 0.1;
 	}
 
 	public static enum AimState {

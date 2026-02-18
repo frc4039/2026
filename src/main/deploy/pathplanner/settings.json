@@ -3,10 +3,12 @@
   "robotLength": 0.812,
   "holonomicMode": true,
   "pathFolders": [
+    "Auto8",
+    "Auto10",
+    "New New Folder",
     "redShootAndCollect",
     "shootAndMove",
-    "shootOnSpot",
-    "testAuto"
+    "shootOnSpot"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.5,

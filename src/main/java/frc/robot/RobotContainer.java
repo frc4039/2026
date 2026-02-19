@@ -82,6 +82,7 @@ public class RobotContainer {
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
 	private final IntakeSlideSubsystem intakeSlideSubsystem = new IntakeSlideSubsystem();
+	private final FieldTimer fieldTimer = new FieldTimer();
 
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
@@ -109,6 +110,8 @@ public class RobotContainer {
 		SmartDashboard.putData(shooterSubsystem);
 		SmartDashboard.putData(shooterHoodSubsystem);
 		SmartDashboard.putData(intakeSlideSubsystem);
+		SmartDashboard.putNumber("Time Remaining In Shift", fieldTimer.getSecondsRemaining());
+		SmartDashboard.putBoolean("Active Shift", fieldTimer.isActive(fieldTimer.getAlliance()));
 
 		hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);

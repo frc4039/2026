@@ -113,7 +113,6 @@ public class FieldTimer {
 
     public double getSecondsRemaining() {
     Optional<Double> secondsRemaining =timeRemainingInCurrentShift().map(time -> time.in(Seconds));	
-
         if(secondsRemaining.isPresent()) {
             return secondsRemaining.get();
         } else {

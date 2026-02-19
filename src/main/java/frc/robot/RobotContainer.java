@@ -112,6 +112,7 @@ public class RobotContainer {
 		SmartDashboard.putData(intakeSlideSubsystem);
 		SmartDashboard.putNumber("Time Remaining In Shift", fieldTimer.getSecondsRemaining());
 		SmartDashboard.putBoolean("Active Shift", fieldTimer.isActive(fieldTimer.getAlliance()));
+		SmartDashboard.putNumber("Game Time", DriverStation.getMatchTime());
 
 		hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);

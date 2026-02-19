@@ -54,19 +54,31 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "pickUpBalls"
+                  "name": "Wait"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "StartIntake"
+                  "name": "Aim"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShooterSpinUp"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpindexerFeed"
                 }
               }
             ]

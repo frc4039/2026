@@ -45,6 +45,7 @@ import frc.robot.commands.TurretAprilTagAimCommand;
 import frc.robot.commands.FeederCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.SpindexerSubsystem;
+import frc.robot.utils.FieldTimer;
 import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
 
@@ -82,8 +83,6 @@ public class RobotContainer {
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
 	private final IntakeSlideSubsystem intakeSlideSubsystem = new IntakeSlideSubsystem();
-	private final FieldTimer fieldTimer = new FieldTimer();
-
 	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
 	private final CommandXboxController driver = new CommandXboxController(
@@ -110,14 +109,10 @@ public class RobotContainer {
 		SmartDashboard.putData(shooterSubsystem);
 		SmartDashboard.putData(shooterHoodSubsystem);
 		SmartDashboard.putData(intakeSlideSubsystem);
-		SmartDashboard.putNumber("Time Remaining In Shift", fieldTimer.getSecondsRemaining());
-		SmartDashboard.putBoolean("Active Shift", fieldTimer.isActive(fieldTimer.getAlliance()));
-		SmartDashboard.putNumber("Game Time", DriverStation.getMatchTime());
-
+		 
 		hardwareMonitor.registerDevice(null, driver);
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
 		SmartDashboard.putData(CommandScheduler.getInstance());
-
 		SmartDashboard.putData(driveSubsystem);
 
 		// Put the BuildInfo so we can see what version of the code is running.
@@ -128,6 +123,15 @@ public class RobotContainer {
 				builder.publishConstString("Git Branch", Helpers.getGitBranch());
 				builder.publishConstString("Git SHA", Helpers.getGitSHA());
 				builder.publishConstString("Build Date", Helpers.getBuildDate());
+			}
+		});
+
+		SmartDashboard.putData("Field Timer", new Sendable() {
+			@Override
+			public void initSendable(SendableBuilder builder2) {
+				builder2.addDoubleProperty("Time Remaining In Shift", ()-> FieldTimer.getSecondsRemaining(), null);
+				builder2.addBooleanProperty("Active Shift", ()-> FieldTimer.isActive(FieldTimer.getAlliance()), null);
+				builder2.addDoubleProperty("Game Time", ()-> DriverStation.getMatchTime(), null);
 			}
 		});
 	}

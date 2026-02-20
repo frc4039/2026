@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.utils;
 
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -111,7 +111,7 @@ public class FieldTimer {
         AUTO_LOSER
     }
 
-    public double getSecondsRemaining() {
+    public static double getSecondsRemaining() {
     Optional<Double> secondsRemaining =timeRemainingInCurrentShift().map(time -> time.in(Seconds));	
         if(secondsRemaining.isPresent()) {
             return secondsRemaining.get();
@@ -119,7 +119,8 @@ public class FieldTimer {
             return -1.0;
         }
     }    
-    public void initSendable(SendableBuilder builder) {
+
+    public static void initSendable(SendableBuilder builder) {
 		builder.addBooleanProperty("Active Shift", () -> isActive(getAlliance()), null);
 		builder.addDoubleProperty("Time Left In Shift", () -> getSecondsRemaining(), null);
 	}

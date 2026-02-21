@@ -98,7 +98,7 @@ public class TurretSubsystem extends SubsystemBase {
 		//Acounts for offset when driving quickly
 		public static final double kLatencyOffset = 0.1;
 
-		public static final double kCloseShotThreshold = 0.0;
+		public static final double kCloseShotThreshold = 7.3;
 	}
 
 	public static enum AimState {

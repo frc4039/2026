@@ -48,10 +48,13 @@ public class SpinUpCommand extends Command {
   @Override
   public void execute() {
     //this should lower the velocity when close to the hub to account for the fact that the hood cant get low enough, CloseShotThreshold is 0 for now
-    if(turretSubsystem.getOutputVelocity() < TurretConstants.kCloseShotThreshold) {
-      multiplier = 0.95;
+    if(turretSubsystem.getOutputVelocity() > TurretConstants.kCloseShotThreshold && turretSubsystem.getOutputVelocity() < 7.5) {
+      multiplier = 0.90;
     }
-    else if(turretSubsystem.getOutputVelocity() > 8) {
+    else if(turretSubsystem.getOutputVelocity() < TurretConstants.kCloseShotThreshold) {
+      multiplier = 0.80;
+    } 
+    else if(turretSubsystem.getOutputVelocity() > 7.8) {
       multiplier = 1.03;
     } else {
       multiplier = 1.0;

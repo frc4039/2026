@@ -74,9 +74,9 @@ public class VisionSubsystem extends SubsystemBase {
 		// Cam mounted facing forward, half a meter forward of center, half a meter up
 		// from center.
 		public static final Transform3d kRobotToCamFrontRight = new Transform3d(
-				new Translation3d(Units.inchesToMeters(12), Units.inchesToMeters(-11.25), Units.inchesToMeters(20)),
-				new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-24.5),
-						Units.degreesToRadians(-13.5)));
+				new Translation3d(Units.inchesToMeters(-4), Units.inchesToMeters(12.0), Units.inchesToMeters(10)),
+				new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(27.5),
+						Units.degreesToRadians(80.0)));
 
 		public static final Transform3d kRobotToCamFrontLeft = new Transform3d(
 				new Translation3d(Units.inchesToMeters(-11.099), Units.inchesToMeters(-13.19),

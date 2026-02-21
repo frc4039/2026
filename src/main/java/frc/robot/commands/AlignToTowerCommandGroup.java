@@ -8,16 +8,9 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class AlignToTowerCommandGroup extends SequentialCommandGroup {
-  /** Creates a new AlignToTowerCommandGroup. */
-  private DriveSubsystem driveSubsystem;
-  private VisionSubsystem visionSubsystem;
-  public AlignToTowerCommandGroup(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new AlignToTowerCommand(driveSubsystem, visionSubsystem), new FinalTowerAlignCommand(driveSubsystem, visionSubsystem));
-  }
+	public AlignToTowerCommandGroup(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem) {
+		addCommands(new AlignToTowerCommand(driveSubsystem, visionSubsystem),
+				new FinalTowerAlignCommand(driveSubsystem, visionSubsystem));
+	}
 }

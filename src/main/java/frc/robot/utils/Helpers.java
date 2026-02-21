@@ -22,21 +22,20 @@ public class Helpers {
 		}
 	}
 
-	 public static String getGitBranch() {
-        String dirtyString = " (dirty)";
-        //TODO: add this back when we know where Build Constants was moved to -> also make it return a String again
-        switch (BuildConstants.DIRTY) {
-             case 0:
-                dirtyString = "";
-        }
-        return BuildConstants.GIT_BRANCH + dirtyString;
-    }
-    
-    public static String getGitSHA() {
-        return BuildConstants.GIT_SHA;
-    }
-    
-    public static String getBuildDate() {
-        return BuildConstants.BUILD_DATE;
-    }
+	public static String getGitBranch() {
+		String dirtyString = " (dirty)";
+		switch (BuildConstants.DIRTY) {
+			case 0:
+				dirtyString = "";
+		}
+		return BuildConstants.GIT_BRANCH + dirtyString;
+	}
+
+	public static String getGitSHA() {
+		return BuildConstants.GIT_SHA;
+	}
+
+	public static String getBuildDate() {
+		return BuildConstants.BUILD_DATE;
+	}
 }

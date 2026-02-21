@@ -30,7 +30,6 @@ public class RobotCentricDriveCommand extends Command {
         driveSubsystem.drive(0, 0, 0, false);
     }
 
-    // Returns true when the command should end.
     @Override
     public boolean isFinished() {
         return false;

@@ -17,6 +17,7 @@ public class TurretMoveCommand extends Command {
 	@Override
 	public void initialize() {
 		System.out.println("In Turret Move Command");
+		//Moves the turret to the desired position
 		turretSubsystem.moveToPosition(position);
 	}
 

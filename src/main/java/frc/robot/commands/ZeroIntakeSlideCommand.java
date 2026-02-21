@@ -25,6 +25,7 @@ public class ZeroIntakeSlideCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    //Sets the intake incoders to zero
     intakeSlideSubsystem.zeroIntake();
   }
 

@@ -20,11 +20,7 @@ public class SpinUpCommand extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
     this.shooterSubsystem = shooterSubsystem; 
     this.turretSubsystem = turretSubsystem;
-    this.multiplier = multiplier;
-    // shootingEstimator.put(7.517, 27.0);
-		// shootingEstimator.put(7.77, 31.0);
-		// shootingEstimator.put(8.24, 35.5);
-		// shootingEstimator.put(7.39, 24.0);
+   
 
     shootingEstimator.put(4.208, 15.0);
 		shootingEstimator.put(4.757, 17.0);

@@ -25,6 +25,7 @@ public class SpindexerCommand extends Command {
 
 	@Override
 	public void execute() {
+		//Checks to make sure that the shooter and turret are at the coreect position and speeds and the runs the spindexer
 		if(Math.abs(shooterSubsystem.getShooterError()) < 5 && Math.abs(turretSubsystem.getTurretError()) < 5) {
 		if (reverseMotor) {
 			feederSubsystem.spin(false);

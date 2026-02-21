@@ -28,6 +28,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.HardwareMonitor;
 
 public class VisionSubsystem extends SubsystemBase {
 	/** Creates a new VisionSubsystem. */
@@ -104,7 +105,7 @@ public class VisionSubsystem extends SubsystemBase {
 	public final PhotonPoseEstimator frontRightPhotonPoseEstimator;
 	public final PhotonPoseEstimator frontLeftPhotonPoseEstimator;
 
-	public VisionSubsystem(DriveSubsystem driveSubsystem, TurretSubsystem turretSubsystem) {
+	public VisionSubsystem(DriveSubsystem driveSubsystem, TurretSubsystem turretSubsystem, HardwareMonitor hardwareMonitor) {
 		m_driveSubsystem = driveSubsystem;
 		this.turretSubsystem = turretSubsystem;
 		aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
@@ -137,6 +138,9 @@ public class VisionSubsystem extends SubsystemBase {
 		redTargets.add(getTagPose(9).toPose2d());
 		redTargets.add(getTagPose(10).toPose2d());
 		redTargets.add(getTagPose(11).toPose2d());
+
+		hardwareMonitor.registerDevice(this, frontLeftCam);
+		hardwareMonitor.registerDevice(this, frontRightCam);
 	}
 
 	/**

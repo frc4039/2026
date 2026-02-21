@@ -149,6 +149,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		builder.addDoubleProperty("Shooter acceleration", () -> shooterLeaderMotor.getAcceleration().getValueAsDouble(),
 				null);
 		builder.addDoubleProperty("Set Velocity", () -> manualVelocity, (manualVelocity) -> this.manualVelocity = manualVelocity);
+		builder.addDoubleProperty("Shooter Current", () -> shooterLeaderMotor.getStatorCurrent().getValueAsDouble(), null);
+
 	}
 
 }

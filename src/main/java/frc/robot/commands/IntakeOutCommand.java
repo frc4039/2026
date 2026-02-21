@@ -8,6 +8,6 @@ import frc.robot.subsystems.IntakeSlideSubsystem.IntakeSlideSubsystemConstants;
 public class IntakeOutCommand extends SequentialCommandGroup {
 	public IntakeOutCommand(IntakeSubsystem intakeSubsystem, IntakeSlideSubsystem intakeSlideSubsystem) {
 		addCommands(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kOutPosition),
-				new IntakeCommand(intakeSubsystem, true));
+				new IntakeCommand(intakeSubsystem, true).alongWith(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kOutPosition)));
 	}
 }

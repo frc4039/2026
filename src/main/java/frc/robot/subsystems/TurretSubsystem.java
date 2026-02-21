@@ -310,7 +310,7 @@ public class TurretSubsystem extends SubsystemBase {
 		}, null);
 		builder.addDoubleProperty("Shooter Target", () -> this.getOutputVelocity(), null);
 		builder.addDoubleProperty("Target", () -> driveSubsystem.getDistanceFromHub(), null);
-		builder.addDoubleProperty("Turret Voltage", () -> turretMotor.getMotorVoltage().getValueAsDouble(), null);
+		builder.addDoubleProperty("Turret Current", () -> turretMotor.getStatorCurrent().getValueAsDouble(), null);
 		builder.addDoubleProperty("Turret Error", () -> turretMotor.getClosedLoopError().getValueAsDouble() /  TurretConstants.kDegreesPerRotation, null);
 		// builder.addDoubleProperty("Turret Target",() -> {
 		// moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,

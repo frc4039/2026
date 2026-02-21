@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -24,6 +25,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.utils.HardwareMonitor;
 
 public class IntakeSlideSubsystem extends SubsystemBase {
 	public final class IntakeSlideSubsystemConstants {
@@ -80,7 +82,7 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		// 				null,
 		// 				this));
 
-	public IntakeSlideSubsystem() {
+	public IntakeSlideSubsystem(HardwareMonitor hardwareMonitor) {
 		//Sets the CanIDs for each respective motor
 		intakeSlideLeftMotor = new TalonFX(IntakeSlideSubsystemConstants.kLeaderMotorID);
 		intakeSlideRightMotor = new TalonFX(IntakeSlideSubsystemConstants.kFollowerMotorID);
@@ -92,6 +94,8 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		//Motor Output Configs
 		MotorOutputConfigs mcfgLeaderMotor = new MotorOutputConfigs();
 		MotorOutputConfigs mcfgFollowerMotor = new MotorOutputConfigs();
+
+		
 
 		mcfgLeaderMotor.withInverted(InvertedValue.CounterClockwise_Positive);
 		mcfgLeaderMotor.withNeutralMode(NeutralModeValue.Coast);
@@ -105,6 +109,7 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 		Slot0Configs slotConfigsLeader = talonFXConfigurationLeader.Slot0;
 		Slot0Configs slotConfigsFollower = talonFXConfigurationFollower.Slot0;
 
+		talonFXConfigurationFollower.withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(10));
 		//PID Tuning
 		slotConfigsLeader.kS = IntakeSlideSubsystemConstants.kSIntakeSlide;
 		slotConfigsLeader.kV = IntakeSlideSubsystemConstants.kVIntakeSlide;
@@ -133,6 +138,9 @@ public class IntakeSlideSubsystem extends SubsystemBase {
 
 		intakeSlideLeftMotor.getConfigurator().apply(talonFXConfigurationLeader);
 		intakeSlideRightMotor.getConfigurator().apply(talonFXConfigurationFollower);
+
+		hardwareMonitor.registerDevice(this, intakeSlideLeftMotor);
+		hardwareMonitor.registerDevice(this, intakeSlideRightMotor);
 	}
 
 	//Runs both motors at a set velocity taking in direction

@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 0.5164118776483051,
-        "y": 0.5169452352577684
+        "x": 0.4794709924768523,
+        "y": 0.5418952546296294
       },
       "prevControl": {
-        "x": 0.2664118776483051,
-        "y": 0.5169452352577684
+        "x": 0.22947099247685232,
+        "y": 0.5418952546296294
       },
       "nextControl": null,
       "isLocked": false,
@@ -72,8 +72,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -81,7 +81,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.42652981948584
+    "rotation": 90.42652981948585
   },
   "reversed": false,
   "folder": "Auto8",

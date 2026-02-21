@@ -76,13 +76,13 @@ public class VisionSubsystem extends SubsystemBase {
 		// from center.
 		public static final Transform3d kRobotToCamFrontRight = new Transform3d(
 				new Translation3d(Units.inchesToMeters(-4), Units.inchesToMeters(12.0), Units.inchesToMeters(10)),
-				new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(27.5),
+				new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-27.5),
 						Units.degreesToRadians(80.0)));
 
 		public static final Transform3d kRobotToCamFrontLeft = new Transform3d(
 				new Translation3d(Units.inchesToMeters(-11.099), Units.inchesToMeters(-13.19),
 						Units.inchesToMeters(12.6)),
-				new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(20), Units.degreesToRadians(-90)));
+				new Rotation3d(Units.degreesToRadians(180), Units.degreesToRadians(-20), Units.degreesToRadians(-90)));
 
 		public static final double kMaxGyroCameraAngleDelta = 89.0;
 	}

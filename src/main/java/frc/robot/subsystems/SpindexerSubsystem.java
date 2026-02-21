@@ -127,6 +127,8 @@ public class SpindexerSubsystem extends SubsystemBase {
 	public void initSendable(SendableBuilder builder) {
 		//Sends Spindexers speed to elastic 
 		builder.addDoubleProperty("Spindexer speed", () -> spindexerMotor.getVelocity().getValueAsDouble(), null);
+		builder.addDoubleProperty("Spindexer Current", () -> spindexerMotor.getStatorCurrent().getValueAsDouble(), null);
+
 	}
 
 }

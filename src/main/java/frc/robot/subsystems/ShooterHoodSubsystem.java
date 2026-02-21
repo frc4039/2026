@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.HardwareMonitor;
 
 public class ShooterHoodSubsystem extends SubsystemBase{
     
@@ -44,7 +45,7 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 
     private TalonFX hoodMotor;
 
-    public ShooterHoodSubsystem(){
+    public ShooterHoodSubsystem(HardwareMonitor hardwareMonitor){
 		//Motor configs and Declarations
         hoodMotor = new TalonFX(ShooterAngleConstants.motorId);
         hoodMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -79,6 +80,8 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 
 		//Apply configs
 		hoodMotor.getConfigurator().apply(talonFXConfigs);
+
+		hardwareMonitor.registerDevice(this, hoodMotor);
     }
 
     public void resetTurret(){

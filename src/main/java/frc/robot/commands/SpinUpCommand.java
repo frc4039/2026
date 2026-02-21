@@ -54,9 +54,12 @@ public class SpinUpCommand extends Command {
     else if(turretSubsystem.getOutputVelocity() < TurretConstants.kCloseShotThreshold) {
       multiplier = 0.80;
     } 
-    else if(turretSubsystem.getOutputVelocity() > 7.8) {
+    else if(turretSubsystem.getOutputVelocity() > 7.8 && turretSubsystem.getOutputVelocity() < 8.3) {
       multiplier = 1.03;
-    } else {
+    } else if(turretSubsystem.getOutputVelocity() > 8.3) {
+      multiplier = 1.3;
+    }
+    else {
       multiplier = 1.0;
     }
 

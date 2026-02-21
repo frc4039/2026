@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.AimCommand;
+import frc.robot.commands.SpinUpCommand;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -85,6 +87,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    CommandScheduler.getInstance().schedule(new AimCommand(m_robotContainer.turretSubsystem, m_robotContainer.driveSubsystem, m_robotContainer.shooterHoodSubsystem, () -> m_robotContainer.currentAimState).alongWith(new SpinUpCommand(m_robotContainer.shooterSubsystem, m_robotContainer.turretSubsystem)));
   }
 
   /** This function is called periodically during operator control. */

@@ -118,6 +118,8 @@ public class FeederSubsystem extends SubsystemBase {
 	@Override
 	public void initSendable(SendableBuilder builder) {
 		builder.addDoubleProperty("Feeder speed", () -> feederMotor.getVelocity().getValueAsDouble(), null);
+		builder.addDoubleProperty("Feeder Current", () -> feederMotor.getStatorCurrent().getValueAsDouble(), null);
+
 	}
 
 }

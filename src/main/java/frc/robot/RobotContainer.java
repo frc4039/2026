@@ -71,26 +71,25 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
  * commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-	// The robot's subsystems and commands are defined here...
+	// The robot's subsystems and commands are defined herepublic HardwareMonitor hardwareMonitor = new HardwareMonitor();
+	public final HardwareMonitor hardwareMonitor = new HardwareMonitor();
+	public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(hardwareMonitor);
+	public final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
+	public final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem, hardwareMonitor);
+	public final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem, hardwareMonitor);
+	public final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
+	public final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem(hardwareMonitor);
+	public final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
+	public final IntakeSlideSubsystem intakeSlideSubsystem = new IntakeSlideSubsystem(hardwareMonitor);
 
-	private HardwareMonitor hardwareMonitor = new HardwareMonitor();
-	private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(hardwareMonitor);
-	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
-	private final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem, hardwareMonitor);
-	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem, hardwareMonitor);
-	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
-	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
-	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
-	private final IntakeSlideSubsystem intakeSlideSubsystem = new IntakeSlideSubsystem();
-
-	private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+	public final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
 
 	private final CommandXboxController driver = new CommandXboxController(
 			OperatorConstants.kDriverControllerPort);
 
 	private final CommandXboxController operator = new CommandXboxController(OperatorConstants.kOperatorPort);
 	public final SendableChooser<Command> AutoChooser = new SendableChooser<Command>();
-	private AimState currentAimState = AimState.AUTOMATIC;
+	public AimState currentAimState = AimState.AUTOMATIC;
 
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -100,7 +99,7 @@ public class RobotContainer {
 
 	NamedCommands.registerCommand("StartIntake", new IntakeCommand(intakeSubsystem,true));
 	NamedCommands.registerCommand("StopIntake", new AutoIntakeStopCommand(intakeSubsystem));
-	NamedCommands.registerCommand("SpindexerFeed", new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, shooterSubsystem, turretSubsystem));
+	NamedCommands.registerCommand("SpindexerFeed", new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, false).alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, false)));
 	NamedCommands.registerCommand("StopSpindexerFeed", new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
 	NamedCommands.registerCommand("ShooterSpinUp", new AutoSpinUpCommand(shooterSubsystem, turretSubsystem));
 	NamedCommands.registerCommand("ShooterStopSpinUp", new AutoSpinUpStopCommand(shooterSubsystem));
@@ -114,6 +113,8 @@ public class RobotContainer {
 
 
 		AutoChooser.setDefaultOption("testAuto", new PathPlannerAuto("testAuto"));
+		AutoChooser.addOption("Auto 8", new PathPlannerAuto("Auto8"));
+		AutoChooser.addOption("Auto 10", new PathPlannerAuto("Auto10"));
 		SmartDashboard.putData("Auto",AutoChooser);
 
 		SmartDashboard.putData(
@@ -197,9 +198,9 @@ public class RobotContainer {
 		operator.rightTrigger().onTrue(
 				new StopIntakeCommand(intakeSubsystem).andThen(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kInPosition)));
 
-		operator.b().onTrue(new InstantCommand(() -> currentAimState = AimState.RIGHT))
+		operator.b().onTrue(new InstantCommand(() -> currentAimState = AimState.LEFT))
 				.onFalse(new InstantCommand(() -> currentAimState = AimState.AUTOMATIC));
-		operator.x().onTrue(new InstantCommand(() -> currentAimState = AimState.LEFT))
+		operator.x().onTrue(new InstantCommand(() -> currentAimState = AimState.RIGHT))
 				.onFalse(new InstantCommand(() -> currentAimState = AimState.AUTOMATIC));
 
 		operator.leftBumper().onTrue(new StopIntakeCommand(intakeSubsystem));

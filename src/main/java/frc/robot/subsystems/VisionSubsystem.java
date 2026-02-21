@@ -12,7 +12,6 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -113,13 +112,9 @@ public class VisionSubsystem extends SubsystemBase {
 		frontRightCam = new PhotonCamera(VisionConstants.kFrontRightCameraName);
 		frontLeftCam = new PhotonCamera(VisionConstants.kFrontLeftCameraName);
 
-		frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
-				PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontRight);
-		frontRightPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+		frontRightPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, VisionConstants.kRobotToCamFrontRight);
 
-		frontLeftPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout,
-				PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.kRobotToCamFrontLeft);
-		frontLeftPhotonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
+		frontLeftPhotonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, VisionConstants.kRobotToCamFrontLeft);
 
 		SmartDashboard.putData("Field", fieldDisplay);
 
@@ -152,7 +147,7 @@ public class VisionSubsystem extends SubsystemBase {
 
 		if (results.size() > 0) {
 			var lastResult = results.get(results.size() - 1);
-			Optional<EstimatedRobotPose> estimatedPose = estimator.update(lastResult);
+			Optional<EstimatedRobotPose> estimatedPose = estimator.estimateClosestToReferencePose(lastResult, new Pose3d(m_driveSubsystem.getPose()));
 			if (estimatedPose.isPresent()) {
 				m_driveSubsystem.addVisionPose(estimatedPose.get().estimatedPose.toPose2d(),
 						estimatedPose.get().timestampSeconds,
@@ -226,10 +221,8 @@ public class VisionSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		frontRightPhotonPoseEstimator.setReferencePose(m_driveSubsystem.getPose());
 		updateCamera(frontRightCam, frontRightPhotonPoseEstimator, "RightFrontPose");
 
-		frontLeftPhotonPoseEstimator.setReferencePose(m_driveSubsystem.getPose());
 		updateCamera(frontLeftCam, frontLeftPhotonPoseEstimator, "LeftFrontPose");
 
 		fieldDisplay.setRobotPose(m_driveSubsystem.getPose());

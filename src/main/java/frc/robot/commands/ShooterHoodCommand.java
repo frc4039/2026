@@ -16,6 +16,8 @@ public class ShooterHoodCommand extends Command {
 	@Override
 	public void initialize() {
 		System.out.println("In Shooter Hood Command");
+		
+		//Moves the shooter hood to a desired position
 		shooterHoodSubsystem.moveToPosition(position);
 	}
 

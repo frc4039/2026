@@ -4,55 +4,6 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.IntakeOutCommand;
-import frc.robot.commands.IntakeShimmyCommand;
-import frc.robot.commands.ManualVelocityCommand;
-import frc.robot.commands.MoveIntakeSlideCommand;
-import frc.robot.commands.MoveHubTargetCommand;
-import frc.robot.commands.OwlHeadTurretCommand;
-import frc.robot.commands.ResetTurretGyro;
-import frc.robot.commands.AimCommand;
-import frc.robot.commands.AlignToTowerCommand;
-import frc.robot.commands.AlignToTowerCommandGroup;
-import frc.robot.commands.AutoAimCommand;
-import frc.robot.commands.AutoIntakeCommand;
-import frc.robot.commands.AutoSpinUpCommand;
-import frc.robot.commands.Autos;
-import frc.robot.commands.SpindexerCommand;
-import frc.robot.commands.StopIntakeCommand;
-import frc.robot.commands.TurretMoveCommand;
-import frc.robot.commands.TurretWithJoystickCommand;
-import frc.robot.commands.ZeroIntakeSlideCommand;
-import frc.robot.subsystems.TurretSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.subsystems.TurretSubsystem.AimState;
-import frc.robot.subsystems.IntakeSlideSubsystem.IntakeSlideSubsystemConstants;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.ShooterHoodSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.FeederSubsystem;
-import frc.robot.subsystems.IntakeSlideSubsystem;
-import frc.robot.commands.RobotCentricDriveCommand;
-import frc.robot.commands.RunFeederCommand;
-import frc.robot.commands.RunSpindexerCommand;
-import frc.robot.commands.RunTurretPowerCommand;
-import frc.robot.commands.ShooterHoodCommand;
-import frc.robot.commands.SpinUpCommand;
-import frc.robot.commands.ShootCommand;
-import frc.robot.commands.TeleopDriveCommand;
-import frc.robot.commands.TurretAprilTagAimCommand;
-import frc.robot.commands.FeederCommand;
-import frc.robot.commands.HoodGoToZeroPositionComand;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.SpindexerSubsystem;
-import frc.robot.utils.HardwareMonitor;
-import frc.robot.utils.Helpers;
-
 import java.security.spec.NamedParameterSpec;
 import java.util.Optional;
 
@@ -66,17 +17,43 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.AutoStopIntakeCommand;
-import frc.robot.commands.AutoSpinUpStopCommand;
-import frc.robot.commands.AutoSpindexerFeedCommand;
-import frc.robot.commands.AutoSpindexerFeedStopCommand;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.AimCommand;
+import frc.robot.commands.FeederCommand;
+import frc.robot.commands.IntakeCommand;
+import frc.robot.commands.IntakeOutCommand;
+import frc.robot.commands.IntakeShimmyCommand;
+import frc.robot.commands.ManualVelocityCommand;
+import frc.robot.commands.MoveHubTargetCommand;
+import frc.robot.commands.MoveIntakeSlideCommand;
+import frc.robot.commands.ResetTurretGyro;
+import frc.robot.commands.RobotCentricDriveCommand;
+import frc.robot.commands.SpinUpCommand;
+import frc.robot.commands.SpindexerCommand;
+import frc.robot.commands.StopIntakeCommand;
+import frc.robot.commands.TeleopDriveCommand;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.FeederSubsystem;
+import frc.robot.subsystems.IntakeSlideSubsystem;
+import frc.robot.subsystems.IntakeSlideSubsystem.IntakeSlideSubsystemConstants;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterHoodSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.SpindexerSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.TurretSubsystem.AimState;
+import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.utils.HardwareMonitor;
+import frc.robot.utils.Helpers;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -92,7 +69,7 @@ public class RobotContainer {
 	private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(hardwareMonitor);
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem, hardwareMonitor);
-	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem);
+	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem, hardwareMonitor);
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
@@ -144,6 +121,7 @@ public class RobotContainer {
 		SmartDashboard.putData(intakeSlideSubsystem);
 
 		hardwareMonitor.registerDevice(null, driver);
+		hardwareMonitor.registerDevice(null, new PowerDistribution(1, ModuleType.kRev));
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
 		SmartDashboard.putData(CommandScheduler.getInstance());
 
@@ -188,7 +166,9 @@ public class RobotContainer {
 
 		driver.rightTrigger().whileTrue(new SpindexerCommand(turretSubsystem, shooterSubsystem, spindexerSubsystem, false)
 				.alongWith(new FeederCommand(shooterSubsystem, turretSubsystem, turretFeederSubsystem, false)));
-		driver.leftTrigger().whileTrue(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true)));
+		driver.leftTrigger().whileTrue(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kOutPosition + 5)
+			.andThen(new RepeatCommand(new IntakeShimmyCommand(intakeSlideSubsystem)).alongWith(new IntakeCommand(intakeSubsystem, true))))
+			.onFalse(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kOutPosition));
 
 		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem).alongWith(new InstantCommand(() -> shooterHoodSubsystem.moveToPosition(65)).alongWith(new InstantCommand(() -> turretSubsystem.moveToPosition(180)))));
 		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, () -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem)));
@@ -232,10 +212,10 @@ public class RobotContainer {
 		// turretSubsystem).ignoringDisable(true));
 		// operator.povRight().onTrue(new MoveHubTargetCommand("right",
 		// turretSubsystem).ignoringDisable(true));
-		operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
-		operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));
-		operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
-		operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
+		operator.povUp().onTrue(new MoveHubTargetCommand("up").ignoringDisable(true));
+		operator.povDown().onTrue(new MoveHubTargetCommand("down").ignoringDisable(true));
+		operator.povLeft().onTrue(new MoveHubTargetCommand("left").ignoringDisable(true));
+		operator.povRight().onTrue(new MoveHubTargetCommand("right").ignoringDisable(true));
 	}
 	public Command getAutonomousCommand() {
     	return AutoChooser.getSelected();

@@ -1,15 +1,8 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.commands;
 
-import java.util.Optional;
-import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -18,14 +11,11 @@ import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem;
 import frc.robot.subsystems.ShooterHoodSubsystem.ShooterAngleConstants;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.TurretSubsystem.AimState;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AimCommand extends Command {
-	/** Creates a new AimCommand. */
 	private TurretSubsystem turretSubsystem;
 	private DriveSubsystem driveSubsystem;
 	private ShooterHoodSubsystem shooterHoodSubsystem;
@@ -52,27 +42,35 @@ public class AimCommand extends Command {
 		Pose2d currentRobotPose2d = driveSubsystem.getShootOnTheFlyPose2d().plus(TurretConstants.kTurretOffset);
 		Pose2d hubPose2d = TurretSubsystem.getHub();
 
+		// Get the current alliance
 		Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
 
+		// Current x position on the field.
 		double driveX = driveSubsystem.getPose().getTranslation().getX();
 
-		if(driveX < Constants.FieldConstants.kRedAllianceLine.getX() && driveX > Constants.FieldConstants.kBlueAllianceLine.getX()){
+		// Check if in neutral zone for shuttling.
+		// TODO: check for neutral zone and opposite aliance zone.
+		if (driveX < Constants.FieldConstants.kRedAllianceLine.getX()
+				&& driveX > Constants.FieldConstants.kBlueAllianceLine.getX()) {
 			// Change target for shuttling
-			if(alliance == Alliance.Red){
+			if (alliance == Alliance.Red) {
 				hubPose2d = Constants.FieldConstants.kRedPassTargetRight;
-			}else{
+			} else {
 				hubPose2d = Constants.FieldConstants.kBluePassTargetRight;
 			}
 
 			// Adjust target to left or right side
-			if((driveSubsystem.getPose().getTranslation().getY() < Constants.FieldConstants.kCenterLine && currentAim.get().equals(AimState.AUTOMATIC)) || currentAim.get().equals(AimState.LEFT)){
+			if ((driveSubsystem.getPose().getTranslation().getY() < Constants.FieldConstants.kCenterLine
+					&& currentAim.get().equals(AimState.AUTOMATIC)) || currentAim.get().equals(AimState.LEFT)) {
 				hubPose2d = Constants.FieldConstants.flipPoseY(hubPose2d);
 			}
 		}
 
+		// Move the turret to the calculated position.
 		turretSubsystem.moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
 				-1 * hubPose2d.relativeTo(currentRobotPose2d).getTranslation().getAngle().getDegrees())));
 
+		// Lower the hood if near the trench.
 		if ((driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(157)
 				&& driveSubsystem.getPose().getTranslation().getX() < Units.inchesToMeters(205))
 				|| (driveSubsystem.getPose().getTranslation().getX() > Units.inchesToMeters(444)
@@ -81,6 +79,7 @@ public class AimCommand extends Command {
 					Math.max(ShooterAngleConstants.kMin, ShooterAngleConstants.kMax))));
 
 		} else {
+			// Otherwise move the hood to the calculated position.
 			shooterHoodSubsystem.moveToPosition((Math.min(ShooterAngleConstants.kMax,
 					Math.max(ShooterAngleConstants.kMin, turretSubsystem.getHoodAngle()))));
 		}

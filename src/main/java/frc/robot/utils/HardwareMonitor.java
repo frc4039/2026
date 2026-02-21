@@ -117,6 +117,7 @@ public class HardwareMonitor implements AutoCloseable, Sendable {
 				for (int bit = 0; bit < 15; bit++) {
 					if (((faults >> bit) & 1) != 0) {
 						errors.add(device.getFaults().toString());
+						break;
 					}
 				}
 			}

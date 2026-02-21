@@ -43,6 +43,8 @@ public class DriveSubsystem extends SubsystemBase {
 		public static final double kMaxSpeedMetersPerSecond = 3.75; // was 5.0 //Keep Lower Than Real Max
 		public static final double kMaxAngularSpeed = Helpers.isBabycakes() ? (1.35 * Math.PI) : (1.8 * Math.PI); // radians per second for turning
 
+		public static final double kLatencyOffset = 0.3;
+
 		public static final double kAimP = 1.8;
 		public static final double kAimI = 0;
 		public static final double kAimD = 0;
@@ -120,8 +122,8 @@ public class DriveSubsystem extends SubsystemBase {
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double m_currentRotation = 0.0;
-	private double m_currentTranslationDir = 0.0;
-	private double m_currentTranslationMag = 0.0;
+	// private double m_currentTranslationDir = 0.0;
+	// private double m_currentTranslationMag = 0.0;
 
 	// Odometry class for tracking robot pose
 	public static SwerveDrivePoseEstimator m_poseEstimator;

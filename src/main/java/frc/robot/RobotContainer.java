@@ -17,7 +17,9 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
@@ -26,7 +28,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AimCommand;
+import frc.robot.commands.AutoIntakeStopCommand;
+import frc.robot.commands.AutoSpinUpCommand;
+import frc.robot.commands.AutoSpinUpStopCommand;
+import frc.robot.commands.AutoSpindexerFeedCommand;
+import frc.robot.commands.AutoSpindexerFeedStopCommand;
 import frc.robot.commands.FeederCommand;
+import frc.robot.commands.HoodGoToZeroPositionComand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.IntakeOutCommand;
 import frc.robot.commands.IntakeShimmyCommand;
@@ -90,9 +98,8 @@ public class RobotContainer {
 	public RobotContainer() {
 		// Configure the trigger bindings
 
-	NamedCommands.registerCommand("Shoot", new ShootCommand(shooterSubsystem));
 	NamedCommands.registerCommand("StartIntake", new IntakeCommand(intakeSubsystem,true));
-	NamedCommands.registerCommand("StopIntake", new AutoStopIntakeCommand(intakeSubsystem));
+	NamedCommands.registerCommand("StopIntake", new AutoIntakeStopCommand(intakeSubsystem));
 	NamedCommands.registerCommand("SpindexerFeed", new AutoSpindexerFeedCommand(spindexerSubsystem, turretFeederSubsystem, shooterSubsystem, turretSubsystem));
 	NamedCommands.registerCommand("StopSpindexerFeed", new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
 	NamedCommands.registerCommand("ShooterSpinUp", new AutoSpinUpCommand(shooterSubsystem, turretSubsystem));
@@ -204,7 +211,7 @@ public class RobotContainer {
 		// operator.b().onTrue(new InstantCommand(() ->
 		// shooterHoodSubsystem.resetTurret()).ignoringDisable(true));
 
-		// operator.povUp().onTrue(new MoveHubTargetCommand("up",
+		//operator.povUp().onTrue(new MoveHubTargetCommand("up"));
 		// turretSubsystem).ignoringDisable(true));
 		// operator.povDown().onTrue(new MoveHubTargetCommand("down",
 		// turretSubsystem).ignoringDisable(true));

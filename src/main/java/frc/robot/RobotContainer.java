@@ -47,6 +47,8 @@ import frc.robot.subsystems.TurretSubsystem.AimState;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.utils.HardwareMonitor;
 import frc.robot.utils.Helpers;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -62,7 +64,7 @@ public class RobotContainer {
 	private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem(hardwareMonitor);
 	private final DriveSubsystem driveSubsystem = new DriveSubsystem(hardwareMonitor);
 	private final TurretSubsystem turretSubsystem = new TurretSubsystem(driveSubsystem, hardwareMonitor);
-	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem);
+	private final VisionSubsystem visionSubsystem = new VisionSubsystem(driveSubsystem, turretSubsystem, hardwareMonitor);
 	private final FeederSubsystem turretFeederSubsystem = new FeederSubsystem(hardwareMonitor);
 	private final ShooterHoodSubsystem shooterHoodSubsystem = new ShooterHoodSubsystem();
 	private final SpindexerSubsystem spindexerSubsystem = new SpindexerSubsystem(hardwareMonitor);
@@ -96,6 +98,7 @@ public class RobotContainer {
 		SmartDashboard.putData(intakeSlideSubsystem);
 
 		hardwareMonitor.registerDevice(null, driver);
+		hardwareMonitor.registerDevice(null, new PowerDistribution(1, ModuleType.kRev));
 		SmartDashboard.putData("Hardware Errors", hardwareMonitor);
 		SmartDashboard.putData(CommandScheduler.getInstance());
 

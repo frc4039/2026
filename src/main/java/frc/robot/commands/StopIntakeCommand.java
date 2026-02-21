@@ -17,6 +17,7 @@ public class StopIntakeCommand extends Command {
 
 	@Override
 	public void initialize() {
+		//Stops the Intake
 		intakeSubsystem.stopMotor();
 	}
 

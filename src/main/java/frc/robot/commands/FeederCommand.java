@@ -11,8 +11,8 @@ public class FeederCommand extends Command {
 	private ShooterSubsystem shooterSubsystem;
 	private TurretSubsystem turretSubsystem;
 
-	public 
-	FeederCommand(ShooterSubsystem shooterSubsystem, TurretSubsystem turretSubsystem, FeederSubsystem turretFeederSubsystem, Boolean reverseMotor) {
+	public FeederCommand(ShooterSubsystem shooterSubsystem, TurretSubsystem turretSubsystem,
+			FeederSubsystem turretFeederSubsystem, Boolean reverseMotor) {
 		addRequirements(turretFeederSubsystem);
 		this.turretFeederSubsystem = turretFeederSubsystem;
 		this.reverseMotor = reverseMotor;
@@ -22,21 +22,21 @@ public class FeederCommand extends Command {
 
 	@Override
 	public void initialize() {
-
 	}
 
 	@Override
 	public void execute() {
-		
-		if(Math.abs(shooterSubsystem.getShooterError()) < 5 && Math.abs(turretSubsystem.getTurretError()) < 5) {
-		if (reverseMotor) {
-			turretFeederSubsystem.feed(true);
+		// Shoot if the turret is at the right angle and the shooter is at the right
+		// speed.
+		if (Math.abs(shooterSubsystem.getShooterError()) < 5 && Math.abs(turretSubsystem.getTurretError()) < 5) {
+			if (reverseMotor) {
+				turretFeederSubsystem.feed(true);
+			} else {
+				turretFeederSubsystem.feed(false);
+			}
 		} else {
-			turretFeederSubsystem.feed(false);
+			turretFeederSubsystem.stop();
 		}
-	} else {
-		turretFeederSubsystem.stop();
-	}
 	}
 
 	@Override

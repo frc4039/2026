@@ -17,11 +17,8 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 public class ShooterSubsystem extends SubsystemBase {
 	public final class ShooterConstants {
@@ -48,7 +45,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private double manualVelocity = 10.0;
 
 	private VoltageOut voltRequest = new VoltageOut(0.0);
-	private SysIdRoutine sysid = new SysIdRoutine(
+	/*private SysIdRoutine sysid = new SysIdRoutine(
 			new SysIdRoutine.Config(
 				Volts.of(0.5).per(Second),
 				Volts.of(4),
@@ -59,14 +56,16 @@ public class ShooterSubsystem extends SubsystemBase {
 					(volts) -> shooterLeaderMotor.setControl(voltRequest.withOutput(volts.in(Volts))),
 					null,
 					this));
-
+	*/
 	public ShooterSubsystem() {
+		//Defines and configs motors
 		shooterLeaderMotor = new TalonFX(ShooterConstants.kLeaderMotorID);
 		shooterFollowerMotor = new TalonFX(ShooterConstants.kFollowerMotorID);
 
 		shooterLeaderMotor.setNeutralMode(NeutralModeValue.Coast);
 		shooterFollowerMotor.setNeutralMode(NeutralModeValue.Coast);
 
+		//Sets motor to follow all the movements of the leader
 		var follower = new Follower(ShooterConstants.kLeaderMotorID, MotorAlignmentValue.Opposed);
 
 		shooterFollowerMotor.setControl(follower);
@@ -86,6 +85,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		slotConfigs.kI = ShooterConstants.kIShooter;
 		slotConfigs.kD = ShooterConstants.kDShooter;
 
+		//Apply configs
 		shooterLeaderMotor.getConfigurator().apply(talonFXConfigs);
 
 		// SmartDashboard.putData("ShooterSubsystem/Start Logging", Commands.runOnce(SignalLogger::start));
@@ -98,6 +98,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
 	public void shoot(Boolean forward) {
+		//Shoots based off direction. Voltage is preDefined with constant
 		final VelocityVoltage request = new VelocityVoltage(ShooterConstants.KMotorVelocity).withSlot(0);
 
 		if (forward) {
@@ -108,11 +109,13 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
 	public void shootInput(double velocity) {
+		//Shoots based off voltage
 		final VelocityVoltage request = new VelocityVoltage(velocity).withSlot(0);
 		shooterLeaderMotor.setControl(request.withVelocity(velocity));
 	}
 
 	public void manualVelocity() {
+		//Sets the leader motors velocity
 		final VelocityVoltage request = new VelocityVoltage(manualVelocity).withSlot(0);
 		shooterLeaderMotor.setControl(request.withVelocity(manualVelocity));
 	}
@@ -122,6 +125,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
 	public double getShooterError() {
+		//Returns the difference of the velocity it should be at and the velocity it is currently at
 		return shooterLeaderMotor.getClosedLoopError().getValueAsDouble();
 	}
 
@@ -132,6 +136,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
 	@Override
 	public void initSendable(SendableBuilder builder) {
+		//Sends values to elastic
 		builder.addDoubleProperty("Shooter speed", () -> shooterLeaderMotor.getVelocity().getValueAsDouble(), null);
 		builder.addDoubleProperty("Shooter acceleration", () -> shooterLeaderMotor.getAcceleration().getValueAsDouble(),
 				null);

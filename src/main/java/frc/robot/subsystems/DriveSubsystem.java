@@ -122,8 +122,8 @@ public class DriveSubsystem extends SubsystemBase {
 
 	// Slew rate filter variables for controlling lateral acceleration
 	private double m_currentRotation = 0.0;
-	private double m_currentTranslationDir = 0.0;
-	private double m_currentTranslationMag = 0.0;
+	// private double m_currentTranslationDir = 0.0;
+	// private double m_currentTranslationMag = 0.0;
 
 	// Odometry class for tracking robot pose
 	public static SwerveDrivePoseEstimator m_poseEstimator;

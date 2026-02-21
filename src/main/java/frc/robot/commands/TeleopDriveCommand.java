@@ -4,12 +4,9 @@
 
 package frc.robot.commands;
 
-import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.DriveSubsystem;
@@ -60,8 +57,6 @@ public class TeleopDriveCommand extends Command {
 			DoubleSupplier ySpeedSupplier,
 			DoubleSupplier rotSpeedSupplier) {
 		this(driveSubsystem, xSpeedSupplier, ySpeedSupplier, rotSpeedSupplier, () -> {
-			Optional<Alliance> currentAlliance = DriverStation.getAlliance();
-
 			return 0.0;
 		});
 	}

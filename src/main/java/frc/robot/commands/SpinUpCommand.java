@@ -4,10 +4,13 @@
 
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.TurretSubsystem.AimState;
 import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -17,10 +20,12 @@ public class SpinUpCommand extends Command {
   private final ShooterSubsystem shooterSubsystem;
   private final TurretSubsystem turretSubsystem;
   private double multiplier;
-  public SpinUpCommand(ShooterSubsystem shooterSubsystem, TurretSubsystem turretSubsystem) {
+  private Supplier<AimState> currentAim;
+  public SpinUpCommand(ShooterSubsystem shooterSubsystem, TurretSubsystem turretSubsystem, Supplier<AimState> currentAim) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.shooterSubsystem = shooterSubsystem; 
     this.turretSubsystem = turretSubsystem;
+    this.currentAim = currentAim;
    
 
     shootingEstimator.put(4.208, 15.0);

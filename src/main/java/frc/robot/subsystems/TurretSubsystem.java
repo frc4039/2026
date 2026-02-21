@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -21,6 +22,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.utils.HardwareMonitor;
 
@@ -290,6 +292,34 @@ public class TurretSubsystem extends SubsystemBase {
 		return (Math.abs((this.getTurretPosition()) - (turretMotor.getClosedLoopReference().getValueAsDouble())) < 2);
 	}
 
+	//TODO: make this work
+	public void getShooterRpm(Supplier<AimState> currentAim) {
+		Pose2d currentRobotPose2d = driveSubsystem.getShootOnTheFlyPose2d().plus(TurretConstants.kTurretOffset);
+		Pose2d hubPose2d = TurretSubsystem.getHub();
+
+		// Get the current alliance
+		Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+		double veloX = driveSubsystem.getDistanceFromHub() / TurretConstants.kTimeOfFlight;
+		
+		double driveX = driveSubsystem.getPose().getTranslation().getX();
+
+		// Check if in neutral zone for shuttling.
+		if (driveX < Constants.FieldConstants.kRedAllianceLine.getX()
+				&& driveX > Constants.FieldConstants.kBlueAllianceLine.getX()) {
+			// Change target for shuttling
+			if (alliance == Alliance.Red) {
+				hubPose2d = Constants.FieldConstants.kRedPassTargetRight;
+			} else {
+				hubPose2d = Constants.FieldConstants.kBluePassTargetRight;
+			}
+
+			// Adjust target to left or right side
+			if ((driveSubsystem.getPose().getTranslation().getY() < Constants.FieldConstants.kCenterLine
+					&& currentAim.get().equals(AimState.AUTOMATIC)) || currentAim.get().equals(AimState.LEFT)) {
+				hubPose2d = Constants.FieldConstants.flipPoseY(hubPose2d);
+			}
+		}
+	}
 	@Override
 	public void periodic() {
 		// For safety, stop the turret whenever the robot is disabled.

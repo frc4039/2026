@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    CommandScheduler.getInstance().schedule(new AimCommand(m_robotContainer.turretSubsystem, m_robotContainer.driveSubsystem, m_robotContainer.shooterHoodSubsystem, () -> m_robotContainer.currentAimState).alongWith(new SpinUpCommand(m_robotContainer.shooterSubsystem, m_robotContainer.turretSubsystem)));
+    CommandScheduler.getInstance().schedule(new AimCommand(m_robotContainer.turretSubsystem, m_robotContainer.driveSubsystem, m_robotContainer.shooterHoodSubsystem, () -> m_robotContainer.currentAimState).alongWith(new SpinUpCommand(m_robotContainer.shooterSubsystem, m_robotContainer.turretSubsystem, () -> m_robotContainer.currentAimState)));
   }
 
   /** This function is called periodically during operator control. */

@@ -20,27 +20,27 @@
         "y": 6.064145249147632
       },
       "prevControl": {
-        "x": 1.8542274402631351,
-        "y": 5.8240062725170825
+        "x": 1.9110009078329675,
+        "y": 5.814470497462849
       },
       "nextControl": {
-        "x": 1.9932709140809632,
-        "y": 6.304284225778182
+        "x": 1.9364974465111304,
+        "y": 6.313820000832416
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.923749177172049,
+        "x": 1.7925197987732036,
         "y": 6.345590976760767
       },
       "prevControl": {
-        "x": 1.6737644729421302,
+        "x": 1.5425350945432847,
         "y": 6.348356415438448
       },
       "nextControl": {
-        "x": 2.173733881401967,
+        "x": 2.0425045030031215,
         "y": 6.342825538083086
       },
       "isLocked": false,
@@ -99,11 +99,22 @@
           "name": "SpindexerFeed"
         }
       }
+    },
+    {
+      "name": "Aim",
+      "waypointRelativePos": 0.0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "Aim"
+        }
+      }
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

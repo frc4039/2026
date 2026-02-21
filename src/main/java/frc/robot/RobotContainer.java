@@ -103,7 +103,7 @@ public class RobotContainer {
 	NamedCommands.registerCommand("StopSpindexerFeed", new AutoSpindexerFeedStopCommand(spindexerSubsystem, turretFeederSubsystem));
 	NamedCommands.registerCommand("ShooterSpinUp", new AutoSpinUpCommand(shooterSubsystem, turretSubsystem));
 	NamedCommands.registerCommand("ShooterStopSpinUp", new AutoSpinUpStopCommand(shooterSubsystem));
-	NamedCommands.registerCommand("Aim", new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem,() -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem)));
+	NamedCommands.registerCommand("Aim", new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem,() -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem, () -> currentAimState)));
 	NamedCommands.registerCommand("Retract Hood", new HoodGoToZeroPositionComand(shooterHoodSubsystem));
 	NamedCommands.registerCommand("Wait", new WaitCommand(5));
 	NamedCommands.registerCommand("IntakeOut", new IntakeOutCommand(intakeSubsystem, intakeSlideSubsystem));
@@ -179,7 +179,7 @@ public class RobotContainer {
 			.onFalse(new MoveIntakeSlideCommand(intakeSlideSubsystem, IntakeSlideSubsystemConstants.kOutPosition));
 
 		driver.x().whileTrue(new ManualVelocityCommand(shooterSubsystem).alongWith(new InstantCommand(() -> shooterHoodSubsystem.moveToPosition(65)).alongWith(new InstantCommand(() -> turretSubsystem.moveToPosition(180)))));
-		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, () -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem)));
+		driver.a().onTrue(new AimCommand(turretSubsystem, driveSubsystem, shooterHoodSubsystem, () -> currentAimState).alongWith(new SpinUpCommand(shooterSubsystem, turretSubsystem, () -> currentAimState)));
 
 		// Robot centric driving
 		

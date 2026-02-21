@@ -185,10 +185,10 @@ public class RobotContainer {
 		// turretSubsystem).ignoringDisable(true));
 		// operator.povRight().onTrue(new MoveHubTargetCommand("right",
 		// turretSubsystem).ignoringDisable(true));
-		operator.povUp().onTrue(new MoveHubTargetCommand("up", turretSubsystem).ignoringDisable(true));
-		operator.povDown().onTrue(new MoveHubTargetCommand("down", turretSubsystem).ignoringDisable(true));
-		operator.povLeft().onTrue(new MoveHubTargetCommand("left", turretSubsystem).ignoringDisable(true));
-		operator.povRight().onTrue(new MoveHubTargetCommand("right", turretSubsystem).ignoringDisable(true));
+		operator.povUp().onTrue(new MoveHubTargetCommand("up").ignoringDisable(true));
+		operator.povDown().onTrue(new MoveHubTargetCommand("down").ignoringDisable(true));
+		operator.povLeft().onTrue(new MoveHubTargetCommand("left").ignoringDisable(true));
+		operator.povRight().onTrue(new MoveHubTargetCommand("right").ignoringDisable(true));
 	}
 
 }

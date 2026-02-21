@@ -11,11 +11,9 @@ import frc.robot.subsystems.TurretSubsystem;
 public class MoveHubTargetCommand extends Command {
   /** Creates a new MoveHubTargetCommand. */
   private String direction;
-  private TurretSubsystem turretSubsystem;
-  public MoveHubTargetCommand(String direction, TurretSubsystem turretSubsystem) {
+  public MoveHubTargetCommand(String direction) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.direction = direction;
-    this.turretSubsystem = turretSubsystem;
   }
 
   // Called when the command is initially scheduled.

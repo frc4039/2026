@@ -15,14 +15,12 @@ public class SpinUpCommand extends Command {
   private InterpolatingDoubleTreeMap shootingEstimator = new InterpolatingDoubleTreeMap();
   private final ShooterSubsystem shooterSubsystem;
   private final TurretSubsystem turretSubsystem;
+  private double multiplier;
   public SpinUpCommand(ShooterSubsystem shooterSubsystem, TurretSubsystem turretSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.shooterSubsystem = shooterSubsystem; 
     this.turretSubsystem = turretSubsystem;
-    // shootingEstimator.put(7.517, 27.0);
-		// shootingEstimator.put(7.77, 31.0);
-		// shootingEstimator.put(8.24, 35.5);
-		// shootingEstimator.put(7.39, 24.0);
+   
 
     shootingEstimator.put(4.208, 15.0);
 		shootingEstimator.put(4.757, 17.0);
@@ -39,11 +37,6 @@ public class SpinUpCommand extends Command {
     shootingEstimator.put(9.405, 39.0);
     shootingEstimator.put(9.779, 41.0);
     shootingEstimator.put(10.295, 43.0);
-
-
-
-
-
   }
 
   // Called when the command is initially scheduled.
@@ -53,7 +46,13 @@ public class SpinUpCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double shootingSpeed = (shootingEstimator.get(turretSubsystem.getOutputVelocity())) * 1.02;
+    if(turretSubsystem.getOutputVelocity() > 8) {
+      multiplier = 1.03;
+    } else {
+      multiplier = 1.0;
+    }
+
+    double shootingSpeed = (shootingEstimator.get(turretSubsystem.getOutputVelocity())) * multiplier;
 		shooterSubsystem.shootInput(shootingSpeed);
   }
 

@@ -11,7 +11,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 
 public class ShooterHoodSubsystem extends SubsystemBase{
     
@@ -32,8 +31,10 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 		public static final double kAcceleration = 1440.0 / kDegreesPerRotation;
 		public static final double kJerk = 10000.0 / kDegreesPerRotation;
 
+		//Threshold for error when moving hood so there is not constant microadjustments
 		public static final double angleThreshold = 0.5;
 
+		//Translates Hood position to real life position
 		public static final double kHoodOffset = 75;
 
 		//Hard limits for hood angle
@@ -44,20 +45,24 @@ public class ShooterHoodSubsystem extends SubsystemBase{
     private TalonFX hoodMotor;
 
     public ShooterHoodSubsystem(){
+		//Motor configs and Declarations
         hoodMotor = new TalonFX(ShooterAngleConstants.motorId);
         hoodMotor.setNeutralMode(NeutralModeValue.Coast);
 		
 
         MotorOutputConfigs mcfg = new MotorOutputConfigs();
 
+		//Inverts motor
 		mcfg.withInverted(InvertedValue.CounterClockwise_Positive);
 		mcfg.withNeutralMode(NeutralModeValue.Coast);
 
+		//Applies configs and limits current (amps) in the motor
 		TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration().withMotorOutput(mcfg);
 		talonFXConfigs.CurrentLimits.StatorCurrentLimit = 15;
 		talonFXConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
 		Slot0Configs slotConfigs = talonFXConfigs.Slot0;
 
+		//Feedforward and Pid configs
 		slotConfigs.kS = ShooterAngleConstants.kSAngle;
 		slotConfigs.kV = ShooterAngleConstants.kVAngle;
 		slotConfigs.kA = ShooterAngleConstants.kAAngle;     
@@ -65,12 +70,14 @@ public class ShooterHoodSubsystem extends SubsystemBase{
 		slotConfigs.kI = ShooterAngleConstants.kIAngle;
 		slotConfigs.kD = ShooterAngleConstants.kDAngle;
 
+		//Control system 
 		MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
 
 		motionMagicConfigs.MotionMagicCruiseVelocity = ShooterAngleConstants.kCruiseVelocity;
 		motionMagicConfigs.MotionMagicAcceleration = ShooterAngleConstants.kAcceleration;
 		motionMagicConfigs.MotionMagicJerk = ShooterAngleConstants.kJerk;
 
+		//Apply configs
 		hoodMotor.getConfigurator().apply(talonFXConfigs);
     }
 

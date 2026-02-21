@@ -72,17 +72,30 @@ public class TurretSubsystem extends SubsystemBase {
 		public static final double kMin = -180;
 		public static final double kMax = 180;
 
+		//Hub Height for the Projectile motion
 		public static final double kHubTargetHeight = 1.4351;
+
+		//Turret Height for Math
 		public static final double kTurretHeight = 0.5;
+
+		//Difference between the turret and hub on the vertical axis
 		public static final double kDeltaZ = kHubTargetHeight - kTurretHeight;
+
+		//Velocity on the up direction
 		public static final double kVelocityZ = 7.3;
+
+		//Calculations for time of flight based on the z Veloctiy and deltaZ
 		public static final double kTimeOfFlight = (kVelocityZ
 				+ Math.sqrt(Math.pow(kVelocityZ, 2) - (2 * 9.81 * kDeltaZ))) / 9.81;
+
+		//Circumference of the shooter wheel
 		public static final double kShooterWheelCircumference = Units.inchesToMeters(4 * Math.PI);
 
+		//Maximum amount the Operator can offset the hub also how much each offset is by
 		public static final double kManualChangeLimit = Units.inchesToMeters(18);
 		public static final double kManualChangeAmount = Units.inchesToMeters(3);
 
+		//Acounts for offset when driving quickly
 		public static final double kLatencyOffset = 0.1;
 	}
 
@@ -154,6 +167,7 @@ public class TurretSubsystem extends SubsystemBase {
 		// SmartDashboard.putData("Turret Subsystem/Dynamic Backward", sysid.dynamic(Direction.kReverse));
 	}
 
+	//Moves to a given position
 	public void moveToPosition(double position) {
 		final MotionMagicVoltage request = new MotionMagicVoltage(position);
 
@@ -164,10 +178,12 @@ public class TurretSubsystem extends SubsystemBase {
 				.withOverrideBrakeDurNeutral(true));
 	}
 
+	//Resets the turret to zero
 	public void resetTurret() {
 		turretMotor.setPosition(0.0 / TurretConstants.kDegreesPerRotation);
 	}
 
+	//Returns the position of the turret
 	public double getTurretPosition() {
 		return turretMotor.getPosition().getValueAsDouble() * TurretConstants.kDegreesPerRotation;
 	}
@@ -177,6 +193,7 @@ public class TurretSubsystem extends SubsystemBase {
 		this.moveToPosition((owlHeadPosition % 360 + 360) % 360);
 	}
 
+	//Command for operator to change the location of the hub
 	public static Transform2d changeTargetLocation(String direction) {
 		Optional<Alliance> alliance = DriverStation.getAlliance();
 		
@@ -214,7 +231,7 @@ public class TurretSubsystem extends SubsystemBase {
 	}
 
 	
-
+	//Returns the pose of the hub
 	public static Pose2d getHub() {
 		Optional<Alliance> alliance = DriverStation.getAlliance();
 		if (alliance.isPresent()) {
@@ -227,23 +244,28 @@ public class TurretSubsystem extends SubsystemBase {
 		return FieldConstants.kRedHub.plus(changeTargetLocation("67"));
 	}
 
+	//Stops the turret motor
 	public void stopMotor() {
 		turretMotor.stopMotor();
 		System.out.println("Trying to disable turret motor");
 	}
 
+	//Velocity needed in the x direction to reach the hub
 	public double getXVelocity() {
 		return driveSubsystem.getDistanceFromHub() / TurretConstants.kTimeOfFlight;
 	}
 
+	//Returns the output velocity for the wheels
 	public double getOutputVelocity() {
 		return Math.sqrt(Math.pow(this.getXVelocity(), 2) + Math.pow(TurretConstants.kVelocityZ, 2));
 	}
 
+	//Returns the angle the hood needs to hit a shot
 	public double getHoodAngle() {
 		return Units.radiansToDegrees(Math.atan2(TurretConstants.kVelocityZ, getXVelocity()));
 	}
 
+	//Returns the Pose of the turret
 	public Pose2d getTurretPose() {
 		return driveSubsystem.getPose()
 				.plus(TurretConstants.kTurretOffset)
@@ -252,10 +274,12 @@ public class TurretSubsystem extends SubsystemBase {
 						Rotation2d.fromDegrees(-1 * this.getTurretPosition())));
 	}
 
+	//Runs the turret at a set power
 	public void runTurretPercentage(double power) {
 		turretMotor.set(power);
 	}
 
+	//Returns the difference between the Turret's goal and its current position
 	public double getTurretError() {
 		return turretMotor.getClosedLoopError().getValueAsDouble();
 	}
@@ -265,6 +289,7 @@ public class TurretSubsystem extends SubsystemBase {
 		// For safety, stop the turret whenever the robot is disabled.
 	}
 
+	//Data for the Dashboard
 	@Override
 	public void initSendable(SendableBuilder builder) {
 		builder.addDoubleProperty("Turret encoder degrees", () -> getTurretPosition(), null);

@@ -1,20 +1,14 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.utils.HardwareMonitor;
-import frc.robot.utils.Helpers;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Minute;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -28,16 +22,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.FeedbackSensor;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.FeedForwardConfig;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 
 public class SpindexerSubsystem extends SubsystemBase {
 	// Constants of the feeder subsystem
@@ -47,6 +32,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 		// RPS: gear ratio 3:!
 		public static final double kSpindexerSpeed = -200;
 
+		//FeedForward and PID Constants
 		public static final double kSpindexerWheelP = 0.021206;
 		public static final double kSpindexerWheelI = 0.0;
 		public static final double kSpindexerWheelD = 0.0;
@@ -59,6 +45,8 @@ public class SpindexerSubsystem extends SubsystemBase {
 
 	private TalonFX spindexerMotor;
 	private VoltageOut voltRequest = new VoltageOut(0.0);
+	//Test to get ideal feed forward values
+	/* 
 	private SysIdRoutine sysid = new SysIdRoutine(
 			new SysIdRoutine.Config(
 				Volts.of(0.5).per(Second),
@@ -70,8 +58,9 @@ public class SpindexerSubsystem extends SubsystemBase {
 					(volts) -> spindexerMotor.setControl(voltRequest.withOutput(volts.in(Volts))),
 					null,
 					this));
-
+	*/
 	public SpindexerSubsystem(HardwareMonitor hardwareMonitor) {
+		//Defines the motor and configs it
 		spindexerMotor = new TalonFX(SpindexerConstants.kSpindexerMotorId);
 
 		spindexerMotor.setNeutralMode(NeutralModeValue.Coast);
@@ -96,10 +85,10 @@ public class SpindexerSubsystem extends SubsystemBase {
 
 		hardwareMonitor.registerDevice(this, spindexerMotor);
 
-		SmartDashboard.putData("SpindexerSubsystem/QuasiStatic Forward",sysid.quasistatic(Direction.kForward));
-		SmartDashboard.putData("SpindexerSubsystem/QuasiStatic Backward",sysid.quasistatic(Direction.kReverse));
-		SmartDashboard.putData("SpindexerSubsystem/Dynamic Forward",sysid.dynamic(Direction.kForward));
-		SmartDashboard.putData("SpindexerSubsystem/Dynamic Backward",sysid.dynamic(Direction.kReverse));
+		//SmartDashboard.putData("SpindexerSubsystem/QuasiStatic Forward",sysid.quasistatic(Direction.kForward));
+		//SmartDashboard.putData("SpindexerSubsystem/QuasiStatic Backward",sysid.quasistatic(Direction.kReverse));
+		//SmartDashboard.putData("SpindexerSubsystem/Dynamic Forward",sysid.dynamic(Direction.kForward));
+		//SmartDashboard.putData("SpindexerSubsystem/Dynamic Backward",sysid.dynamic(Direction.kReverse));
 		SmartDashboard.putData("ShooterSubsystem/Start Logging", Commands.runOnce(SignalLogger::start));
 		SmartDashboard.putData("ShooterSubsystem/Stop Logging", Commands.runOnce(SignalLogger::stop));
 		
@@ -137,6 +126,7 @@ public class SpindexerSubsystem extends SubsystemBase {
 
 	@Override
 	public void initSendable(SendableBuilder builder) {
+		//Sends Spindexers speed to elastic 
 		builder.addDoubleProperty("Spindexer speed", () -> spindexerMotor.getVelocity().getValueAsDouble(), null);
 	}
 

@@ -8,6 +8,7 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.TurretSubsystem.TurretConstants;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SpinUpCommand extends Command {
@@ -46,7 +47,14 @@ public class SpinUpCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(turretSubsystem.getOutputVelocity() > 8) {
+    //this should lower the velocity when close to the hub to account for the fact that the hood cant get low enough, CloseShotThreshold is 0 for now
+    if(turretSubsystem.getOutputVelocity() > TurretConstants.kCloseShotThreshold && turretSubsystem.getOutputVelocity() < 7.5) {
+      multiplier = 0.90;
+    }
+    else if(turretSubsystem.getOutputVelocity() < TurretConstants.kCloseShotThreshold) {
+      multiplier = 0.80;
+    } 
+    else if(turretSubsystem.getOutputVelocity() > 7.8) {
       multiplier = 1.03;
     } else {
       multiplier = 1.0;

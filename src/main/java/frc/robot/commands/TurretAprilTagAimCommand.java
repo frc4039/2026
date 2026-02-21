@@ -39,6 +39,8 @@ public class TurretAprilTagAimCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    //Gets the angle that the robot is offset from the hub and moves the turret to the opposite one
     Pose2d currentRobotPose2d = driveSubsystem.getPose().plus(TurretConstants.kTurretOffset);
     Pose2d hubPose2d = TurretSubsystem.getHub();
   turretSubsystem.moveToPosition(Math.min(TurretConstants.kMax, Math.max(TurretConstants.kMin,
